@@ -251,6 +251,15 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
   scene.add(sun, sun.target);
   const headlamp = new THREE.SpotLight(0xfff1d6, 0, 260, 0.42, 0.55, 1.2);
   scene.add(headlamp, headlamp.target);
+  const platformFill = new THREE.DirectionalLight(0xbcdcff, 0);
+  platformFill.position.set(-0.45, 0.72, 0.48);
+  scene.add(platformFill);
+  const trainRim = new THREE.DirectionalLight(0x8fb7ff, 0);
+  trainRim.position.set(0.78, 0.46, -0.52);
+  scene.add(trainRim);
+  const trackGlow = new THREE.PointLight(0x7fe8ff, 0, 75, 2);
+  trackGlow.position.set(0, 5.5, 24);
+  scene.add(trackGlow);
 
   /* ── Sky ── */
   const skyUniforms = {
@@ -1576,7 +1585,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     const el = THREE.MathUtils.degToRad(Math.max(elev, -10));
     sunDir.set(Math.cos(el) * Math.sin(az), Math.sin(el), -Math.cos(el) * Math.cos(az)).normalize();
     skyUniforms.uSunDir.value.copy(sunDir);
-    const nightLight = world === 'space' || world === 'moon' ? 0.6 : 0.12;
+    const nightLight = world === 'space' || world === 'moon' ? 0.6 : 0.24;
     sun.intensity = lerp(nightLight, 2.6, day) * (sky.weather === 'overcast' || sky.weather === 'rain' || sky.weather === 'storm' ? 0.45 : 1);
     sun.color.set(pal.disc).lerp(new THREE.Color(0xffffff), 0.5);
     hemi.color.copy(cMid).lerp(new THREE.Color(0xffffff), 0.45);
@@ -1586,6 +1595,11 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
 
     const night = 1 - day;
     headlamp.intensity = night * 260;
+    const groundNight = world === 'country' ? smooth(0.18, 0.85, night) : 0;
+    platformFill.intensity = groundNight * 0.5;
+    trainRim.intensity = groundNight * 0.68;
+    trackGlow.intensity = groundNight * 42;
+    trackGlow.position.set(Math.sin(origin.h) * 16, 5.5, Math.cos(origin.h) * 16 + 18);
     const glow = night * 1.1 + 0.08;
     cars.forEach((car, i) => {
       if (!car.glass) return;
