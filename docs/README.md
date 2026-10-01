@@ -8,7 +8,7 @@ description: One train. Everyone's on it. Your bag is your seat.
 
 **Seat Railway** is a train run by one number. The train's length, the line it runs on and the world it runs through are read live from the market for its token, so the train on your screen _is_ the chart. On board are 178 seats, and they go to the biggest holders, in order.
 
-Train **SR350** · Express · [dogecoin87.github.io/seat-railway](https://dogecoin87.github.io/seat-railway/)
+Train **SR350** · Express · [seat-railway.space](https://seat-railway.space/)
 
 ## The premise
 

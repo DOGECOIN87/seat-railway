@@ -6,7 +6,7 @@ description: From zero to seated in four steps.
 
 ### 1. Open the site
 
-Go to [dogecoin87.github.io/seat-railway](https://dogecoin87.github.io/seat-railway/). The page opens on the train, full screen, running through the country with as many carriages as its market cap has earned. The split-flap board turns through the line's sayings — _Hold more, ride longer_ first. Press **Enter** to go in.
+Go to [seat-railway.space](https://seat-railway.space/). The page opens on the train, full screen, running through the country with as many carriages as its market cap has earned. The split-flap board turns through the line's sayings — _Hold more, ride longer_ first. Press **Enter** to go in.
 
 ### 2. Get the token
 

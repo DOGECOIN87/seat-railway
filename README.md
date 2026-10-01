@@ -9,7 +9,7 @@
 A train run by one number: its length, the line it runs on and the world it runs through are read live from its token's market,<br>
 so the train on your screen *is* the chart — and its 178 seats go to the biggest holders, in order.
 
-[![Ride now](https://img.shields.io/badge/ride%20now-dogecoin87.github.io%2Fseat--railway-00C9F1?style=for-the-badge&logo=googlechrome&logoColor=white)](https://dogecoin87.github.io/seat-railway/)
+[![Ride now](https://img.shields.io/badge/ride%20now-seat--railway.space-00C9F1?style=for-the-badge&logo=googlechrome&logoColor=white)](https://seat-railway.space/)
 [![Read the docs](https://img.shields.io/badge/read%20the%20docs-docs%2F-0E2E5E?style=for-the-badge&logo=gitbook&logoColor=white)](docs/README.md)
 
 [![Deploy to GitHub Pages](https://github.com/DOGECOIN87/seat-railway/actions/workflows/deploy.yml/badge.svg)](https://github.com/DOGECOIN87/seat-railway/actions/workflows/deploy.yml)
@@ -254,7 +254,7 @@ The page is a static single-page app on GitHub Pages. Anything that has to be sh
 
 ```mermaid
 flowchart LR
-    subgraph Browser["dogecoin87.github.io/seat-railway · GitHub Pages"]
+    subgraph Browser["seat-railway.space · GitHub Pages"]
         UI["React 19 + Tailwind 4<br/>the page, the seat map, the directory"]
         GL["three.js<br/>the train, the line, the five worlds"]
         UI --- GL
@@ -271,7 +271,7 @@ flowchart LR
 The train is built in [`src/three/RailWorld.ts`](src/three/RailWorld.ts) and sized by the pure functions in [`src/lib/consist.ts`](src/lib/consist.ts). The seat ladder lives in [`src/lib/seating.ts`](src/lib/seating.ts) — no browser and no Cloudflare in it — and the page and the Worker import the same file, so they cannot disagree about who sits where. → [How it is built](docs/for-developers/how-it-is-built.md) · [Engineering notes](docs/for-developers/engineering-notes.md)
 
 > [!WARNING]
-> **The Worker is shared with Seat Airlines for now**, and so is the token: the committed build reads `seat-airlines-banners.trashmarket.workers.dev`. That Worker only answers origins in its `ALLOWED_ORIGINS`, so until this site's origin is added there, the published railway shows the train and the market but no seats, adverts or directory. For a token of its own, deploy `worker/` under a new name and set `VITE_BANNERS_API`. → [Deploying](docs/for-developers/deploying.md)
+> **The Worker is shared with Seat Airlines for now**, and so is the token: the committed build reads `seat-airlines-banners.trashmarket.workers.dev`. That Worker only answers origins in its `ALLOWED_ORIGINS`, so until `https://seat-railway.space` is added there, the published railway shows the train and the market but no seats, adverts or directory. For a token of its own, deploy `worker/` under a new name and set `VITE_BANNERS_API`. → [Deploying](docs/for-developers/deploying.md)
 
 ### Quick start
 
@@ -325,7 +325,7 @@ The full list, and the Worker's bindings and secrets: [Configuration](docs/for-d
 
 | What | How |
 | :-- | :-- |
-| **The page** | Every push to `main` runs the tests, builds and publishes to GitHub Pages at [dogecoin87.github.io/seat-railway](https://dogecoin87.github.io/seat-railway/) — once Pages is turned on (**Settings → Pages → Source: GitHub Actions**). |
+| **The page** | Every push to `main` runs the tests, builds and publishes to GitHub Pages at [seat-railway.space](https://seat-railway.space/) — once Pages is turned on (**Settings → Pages → Source: GitHub Actions**). |
 | **The Worker** | Pushes that touch `worker/` type-check, test and deploy it — when the repository has a `CLOUDFLARE_API_TOKEN` secret. Give the railway's Worker a name of its own first, so it cannot replace Seat Airlines'. |
 | **A new token** | `npm run token:update -- <new CA>`: checks on-chain that it is a token mint, writes it everywhere it is printed (page, Worker, `index.html`, docs), runs the tests and a build, and pushes. `--no-push` stops before committing. |
 

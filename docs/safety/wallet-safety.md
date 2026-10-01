@@ -55,7 +55,7 @@ All three are checked by the server, and all three expire: a signature more than
 
 ## Check you are in the right place
 
-* The site is **dogecoin87.github.io/seat-railway**, and its source is [github.com/DOGECOIN87/seat-railway](https://github.com/DOGECOIN87/seat-railway).
+* The site is **seat-railway.space**, and its source is [github.com/DOGECOIN87/seat-railway](https://github.com/DOGECOIN87/seat-railway).
 * The token's contract address is on the **CA** strip at the top of the site. Compare the **whole** address before you buy — see [The token](../getting-started/the-token.md).
 
 ## What is public

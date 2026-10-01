@@ -11,11 +11,23 @@ description: The page on GitHub Pages, the Worker on Cloudflare, the token, and 
 1. **Turn Pages on first.** Repository → **Settings → Pages → Source: GitHub Actions**. Without it the workflow builds and then fails at the deploy step with a permissions error.
 2. **Configuration** goes in repository **variables**, not secrets: **Settings → Secrets and variables → Actions → Variables**. See [Configuration](configuration.md) for why.
 
-### The address
+### The domain
 
-With no `public/CNAME`, the site is published at **https://dogecoin87.github.io/seat-railway/**. The build uses relative paths (`base: './'` in `vite.config.ts`), so it works under that sub-path as it is.
+`public/CNAME` holds `seat-railway.space`, and the build copies it into `dist/`, so the custom domain survives every deploy. At the registrar:
 
-To give it a domain of its own, put the domain in `public/CNAME`, point the domain's DNS at GitHub Pages (four `A` records to `185.199.108.153`–`185.199.111.153`, and a `CNAME` for `www` to `dogecoin87.github.io.`), set **Settings → Pages → Custom domain**, and update the address in `index.html`, `public/robots.txt`, `public/sitemap.xml`, `src/lib/shareCard.ts` and `scripts/update-token.mjs`.
+| Type | Name | Value |
+| --- | --- | --- |
+| A | `@` | `185.199.108.153` |
+| A | `@` | `185.199.109.153` |
+| A | `@` | `185.199.110.153` |
+| A | `@` | `185.199.111.153` |
+| AAAA | `@` | `2606:50c0:8000::153` |
+| AAAA | `@` | `2606:50c0:8001::153` |
+| AAAA | `@` | `2606:50c0:8002::153` |
+| AAAA | `@` | `2606:50c0:8003::153` |
+| CNAME | `www` | `dogecoin87.github.io.` |
+
+Then **Settings → Pages → Custom domain → `seat-railway.space`**, wait for the DNS check, and tick **Enforce HTTPS** once it is offered.
 
 {% hint style="warning" %}
 Do **not** reuse `seat-airlines.space`: it belongs to Seat Airlines' own Pages site.
@@ -24,7 +36,7 @@ Do **not** reuse `seat-airlines.space`: it belongs to Seat Airlines' own Pages s
 ## The Worker — Cloudflare
 
 {% hint style="warning" %}
-**Seat Railway currently uses Seat Airlines' Worker** (`seat-airlines-banners.trashmarket.workers.dev`), and so the same token's holders, adverts and directory. That Worker only answers the origins in its `ALLOWED_ORIGINS`, so until `https://dogecoin87.github.io` (or the railway's own domain) is added there, the published railway shows the train and the market but **no seats, adverts or directory**. For a token of its own, the railway needs a Worker of its own — deploy `worker/` under a new name, then set `VITE_BANNERS_API` to it.
+**Seat Railway currently uses Seat Airlines' Worker** (`seat-airlines-banners.trashmarket.workers.dev`), and so the same token's holders, adverts and directory. That Worker only answers the origins in its `ALLOWED_ORIGINS`, so until `https://seat-railway.space` and `https://www.seat-railway.space` are added there, the published railway shows the train and the market but **no seats, adverts or directory**. For a token of its own, the railway needs a Worker of its own — deploy `worker/` under a new name, then set `VITE_BANNERS_API` to it.
 {% endhint %}
 
 `.github/workflows/worker.yml` runs on pushes to `main` that touch `worker/`. It type-checks and tests the Worker, and deploys it **only if** the repository has a `CLOUDFLARE_API_TOKEN` secret (with Workers Scripts, Workers KV Storage and Workers R2 Storage edit rights). Without one it stops after the tests and says so in the job summary — a green run does not by itself mean the Worker was deployed, so check the **Deploy** step.

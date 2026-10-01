@@ -402,7 +402,7 @@ export async function composeCard(shot: HTMLCanvasElement | null, f: SharedFligh
   const urlCap = capOf();
   const urlTop = H - B - urlCap;
   ctx.fillStyle = CYAN;
-  write('DOGECOIN87.GITHUB.IO/SEAT-RAILWAY', M, urlTop, urlCap);
+  write('SEAT-RAILWAY.SPACE', M, urlTop, urlCap);
   set(`800 34px ${SANS}`, 0);
   const dare = ink('Can you beat it?');
   const dareTop = urlTop - 16 - dare.down - capOf();

@@ -42,7 +42,7 @@ A blank variable counts as unset, so passing an empty repository variable throug
 | --- | --- | --- |
 | `TOKEN_MINT` | variable | The mint. Turns on the holder check for adverts and sign-in, and lets the directory tell the coaches apart. |
 | `RPC_URL` | **secret** | The Solana RPC endpoint — a Helius URL (`https://mainnet.helius-rpc.com/?api-key=…`) is recommended: the holder list is then read from Helius's `getTokenAccounts` index, far cheaper than a program scan. Unset, the Worker falls back to Solana's public endpoint, which rate-limits real traffic — set it. |
-| `ALLOWED_ORIGINS` | variable | Comma-separated origins allowed to call the Worker. Seat Airlines' production Worker allows `https://seat-airlines.space,https://www.seat-airlines.space`; for this site to use it, add `https://dogecoin87.github.io`. Empty echoes any origin — fine locally, careless in production. |
+| `ALLOWED_ORIGINS` | variable | Comma-separated origins allowed to call the Worker. Seat Airlines' production Worker allows `https://seat-airlines.space,https://www.seat-airlines.space`; for this site to use it, add `https://seat-railway.space,https://www.seat-railway.space`. Empty echoes any origin — fine locally, careless in production. |
 | `HOLDERS_URL` | variable | An indexer, optional. If set, use the same feed as the page's `VITE_HOLDERS_URL`. |
 | `MANIFEST_SIZE` | variable | Defaults to 178. Must match `VITE_MANIFEST_SIZE`. |
 | `PUBLIC_IMAGE_BASE` | variable | The R2 bucket's public URL. Without it, artwork is kept in KV and served from `/images/…`. |

@@ -8,7 +8,7 @@ Seat Railway is two deployments:
 
 | Part | What it is | Where it runs |
 | --- | --- | --- |
-| **The page** | A static single-page app: React 19, Vite, Tailwind CSS 4 and three.js | GitHub Pages, at `dogecoin87.github.io/seat-railway` |
+| **The page** | A static single-page app: React 19, Vite, Tailwind CSS 4 and three.js | GitHub Pages, at `seat-railway.space` |
 | **The Worker** | One Cloudflare Worker, `seat-airlines-banners` — for now **shared with Seat Airlines** | Cloudflare, with KV, R2 and D1 bound to it |
 
 The page reads three outside services:

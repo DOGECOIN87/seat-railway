@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://dogecoin87.github.io/seat-railway/sitemap.xml
+Sitemap: https://seat-railway.space/sitemap.xml
