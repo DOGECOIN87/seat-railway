@@ -551,12 +551,18 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
      to the tower's real size, so every floor is 3.7 m whatever its height,
      a share of them lit after dark. */
   const urbanNight = { value: 0 };
-  const towerMat = (() => {
+  /* Three facade styles, picked per tower: a grid of punched windows, long
+     ribbon windows, or tall glass between vertical fins. A tower's lowest box
+     has a lobby of glass lit at street level; an upper box (a setback) does
+     not. Tall towers' tops carry a lit crown after dark. */
+  const makeTowerMat = (upper: boolean) => {
     const m = keep(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6, metalness: 0.3 }));
+    if (upper) m.defines = { ...m.defines, TOWER_UPPER: 1 };
+    m.customProgramCacheKey = () => `tower-${upper ? 'upper' : 'base'}`;
     m.onBeforeCompile = (sh) => {
       sh.uniforms.uNight = urbanNight;
       sh.vertexShader = sh.vertexShader
-        .replace('#include <common>', '#include <common>\nvarying vec3 vFacade;\nvarying vec3 vFaceN;\nvarying float vSeed;')
+        .replace('#include <common>', '#include <common>\nvarying vec3 vFacade;\nvarying vec3 vFaceN;\nvarying float vSeed;\nvarying float vTowerH;')
         .replace('#include <begin_vertex>', `#include <begin_vertex>
           #ifdef USE_INSTANCING
             vec3 sc = vec3(length(instanceMatrix[0].xyz), length(instanceMatrix[1].xyz), length(instanceMatrix[2].xyz));
@@ -566,6 +572,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
             vSeed = 0.0;
           #endif
           vFacade = position * sc;
+          vTowerH = sc.y;
           vFaceN = normal;`);
       sh.fragmentShader = sh.fragmentShader
         .replace('#include <common>', `#include <common>
@@ -573,23 +580,53 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
           varying vec3 vFacade;
           varying vec3 vFaceN;
           varying float vSeed;
+          varying float vTowerH;
           float paneHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }`)
         .replace('#include <color_fragment>', `#include <color_fragment>
           float acrossX = step(0.5, abs(vFaceN.x));
-          vec2 cell = vec2(mix(vFacade.x, vFacade.z, acrossX) / 3.1, vFacade.y / 3.7);
-          vec2 pf = fract(cell);
+          float along = mix(vFacade.x, vFacade.z, acrossX);
           float wall = 1.0 - step(0.5, abs(vFaceN.y));
-          float pane = wall * step(0.12, pf.x) * step(pf.x, 0.88) * step(0.2, pf.y) * step(pf.y, 0.9) * step(4.5, vFacade.y);
-          vec3 glassTone = mix(vec3(0.09, 0.14, 0.2), vec3(0.3, 0.42, 0.52), paneHash(floor(cell) + vSeed * 7.0) * 0.55);
+          float style = floor(vSeed * 3.0);
+          // 0: punched grid. 1: ribbon windows, floor-long bands. 2: tall glass between fins.
+          float colW = style > 1.5 ? 1.6 : 3.1;
+          vec2 cell = vec2(along / colW, vFacade.y / 3.7);
+          vec2 pf = fract(cell);
+          vec2 lo = style > 1.5 ? vec2(0.3, 0.06) : style > 0.5 ? vec2(0.0, 0.3) : vec2(0.12, 0.2);
+          vec2 hi = style > 1.5 ? vec2(0.7, 0.97) : style > 0.5 ? vec2(1.0, 0.88) : vec2(0.88, 0.9);
+          float lobbyH = 4.5;
+          #ifdef TOWER_UPPER
+            lobbyH = 0.0;
+          #endif
+          float pane = wall * step(lo.x, pf.x) * step(pf.x, hi.x) * step(lo.y, pf.y) * step(pf.y, hi.y) * step(lobbyH, vFacade.y);
+          // Ribbon windows light by the bay, not by the band, or a whole floor would come on at once.
+          vec2 litCell = style > 0.5 && style < 1.5 ? vec2(floor(along / 3.1), cell.y) : cell;
+          vec3 glassTone = mix(vec3(0.09, 0.14, 0.2), vec3(0.3, 0.42, 0.52), paneHash(floor(litCell) + vSeed * 7.0) * 0.55);
           diffuseColor.rgb = mix(diffuseColor.rgb, glassTone, pane * 0.88);
-          float paneLit = step(0.62 - 0.3 * uNight, paneHash(floor(cell) * 1.7 + vSeed * 13.0)) * pane;`)
+          float paneLit = step(0.62 - 0.3 * uNight, paneHash(floor(litCell) * 1.7 + vSeed * 13.0)) * pane;
+          // The lobby: a storey of glass at street level, mullions every two metres, lit warm at night.
+          float lobby = 0.0;
+          #ifndef TOWER_UPPER
+            lobby = wall * step(0.4, vFacade.y) * step(vFacade.y, 4.1) * step(0.12, fract(along / 2.0));
+            diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.12, 0.15, 0.17), lobby);
+          #endif
+          // The crown: a lit band round the very top of a tall tower.
+          float crown = wall * step(vTowerH - 1.4, vFacade.y) * step(vFacade.y, vTowerH - 0.4) * step(0.55, vSeed) * step(40.0, vTowerH);
+          // Roofs: tar and gravel, darker than the walls.
+          diffuseColor.rgb *= mix(1.0, 0.55, 1.0 - wall);`)
         .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
           roughnessFactor = mix(roughnessFactor, 0.1, pane);`)
         .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-          totalEmissiveRadiance += paneLit * uNight * mix(vec3(1.0, 0.8, 0.52), vec3(0.75, 0.88, 1.0), step(0.8, paneHash(floor(cell) + 3.1))) * 1.6;`);
+          totalEmissiveRadiance += paneLit * uNight * mix(vec3(1.0, 0.8, 0.52), vec3(0.75, 0.88, 1.0), step(0.8, paneHash(floor(litCell) + 3.1))) * 1.6;
+          totalEmissiveRadiance += lobby * (0.15 + uNight) * vec3(1.0, 0.86, 0.62) * 1.3;
+          totalEmissiveRadiance += crown * uNight * mix(vec3(0.0, 0.79, 0.95), vec3(0.95, 0.97, 1.0), step(0.78, vSeed)) * 2.2;`);
     };
     return m;
-  })();
+  };
+  const towerMat = makeTowerMat(false);
+  const towerUpperMat = makeTowerMat(true);
+  /* What stands on the roofs, and on the pavements. */
+  const beaconMat = keep(new THREE.MeshBasicMaterial({ color: 0x551111, toneMapped: false }));
+  const lampHeadMat = keep(new THREE.MeshBasicMaterial({ color: 0xffe2b0, toneMapped: false }));
   const TOWER = ['#8f9aa5', '#b9b2a6', '#5d6773', '#c9ccd0', '#7c858c', '#a39a8d', '#3f4a56'].map((c) => new THREE.Color(c));
 
   /* ── Shared stock for the country ── */
@@ -606,7 +643,14 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
       geo: (() => { const g = new THREE.CylinderGeometry(0.62, 0.62, 1, 3); g.rotateZ(Math.PI / 2); g.rotateX(Math.PI / 6); g.scale(1, 0.75, 1.15); return keep(g); })(),
       mat: weathered(flat(0x8c3b2e), 0.3), cap: 140,
     },
-    tower: { geo: geoBase(new THREE.BoxGeometry(1, 1, 1), 0.5), mat: towerMat, cap: 90 },
+    tower: { geo: geoBase(new THREE.BoxGeometry(1, 1, 1), 0.5), mat: towerMat, cap: 120 },
+    towerUp: { geo: geoBase(new THREE.BoxGeometry(1, 1, 1), 0.5), mat: towerUpperMat, cap: 160 },
+    tank: { geo: geoBase(new THREE.CylinderGeometry(1, 1, 1, 12), 0.5), mat: flat(0x6b4a33), cap: 50 },
+    hvac: { geo: geoBase(new THREE.BoxGeometry(1, 1, 1), 0.5), mat: flat(0x9a9ea3), cap: 160 },
+    mast: { geo: geoBase(new THREE.CylinderGeometry(0.12, 0.3, 1, 6), 0.5), mat: flat(0x2b2e33), cap: 50 },
+    beacon: { geo: keep(new THREE.SphereGeometry(1, 8, 6)), mat: beaconMat, cap: 120 },
+    post: { geo: geoBase(new THREE.CylinderGeometry(0.09, 0.14, 1, 6), 0.5), mat: flat(0x33373d), cap: 40 },
+    lampHead: { geo: keep(new THREE.SphereGeometry(1, 8, 6)), mat: lampHeadMat, cap: 40 },
   } as const;
   type Kind = keyof typeof STOCK;
   const KINDS = Object.keys(STOCK) as Kind[];
@@ -832,7 +876,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     for (const k of KINDS) {
       const m = new THREE.InstancedMesh(STOCK[k].geo, STOCK[k].mat, STOCK[k].cap);
       m.count = 0;
-      if (k === 'house' || k === 'roof' || k === 'tower') m.castShadow = true;
+      if (k === 'house' || k === 'roof' || k === 'tower' || k === 'towerUp') m.castShadow = true;
       scatter[k] = m;
       group.add(m);
     }
@@ -1238,6 +1282,18 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
      to a block in the town, with trees along the way. */
   const scatterUrban = (c: Chunk, u0: number, origin: Frame, r: () => number) => {
     const city = world === 'city';
+    // Street lamps down both sides of the line.
+    for (let u = Math.ceil(u0 / 32) * 32; u < u0 + CHUNK; u += 32) {
+      if (stationMask(u) > 0.05 || (city && riverValley(u) > 0.01)) continue;
+      const f = frameAt(u, fa);
+      for (const side of [-1, 1]) {
+        const x = side * (FORM + 7.5);
+        local(f, x, heightAt(u, x, f.y, world), origin, v3);
+        put(c, 'post', v3, 0, 1, 7, 1);
+        v3.y += 7.1;
+        put(c, 'lampHead', v3, 0, 0.32, 0.22, 0.32);
+      }
+    }
     const bu = city ? 90 : 70, bx = city ? 80 : 60, sw = city ? 14 : 9;
     const reach = city ? 1100 : 320;
     const firstBlock = Math.floor(u0 / bu), lastBlock = Math.floor((u0 + CHUNK) / bu);
@@ -1262,8 +1318,41 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
             const core = Math.pow(fbm(midU / 900, x / 900, 81, 3), 2) * 3.4;
             const ht = 16 + (core * 150 + r() * 45) * (1 - smooth(250, 1050, Math.abs(x)) * 0.8);
             const h = heightAt(midU, x, f.y, world);
-            local(f, x, h - 0.5, origin, v3);
-            put(c, 'tower', v3, -f.h, w, ht + 0.5, d, TOWER[Math.floor(r() * TOWER.length)]);
+            const tone = TOWER[Math.floor(r() * TOWER.length)];
+            const at = (dx: number, dz: number, y: number) => {
+              const fz = frameAt(midU + dz, fb);
+              return local(fz, x + dx, h + y, origin, v3);
+            };
+            let roofW = w, roofD = d, roofY = ht;
+            if (ht > 60 && r() < 0.8) {
+              // A setback tower: a podium on the street, a shaft, a narrower top.
+              const pod = 9 + r() * 7;
+              const shaftTop = ht * (0.6 + r() * 0.15);
+              put(c, 'tower', at(0, 0, -0.5), -f.h, w, pod + 0.5, d, tone);
+              put(c, 'towerUp', at(0, 0, pod), -f.h, w * 0.78, shaftTop - pod, d * 0.78, tone);
+              roofW = w * (0.45 + r() * 0.15); roofD = d * (0.45 + r() * 0.15);
+              put(c, 'towerUp', at(0, 0, shaftTop), -f.h, roofW, ht - shaftTop, roofD, tone);
+            } else {
+              put(c, 'tower', at(0, 0, -0.5), -f.h, w, ht + 0.5, d, tone);
+            }
+            // What stands on the roof.
+            if (roofY > 60) {
+              const mh = 8 + r() * 14;
+              put(c, 'mast', at(0, 0, roofY), 0, 1, mh, 1);
+              put(c, 'beacon', at(0, 0, roofY + mh), 0, 0.45, 0.45, 0.45);
+              for (const [sx, sz] of [[-1, -1], [1, 1]]) put(c, 'beacon', at(sx * roofW * 0.45, sz * roofD * 0.45, roofY + 0.3), 0, 0.3, 0.3, 0.3);
+            } else {
+              const units = 1 + Math.floor(r() * 3);
+              for (let k = 0; k < units; k++) {
+                put(c, 'hvac', at((r() - 0.5) * roofW * 0.6, (r() - 0.5) * roofD * 0.6, roofY), -f.h, 2 + r() * 3, 1.2 + r(), 2 + r() * 2);
+              }
+              if (r() < 0.45) {
+                // A water tank on legs, as old city roofs have.
+                const tx = (r() - 0.5) * roofW * 0.5, tz = (r() - 0.5) * roofD * 0.5;
+                put(c, 'post', at(tx, tz, roofY), 0, 14, 2.4, 14);
+                put(c, 'tank', at(tx, tz, roofY + 2.4), 0, 2.2, 3.4, 2.2);
+              }
+            }
           } else {
             // The row nearest the line is the shops' (see the shopfronts below).
             if (bj === 0) continue;
@@ -2176,6 +2265,10 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     headlamp.intensity = night * 260;
     const groundNight = grounded(world) ? smooth(0.18, 0.85, night) : 0;
     urbanNight.value = smooth(0.25, 0.8, night);
+    // Aircraft warning lights blink red; street lamps come up at dusk.
+    const blinkOn = (time % 1.5) < 0.22;
+    beaconMat.color.setRGB(blinkOn ? 1.6 : 0.35 + 0.25 * (1 - urbanNight.value), blinkOn ? 0.12 : 0.04, blinkOn ? 0.08 : 0.03);
+    lampHeadMat.color.setRGB(1, 0.89, 0.69).multiplyScalar(0.35 + urbanNight.value * 1.4);
     platformFill.intensity = groundNight * 0.5;
     trainRim.intensity = groundNight * 0.68;
     trackGlow.intensity = groundNight * 42;

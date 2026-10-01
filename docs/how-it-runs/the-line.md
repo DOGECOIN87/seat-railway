@@ -52,6 +52,9 @@ The paving uses a real concrete texture with a normal map. The street grid, kerb
 The town gives way to the city:
 
 * **Towers:** glass and stone towers on a wider street grid, tallest downtown near the line and lower toward the edge of the city.
+* **Skyline:** the tall towers step back as they rise, from a podium on the street to a shaft to a narrower top. Their roofs carry antenna masts with red aircraft-warning lights that blink after dark. Lower roofs have plant boxes and old-style water tanks on legs.
+* **Facades:** each tower is one of three styles (a grid of punched windows, long ribbon windows, or tall glass between fins), with a glass lobby lit at street level. At night some of the tallest light a crown round their top, cyan or white.
+* **Street lamps** line both sides of the track, in the town and the city.
 * **Windows:** every tower's windows are cut to its real size, one floor every 3.7 m. At night a share of them light up, warm or cool, never the same pattern twice.
 * **Plazas and parks:** some blocks are left open as plazas and small parks.
 * **The river:** halfway between every pair of stations the line crosses a river. The valley drops away under a steel suspension bridge with a single tall tower, and the water moves beneath it.
