@@ -136,6 +136,7 @@ const POSITIONS: { key: SeatPosition; label: string }[] = [
   { key: 'window', label: 'Window' },
   { key: 'aisle', label: 'Aisle' },
 ];
+const PRIVATE_ROOMS = ALL_SEATS.filter((seat) => seat.zone === 'first');
 
 /** Which way you are looking from a seat. */
 const FACINGS: { key: Facing; label: string; long: string; short: string }[] = [
@@ -239,6 +240,7 @@ export default function App() {
   /** Where you are sitting. Independent of where you are ticketed. */
   const [viewZone, setViewZone] = useState<ZoneKey>('economy');
   const [viewPosition, setViewPosition] = useState<SeatPosition>('window');
+  const [viewSeatId, setViewSeatId] = useState<string | null>(null);
   const [boardedAt, setBoardedAt] = useState<number | null>(null);
 
   /* Check-in. The seat is not a choice: the wallet's holding decides it. */
@@ -374,7 +376,8 @@ export default function App() {
     ? `${wallet.address.slice(0, 4)}…${wallet.address.slice(-4)}`
     : 'Standby';
 
-  const viewSeat = useMemo(() => representativeSeat(viewZone, viewPosition), [viewZone, viewPosition]);
+  const viewSeat = useMemo(() => ALL_SEATS.find((seat) => seat.id === viewSeatId && seat.zone === viewZone)
+    ?? representativeSeat(viewZone, viewPosition), [viewZone, viewPosition, viewSeatId]);
   const viewZoneDef = CABIN_ZONES.find((z) => z.key === viewZone) ?? CABIN_ZONES[0];
 
   const nextId = useRef(0);
@@ -474,6 +477,7 @@ export default function App() {
     if (boardedAt === null) setBoardedAt(tick.marketCap);
     setViewZone(berth.seat!.zone);
     setViewPosition(berth.seat!.position);
+    setViewSeatId(id);
     setCamera(berth.seat!.zone === 'deck' ? 'deck' : 'seat');
     setFacing('forward');
     say(
@@ -527,6 +531,7 @@ export default function App() {
   }, [manifest, seatKey, holding, say, ding]);
 
   const walkTo = (zone: ZoneKey) => {
+    if (zone !== viewZone) setViewSeatId(zone === claimedSeat?.zone ? claimedSeat.id : null);
     setViewZone(zone);
     setCamera(zone === 'deck' ? 'deck' : 'seat');
     if (zone === 'deck') setFacing('forward');
@@ -809,7 +814,7 @@ export default function App() {
                     ? 'Freight car · at the back'
                     : camera === 'deck'
                       ? "Driver's cab"
-                      : `${viewZoneDef.name} · ${viewSeat.id} · ${facing === 'forward' ? 'forward' : `looking ${facing}`}`
+                      : `${viewZone === 'first' ? 'Private room' : viewZoneDef.name} · ${viewSeat.id} · ${facing === 'forward' ? 'forward' : `looking ${facing}`}`
               }
               onZoomOutBeyond={camera === 'exterior' ? undefined : () => setCamera('exterior')}
               zoomOutHint="Zoom out of the train"
@@ -932,7 +937,7 @@ export default function App() {
                     <button
                       key={pos.key}
                       type="button"
-                      onClick={() => setViewPosition(pos.key)}
+                      onClick={() => { setViewSeatId(null); setViewPosition(pos.key); }}
                       aria-pressed={viewPosition === pos.key}
                       className={seg(viewPosition === pos.key)}
                     >
@@ -943,6 +948,21 @@ export default function App() {
               </div>
             )}
           </div>
+
+          {camera === 'seat' && viewZone === 'first' && (
+            <div className="sa-walk sd-chrome rail-room-picker">
+              <span className="sa-strip-label">Private room</span>
+              <div className="sa-seg" role="group" aria-label="Preview a private first-class room">
+                {PRIVATE_ROOMS.map((room) => (
+                  <button key={room.id} type="button" className={seg(viewSeat.id === room.id)}
+                    aria-label={`Preview room ${room.id}`} aria-pressed={viewSeat.id === room.id}
+                    onClick={() => { setViewSeatId(room.id); setFacing('forward'); }}>
+                    {room.id}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* ── Where the flight is ──
               Three displays let into the panel, the whole route drawn as a

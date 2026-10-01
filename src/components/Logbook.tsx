@@ -143,46 +143,18 @@ const SPINS = [
   { rate: -10, label: 'Reverse' },
 ];
 
-const FLAPS = [
-  { value: null, label: 'Auto' },
-  { value: 0, label: 'Up' },
-  { value: 0.5, label: 'Half' },
-  { value: 1, label: 'Down' },
-];
-
 const Controls = ({ controls, onControls }: {
   controls: ManualControls;
   onControls: (next: Partial<ManualControls>) => void;
 }) => {
   const set = (patch: Partial<ManualControls>) => onControls(patch);
-  const inverted = ((controls.halfRolls % 2) + 2) % 2 === 1;
 
   return (
     <div className="space-y-2.5">
-      <Row label="Attitude">
-        <Switch on={inverted} onClick={() => set({ halfRolls: inverted ? controls.halfRolls - 1 : controls.halfRolls + 1 })}>
-          {inverted ? 'Inverted' : 'Invert'}
-        </Switch>
-        {/* Two half-turns is a full one, and the scene eases the whole way
-            round rather than to the nearest equivalent — so this rolls. */}
-        <Switch on={false} onClick={() => set({ halfRolls: controls.halfRolls + 2 })}>Barrel roll</Switch>
-        {controls.halfRolls !== 0 && (
-          <Switch on={false} onClick={() => set({ halfRolls: 0 })}>Upright</Switch>
-        )}
-      </Row>
-
       <Row label="Camera">
         {SPINS.map((s) => (
           <Switch key={s.label} on={controls.spin === s.rate} onClick={() => set({ spin: s.rate })}>
             {s.label}
-          </Switch>
-        ))}
-      </Row>
-
-      <Row label="Flaps">
-        {FLAPS.map((f) => (
-          <Switch key={f.label} on={controls.flaps === f.value} onClick={() => set({ flaps: f.value })}>
-            {f.label}
           </Switch>
         ))}
       </Row>
