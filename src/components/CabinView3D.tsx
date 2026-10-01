@@ -8,6 +8,7 @@ import type { SkyState } from '../lib/sky';
 import { useAttitude } from '../lib/useAttitude';
 import { HANDS_OFF, type ManualControls } from '../lib/manualControls';
 import type { CabinSeat, CabinZone, Facing } from '../content/cabin';
+import RailInteriorFallback from './RailInteriorFallback';
 
 /**
  * The view from a seat, rendered.
@@ -48,6 +49,7 @@ interface CabinView3DProps {
 const CabinView3D = ({ feed, sky, band, seat, zone, facing, taken, adverts, controls = HANDS_OFF }: CabinView3DProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [doorOpen, setDoorOpen] = useState(false);
+  const [noGl, setNoGl] = useState(false);
   const world = useRef<RailHandles | null>(null);
   const pose = useRef<ViewPose>({ seatIndex: 0, row: 1, yaw: 0, id: '1A' });
   /** Free look, added on top of whichever way the buttons are pointing. */
@@ -63,7 +65,7 @@ const CabinView3D = ({ feed, sky, band, seat, zone, facing, taken, adverts, cont
     try {
       handles = createRailWorld(canvas, { interior: 'coach' });
     } catch {
-      // No WebGL. The page still works; this view simply stays dark.
+      setNoGl(true);
       return;
     }
     world.current = handles;
@@ -137,7 +139,7 @@ const CabinView3D = ({ feed, sky, band, seat, zone, facing, taken, adverts, cont
   return (
     <div
       className="sd-view sd-frame relative w-full cursor-grab overflow-hidden active:cursor-grabbing"
-      role="img"
+      role="group"
       aria-label={`The view from seat ${seat.id} in ${zone.name}, looking ${facing}. Drag to look around.`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -146,6 +148,7 @@ const CabinView3D = ({ feed, sky, band, seat, zone, facing, taken, adverts, cont
       style={{ touchAction: 'none' }}
     >
       <canvas ref={canvasRef} className="block h-full w-full" />
+      {noGl && <RailInteriorFallback mode="coach" seat={seat} zone={zone} doorOpen={doorOpen} />}
       {zone.key === 'first' && <button className="absolute top-3 right-3 rounded-md bg-black/75 px-3 py-2 text-xs text-white"
         aria-pressed={doorOpen} onPointerDown={(e) => e.stopPropagation()} onClick={() => setDoorOpen((open) => !open)}>
         {doorOpen ? 'Close suite door' : 'Open suite door'}
@@ -156,9 +159,9 @@ const CabinView3D = ({ feed, sky, band, seat, zone, facing, taken, adverts, cont
         {seat.id} · {zone.name}
       </p>
       {/* Under 420px it would run into the seat beside it, and dragging is what a thumb does anyway. */}
-      <p className="pointer-events-none absolute bottom-3 right-3 hidden text-[11px] uppercase tracking-[0.18em] text-white/45 min-[420px]:block sm:bottom-4 sm:right-4">
+      {!noGl && <p className="pointer-events-none absolute bottom-3 right-3 hidden text-[11px] uppercase tracking-[0.18em] text-white/45 min-[420px]:block sm:bottom-4 sm:right-4">
         Drag to look
-      </p>
+      </p>}
     </div>
   );
 };

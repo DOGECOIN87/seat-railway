@@ -6,6 +6,7 @@ import type { BandState } from '../lib/flightModel';
 import type { SkyState } from '../lib/sky';
 import { useAttitude } from '../lib/useAttitude';
 import { HANDS_OFF, type ManualControls } from '../lib/manualControls';
+import RailInteriorFallback from './RailInteriorFallback';
 
 export default function CargoHold3D({ feed, sky, band, belowCutoff, controls = HANDS_OFF }: {
   feed: FlightFeed; sky: SkyState; band: BandState; belowCutoff: number; controls?: ManualControls;
@@ -46,7 +47,7 @@ export default function CargoHold3D({ feed, sky, band, belowCutoff, controls = H
       }}
       onPointerUp={() => { drag.current.on = false; }} onPointerCancel={() => { drag.current.on = false; }}>
       <canvas ref={canvas} className="block h-full w-full" />
-      {noGl && <p className="absolute inset-0 grid place-items-center text-white/70">3D view unavailable. Freight carriage: {belowCutoff} aboard.</p>}
+      {noGl && <RailInteriorFallback mode="freight" />}
       <p className="pointer-events-none absolute bottom-3 left-3 bg-black/75 px-3 py-2 font-mono text-xs text-white">FREIGHT · {belowCutoff} below the cutoff</p>
     </div>
   );

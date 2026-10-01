@@ -108,7 +108,7 @@ export function createRailInterior(mode: RailInteriorMode) {
   };
 
   const chairs = new THREE.Group(); group.add(chairs);
-  const suiteDoors = new Map<string, { mesh: THREE.Mesh; z: number }>();
+  const suiteDoors = new Map<string, { mesh: THREE.Group; z: number }>();
   let suiteDoorOpen = false;
   const chairBacks = new Map<string, THREE.Object3D>();
   const screens = new Map<string, THREE.Mesh>();
@@ -198,9 +198,11 @@ export function createRailInterior(mode: RailInteriorMode) {
           for (const end of [-1, 1]) box(chairs, suiteWall, [1.36, 2.5, 0.08], [side * 1.1, 2.25, z + end * 3.85]);
           box(chairs, suiteWall, [0.08, 2.5, 2.75], [side * 0.42, 2.25, z - 2.5]);
           box(chairs, suiteWall, [0.08, 2.5, 2.75], [side * 0.42, 2.25, z + 2.5]);
-          const door = box(chairs, charcoal, [0.085, 2.35, 2.25], [side * 0.42, 2.18, z]);
+          const door = new THREE.Group();
+          door.position.z = z; chairs.add(door);
+          box(door, charcoal, [0.085, 2.35, 2.25], [side * 0.42, 2.18, 0]);
           suiteDoors.set(`${n}${side < 0 ? 'A' : 'D'}`, { mesh: door, z });
-          box(chairs, gold, [0.035, 0.25, 0.045], [side * 0.48, 1.95, z + 0.65]);
+          box(door, gold, [0.035, 0.25, 0.045], [side * 0.48, 1.95, 0.65]);
           box(chairs, gold, [0.025, 0.035, 7.65], [side * 0.48, 3.25, z]);
           box(chairs, lampMat, [0.025, 0.02, 7.5], [side * 0.51, 3.26, z]);
           box(chairs, suiteWall, [0.48, 0.075, 1.25], [side * 1.5, 1.75, z - 1.4]);

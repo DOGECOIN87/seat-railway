@@ -7,7 +7,7 @@ import type { Annunciators, BandState } from '../lib/flightModel';
 import type { SkyState } from '../lib/sky';
 import { useAttitude } from '../lib/useAttitude';
 import { HANDS_OFF, type ManualControls } from '../lib/manualControls';
-import FlightDeck from './FlightDeck';
+import RailInteriorFallback from './RailInteriorFallback';
 
 /**
  * The flight deck, rendered: the captain's seat, in the same aeroplane and
@@ -90,7 +90,7 @@ const FlightDeck3D = ({ feed, lamps, sky, band, controls = HANDS_OFF }: FlightDe
     world.current?.render(a, latest.current.sky, latest.current.band, pose.current);
   }, controls);
 
-  if (noGl) return <FlightDeck feed={feed} lamps={lamps} sky={sky} band={band} controls={controls} />;
+  if (noGl) return <div className="sd-view sd-frame relative w-full overflow-hidden"><RailInteriorFallback mode="cab" /></div>;
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     drag.current = { active: true, x: e.clientX, y: e.clientY };

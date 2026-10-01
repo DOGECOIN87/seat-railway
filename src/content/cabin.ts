@@ -81,7 +81,7 @@ export const CABIN_ZONES: readonly CabinZone[] = [
     note: 'Rows 1–2',
     className: 'FIRST',
     group: '1',
-    perk: 'Your own private suite: a panoramic window, reclining armchair, desk and reading light.',
+    perk: 'Your own private room: a daybed, reclining armchair, panoramic window, desk, personal screen, reading light and sliding door.',
     accent: 'cerise',
     code: 'FST',
     visual: 'Private window suites',

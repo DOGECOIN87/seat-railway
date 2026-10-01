@@ -905,7 +905,7 @@ export default function App() {
               </div>
             </div>
 
-            {camera === 'seat' && (
+            {camera === 'seat' && viewZone !== 'first' && (
               <div className="sa-walk sd-chrome xl:ml-auto">
                 <span className="sa-strip-label">Seat</span>
                 <div className="sa-seg" role="group" aria-label="Seat position">
