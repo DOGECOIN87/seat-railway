@@ -155,7 +155,7 @@ const ExteriorView = ({ feed, sky, band, taken, claimed, viewing, controls = HAN
   return (
     <div
       className="sd-view sd-frame sd-frame--wide relative w-full cursor-grab overflow-hidden active:cursor-grabbing"
-      role="img"
+      role="group"
       aria-label={`The SEAT RAILWAY train SR350 from outside, ${band.label.toLowerCase()}. Each carriage is a market-cap milestone, and lit carriages carry booked seats${
         claimed ? `; seat ${claimed.id} is yours` : ''
       }. Drag to walk around the train.`}
@@ -166,7 +166,7 @@ const ExteriorView = ({ feed, sky, band, taken, claimed, viewing, controls = HAN
       style={{ touchAction: 'none' }}
     >
       <canvas ref={canvasRef} className="block h-full w-full" />
-      <div className="absolute right-3 top-3 flex gap-1 rounded-md bg-black/70 p-1" onPointerDown={(e) => e.stopPropagation()}>
+      <div className="absolute right-3 top-12 z-10 flex gap-1 rounded-md bg-black/70 p-1" role="group" aria-label="Exterior camera" onPointerDown={(e) => e.stopPropagation()}>
         <button className="px-2 py-1.5 text-[11px] text-white" onClick={() => { orbit.current.angle = 0; setWide(false); }}>Front</button>
         <button className="px-2 py-1.5 text-[11px] text-white" onClick={() => { orbit.current.angle = 52; setWide(false); }}>Side</button>
         <button className={`px-2 py-1.5 text-[11px] ${wide ? 'text-[#00C9F1]' : 'text-white'}`} aria-pressed={wide} onClick={() => { orbit.current.angle = 52; setWide((value) => !value); }}>Full train</button>

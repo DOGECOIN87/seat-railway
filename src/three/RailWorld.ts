@@ -207,6 +207,7 @@ export interface RailHandles extends WorldHandles {
   /** The market cap the train is sized for. */
   setMarket: (marketCap: number, change5m: number) => void;
   setSuiteDoor: (open: boolean) => void;
+  setSuiteLighting: (brightness: number) => void;
 }
 
 interface Frame {
@@ -1816,7 +1817,8 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     renderer.dispose();
   };
 
-  return { render, resize, setOccupancy, setAdverts, setControls, travelled, groundAt, planeOnScreen, setDeckReadout, setMarket, setSuiteDoor: (open) => inside?.setSuiteDoor(open), dispose };
+  return { render, resize, setOccupancy, setAdverts, setControls, travelled, groundAt, planeOnScreen, setDeckReadout, setMarket,
+    setSuiteDoor: (open) => inside?.setSuiteDoor(open), setSuiteLighting: (brightness) => inside?.setSuiteLighting(brightness), dispose };
 }
 
 /** A few small geometries into one, positions and normals only. */

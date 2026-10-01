@@ -1,29 +1,41 @@
-import { useId } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import type { CabinSeat, CabinZone } from '../content/cabin';
 
 /** A readable carriage plan when the browser cannot create a 3D context. */
-export default function RailInteriorFallback({ mode, seat, zone, doorOpen = false }: {
-  mode: 'coach' | 'cab' | 'freight'; seat?: CabinSeat; zone?: CabinZone; doorOpen?: boolean;
+export default function RailInteriorFallback({ mode, seat, zone, doorOpen = false, brightness = 0.55 }: {
+  mode: 'coach' | 'cab' | 'freight'; seat?: CabinSeat; zone?: CabinZone; doorOpen?: boolean; brightness?: number;
 }) {
   const id = useId().replace(/:/g, '');
   const suite = mode === 'coach' && zone?.key === 'first';
+  const mirror = suite && seat?.bank === 'right';
+  const mx = (x: number) => mirror ? 1000 - x : x;
+  const reflection = mirror ? 'translate(1000 0) scale(-1 1)' : undefined;
+  const container = useRef<HTMLDivElement>(null);
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    if (!container.current) return;
+    const size = () => setCompact(container.current!.getBoundingClientRect().width < 640);
+    const observer = new ResizeObserver(size); observer.observe(container.current); size();
+    return () => observer.disconnect();
+  }, []);
   const title = suite ? `PRIVATE SUITE ${seat?.id}` : mode === 'cab' ? "SR350 · DRIVER’S CAB" : mode === 'freight' ? 'SR350 · FREIGHT CARRIAGE' : `${zone?.name.toUpperCase()} · CARRIAGE PLAN`;
-  return <div className="absolute inset-0 bg-[#071015]">
-    <svg viewBox="0 0 1000 560" className="h-full w-full" role="img" aria-label={suite
+  return <div ref={container} className="absolute inset-0 bg-[#071015]">
+    {compact && suite && <p className="rail-plan-caption">Room layout · 3D unavailable</p>}
+    <svg viewBox={compact && suite ? `${mirror ? 270 : 300} 90 445 420` : '0 0 1000 560'} className="h-full w-full" role="img" aria-label={suite
       ? 'Private first-class room with a daybed, armchair, window desk, personal screen, reading light and sliding door onto the corridor.'
       : title}>
       <defs>
-        <linearGradient id={`${id}-floor`} x2="1" y2="1"><stop stopColor="#273d40"/><stop offset="1" stopColor="#12282b"/></linearGradient>
+        <linearGradient id={`${id}-floor`} x2="1" y2="1"><stop stopColor={brightness > 0.6 ? '#385054' : '#273d40'}/><stop offset="1" stopColor={brightness > 0.6 ? '#243b3e' : '#12282b'}/></linearGradient>
         <pattern id={`${id}-carpet`} width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 8L8 0" stroke="#91aaab" strokeOpacity=".08"/></pattern>
         <linearGradient id={`${id}-glass`} x2="0" y2="1"><stop stopColor="#294f62"/><stop offset="1" stopColor="#112531"/></linearGradient>
       </defs>
       <text x="52" y="52" fill="#d9c498" fontFamily="monospace" fontSize="17" letterSpacing="3">{title}</text>
       <text x="52" y="78" fill="#8ea5ac" fontFamily="sans-serif" fontSize="13">Layout view · 3D unavailable in this browser</text>
       {suite ? <>
+        <g transform={reflection}>
         <rect x="330" y="102" width="290" height="390" rx="6" fill={`url(#${id}-floor)`} stroke="#d9c498" strokeWidth="7"/>
         <rect x="335" y="107" width="280" height="380" fill={`url(#${id}-carpet)`}/>
         <rect x="622" y="102" width="90" height="390" fill="#1a262b"/>
-        <text x="678" y="302" transform="rotate(90 678 302)" textAnchor="middle" fill="#81949a" fontFamily="monospace" fontSize="12" letterSpacing="3">CORRIDOR</text>
         <rect x="322" y="144" width="16" height="262" rx="3" fill={`url(#${id}-glass)`} stroke="#70a8b5"/>
         <path d="M330 157V393" stroke="#91dbe5" strokeWidth="3"/>
         <rect x="353" y="127" width="240" height="108" rx="9" fill="#7b9d9a"/>
@@ -32,7 +44,8 @@ export default function RailInteriorFallback({ mode, seat, zone, doorOpen = fals
         <path d="M450 136V224" stroke="#bdad91" strokeWidth="2"/>
         <rect x="351" y="260" width="55" height="112" rx="4" fill="#c2a66e"/>
         <rect x="355" y="264" width="47" height="104" rx="3" fill="#e4ded0"/>
-        <circle cx="379" cy="278" r="9" fill="#fff1bd" stroke="#b79d63" strokeWidth="3"/>
+        <circle cx="379" cy="278" r="19" fill="#fff1bd" opacity={brightness * 0.18}/>
+        <circle cx="379" cy="278" r="9" fill="#fff1bd" stroke="#b79d63" strokeWidth="3" opacity={0.35 + brightness * 0.65}/>
         <rect x="470" y="291" width="101" height="112" rx="20" fill="#426b68" stroke="#aac1b9" strokeWidth="2"/>
         <rect x="477" y="368" width="87" height="28" rx="10" fill="#5c827b"/>
         <rect x="455" y="310" width="20" height="76" rx="8" fill="#244846" stroke="#c2a66e"/>
@@ -42,14 +55,19 @@ export default function RailInteriorFallback({ mode, seat, zone, doorOpen = fals
         <path d="M620 298V400" stroke="#071015" strokeWidth="10"/>
         <path d={doorOpen ? 'M620 200V296' : 'M620 300V398'} stroke="#acb9b8" strokeWidth="7"/>
         <path d="M620 303h-12m0 0v21" stroke="#d9c498" strokeWidth="3" fill="none" transform={doorOpen ? 'translate(0 -100)' : undefined}/>
-        <g fill="#d7e4e3" fontFamily="sans-serif" fontSize="14">
-          <text x="230" y="183" textAnchor="end">Daybed</text><path d="M245 180H328" stroke="#526b72"/>
-          <text x="230" y="313" textAnchor="end">Window desk</text><path d="M245 310H348" stroke="#526b72"/>
-          <text x="230" y="350" textAnchor="end">Panoramic window</text><path d="M245 347H319" stroke="#526b72"/>
-          <text x="756" y="348">Sliding door</text><path d="M625 344H741" stroke="#526b72"/>
-          <text x="756" y="421">Reclining armchair</text><path d="M580 403L610 418H741" stroke="#526b72" fill="none"/>
-          <text x="756" y="123">Personal screen</text><path d="M530 118H741" stroke="#526b72"/>
         </g>
+        <text x={mx(678)} y="302" transform={`rotate(${mirror ? -90 : 90} ${mx(678)} 302)`} textAnchor="middle" fill="#81949a" fontFamily="monospace" fontSize="12" letterSpacing="3">CORRIDOR</text>
+        {!compact && <g fill="#d7e4e3" fontFamily="sans-serif" fontSize="14">
+          <text x={mx(230)} y="183" textAnchor={mirror ? 'start' : 'end'}>Daybed</text>
+          <text x={mx(230)} y="313" textAnchor={mirror ? 'start' : 'end'}>Window desk</text>
+          <text x={mx(230)} y="350" textAnchor={mirror ? 'start' : 'end'}>Panoramic window</text>
+          <text x={mx(756)} y="348" textAnchor={mirror ? 'end' : 'start'}>Sliding door</text>
+          <text x={mx(756)} y="421" textAnchor={mirror ? 'end' : 'start'}>Reclining armchair</text>
+          <text x={mx(756)} y="123" textAnchor={mirror ? 'end' : 'start'}>Personal screen</text>
+          <g transform={reflection} stroke="#526b72" fill="none">
+            <path d="M245 180H328M245 310H348M245 347H319M625 344H741M580 403L610 418H741M530 118H741"/>
+          </g>
+        </g>}
       </> : mode === 'cab' ? <>
         <path d="M180 100H820L950 305H50Z" fill={`url(#${id}-glass)`}/>
         <path d="M475 104L280 305M525 104L720 305" stroke="#93bbc6" strokeWidth="5"/>

@@ -59,9 +59,10 @@ const Seat = ({ id, zone, entry, banner, mine, onOpen, onInspect }: SeatProps) =
           ? 'sa-seat--open sa-seat--lav'
           : 'sa-seat--open';
 
+  const place = zone === 'first' ? 'Private room' : 'Seat';
   const label = sold
-    ? `Seat ${id}, rank ${entry.rank}, ${shortAddress(entry.address)}${banner ? `. Advert: ${banner.alt}` : ''}`
-    : `Seat ${id}, open${lavatory ? ', aisle seat by the lavatory' : ''}`;
+    ? `${place} ${id}, rank ${entry.rank}, ${shortAddress(entry.address)}${banner ? `. Advert: ${banner.alt}` : ''}`
+    : `${place} ${id}, open${lavatory ? ', aisle seat by the lavatory' : ''}`;
 
   return (
     <button

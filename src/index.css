@@ -3225,6 +3225,14 @@ p { text-wrap-style: pretty; }
 }
 .sa-landing.is-leaving { opacity: 0; pointer-events: none; }
 .sa-landing__scene { position: absolute; inset: 0; }
+.rail-room-picker { padding: 0.8rem 1.25rem; border-bottom: 1px solid var(--ui-line); }
+.rail-plan-caption { position: absolute; top: 0.75rem; left: 0.75rem; color: #b1c2c5; font: 10px monospace; z-index: 1; }
+.rail-suite-controls { position: absolute; bottom: 3rem; right: 0.75rem; left: 0.75rem; z-index: 10; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5rem; pointer-events: none; }
+.rail-suite-controls > div, .rail-suite-controls > button { pointer-events: auto; display: flex; align-items: center; gap: 0.2rem; padding: 0.3rem; border: 1px solid #c8ad7540; border-radius: 8px; background: #071015ed; color: #e9e5da; font-size: 12px; }
+.rail-suite-controls span { padding: 0 0.45rem; color: #bdac86; }
+.rail-suite-controls button { min-height: 34px; padding: 0.35rem 0.65rem; border-radius: 5px; }
+.rail-suite-controls button[aria-pressed="true"] { background: #c8ad75; color: #17282a; }
+@media (max-width: 420px) { .rail-suite-controls { justify-content: center; } .rail-suite-controls button { padding-inline: 0.5rem; } }
 .rail-splash { position: absolute; inset: 0; z-index: 20; display: grid; place-content: center; gap: 2rem; padding: 2rem; background: #090e12; }
 .rail-splash .sa-board { width: min(80vw, 650px); }
 .rail-splash button { justify-self: center; padding: 0.6rem 1rem; color: #adc0ca; }

@@ -27,6 +27,22 @@ export function createRailInterior(mode: RailInteriorMode) {
   const gold = material(0xc8ad75, 0.26, 0.8);
   const carpet = material(0x273639, 1);
   const linen = material(0xf4f1e9, 0.95);
+  const wood = material(0xffffff, 0.58, 0);
+  if (mode === 'coach') {
+    const grain = document.createElement('canvas'); grain.width = 128; grain.height = 512;
+    const brush = grain.getContext('2d')!;
+    brush.fillStyle = '#855d42'; brush.fillRect(0, 0, 128, 512);
+    for (let x = 0; x < 128; x++) {
+      const tone = 65 + Math.round((Math.sin(x * 3.7) * 0.5 + 0.5) * 50);
+      brush.strokeStyle = `rgba(${tone + 56},${tone + 19},${tone},0.32)`;
+      brush.beginPath(); brush.moveTo(x, 0);
+      for (let y = 0; y <= 512; y += 16) brush.lineTo(x + Math.sin(y * 0.023 + x * 0.43) * 1.8, y);
+      brush.stroke();
+    }
+    const woodTex = keep(new THREE.CanvasTexture(grain)); woodTex.colorSpace = THREE.SRGBColorSpace;
+    wood.map = woodTex;
+  }
+  const quilt = material(0x9baaa0, 0.95, 0);
   const lampMat = keep(new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff4e3, emissiveIntensity: 1.4 }));
   const cyan = keep(new THREE.MeshStandardMaterial({ color: 0x00c9f1, emissive: 0x00c9f1, emissiveIntensity: 0.5 }));
   const unitBox = keep(new THREE.BoxGeometry(1, 1, 1));
@@ -109,7 +125,9 @@ export function createRailInterior(mode: RailInteriorMode) {
 
   const chairs = new THREE.Group(); group.add(chairs);
   const suiteDoors = new Map<string, { mesh: THREE.Group; z: number }>();
+  const readingLights = new Map<string, THREE.PointLight>();
   let suiteDoorOpen = false;
+  let suiteBrightness = 0.55;
   const chairBacks = new Map<string, THREE.Object3D>();
   const screens = new Map<string, THREE.Mesh>();
   const screenMaps = new Map<string, THREE.Texture>();
@@ -159,7 +177,7 @@ export function createRailInterior(mode: RailInteriorMode) {
     }
   };
   const buildCoach = (row: number) => {
-    chairs.clear(); chairBacks.clear(); suiteDoors.clear();
+    chairs.clear(); chairBacks.clear(); suiteDoors.clear(); readingLights.clear();
     activeRows = coachRows(row);
     for (const screen of screens.values()) (screen.material as THREE.Material).dispose();
     screens.clear();
@@ -205,16 +223,29 @@ export function createRailInterior(mode: RailInteriorMode) {
           box(door, gold, [0.035, 0.25, 0.045], [side * 0.48, 1.95, 0.65]);
           box(chairs, gold, [0.025, 0.035, 7.65], [side * 0.48, 3.25, z]);
           box(chairs, lampMat, [0.025, 0.02, 7.5], [side * 0.51, 3.26, z]);
-          box(chairs, suiteWall, [0.48, 0.075, 1.25], [side * 1.5, 1.75, z - 1.4]);
+          box(chairs, wood, [1.3, 0.75, 0.03], [side * 1.1, 1.45, z - 3.79]);
+          box(chairs, gold, [1.3, 0.025, 0.04], [side * 1.1, 1.83, z - 3.77]);
+          for (const end of [-1, 1]) box(chairs, wood, [0.03, 0.72, 2.66], [side * 0.47, 1.43, z + end * 2.5]);
+          box(chairs, lampMat, [0.025, 0.02, 7.5], [side * 1.65, 3.26, z]);
+          box(chairs, wood, [0.48, 0.075, 1.25], [side * 1.5, 1.75, z - 1.4]);
           box(chairs, gold, [0.5, 0.025, 1.27], [side * 1.5, 1.71, z - 1.4]);
-          box(chairs, charcoal, [0.06, 0.7, 0.8], [side * 1.66, 1.35, z - 1.4]);
+          box(chairs, wood, [0.35, 0.67, 0.65], [side * 1.56, 1.36, z - 1.5]);
+          for (const level of [1.27, 1.49]) {
+            box(chairs, gold, [0.012, 0.025, 0.16], [side * 1.375, level, z - 1.5]);
+            box(chairs, charcoal, [0.01, 0.01, 0.6], [side * 1.378, level - 0.06, z - 1.5]);
+          }
           box(chairs, premium, [1.05, 0.35, 1.85], [side * 1.1, 1.22, z - 2.78]);
           box(chairs, linen, [1.02, 0.12, 1.8], [side * 1.1, 1.45, z - 2.78]);
           box(chairs, linen, [0.7, 0.12, 0.35], [side * 1.1, 1.57, z - 3.43]);
+          box(chairs, quilt, [1.025, 0.045, 0.6], [side * 1.1, 1.535, z - 2.18]);
+          for (let seam = -0.4; seam <= 0.4; seam += 0.2) box(chairs, linen, [0.008, 0.003, 0.59], [side * 1.1 + seam, 1.56, z - 2.18]);
+          box(chairs, wood, [1.12, 0.65, 0.07], [side * 1.1, 1.43, z - 3.74]);
+          box(chairs, gold, [1.13, 0.025, 0.075], [side * 1.1, 1.77, z - 3.74]);
           box(chairs, gold, [0.03, 0.6, 0.03], [side * 1.65, 2.06, z - 1.9]);
           box(chairs, lampMat, [0.23, 0.16, 0.23], [side * 1.65, 2.4, z - 1.9]);
           const reading = new THREE.PointLight(0xffd8a5, 5, 4, 1.6);
           reading.position.set(side * 1.55, 2.35, z - 1.7); chairs.add(reading);
+          readingLights.set(`${n}${side < 0 ? 'A' : 'D'}`, reading);
           const suiteScreen = display(chairs, 0.9, 0.48, side * 1.1, 2.36, z - 3.78);
           const artMat = new THREE.MeshBasicMaterial({ map: displayTex, toneMapped: false });
           suiteScreen.material = artMat; screens.set(`${n}${side < 0 ? 'A' : 'D'}`, suiteScreen);
@@ -281,13 +312,22 @@ export function createRailInterior(mode: RailInteriorMode) {
       return eye.set(seat ? railSeatX(seat) : 0, 2.28, railRowZ(pose.row) - 0.06);
     },
     update(a: Attitude, speed: number, night: number, now: number) {
-      lights.forEach((light) => { light.intensity = 12 + night * 6; });
+      const suite = mode === 'coach' && currentCoach === 0;
+      const seat = suite ? findSeat(currentSeat) : null;
+      lights.forEach((light, index) => {
+        light.intensity = (12 + night * 6) * (suite ? suiteBrightness : 1);
+        light.color.setHex(suite ? 0xffdfb8 : 0xfff4e5);
+        light.position.set(seat ? railSeatX(seat) : 0, 3.25, seat?.row ? railRowZ(seat.row) + (index - 1) * 2.8 : (index - 1) * 6);
+      });
+      readingLights.forEach((light, id) => { light.intensity = 5 * (id === currentSeat ? suiteBrightness : 0.55); });
+      fill.intensity = suite ? 0.5 + suiteBrightness * 0.45 : 1.05;
       paint(a, speed, now);
     },
     setOccupancy(taken: ReadonlySet<string>) { sold = taken; resit(); },
     setAdverts(bySeat: Readonly<Record<string, string>>) { adverts = bySeat; loadAdverts(); },
     setReadout(value: DeckReadout) { readout = value; },
     setSuiteDoor(open: boolean) { suiteDoorOpen = open; },
+    setSuiteLighting(brightness: number) { suiteBrightness = Math.max(0.2, Math.min(1, Number.isFinite(brightness) ? brightness : 0.55)); },
     dispose() {
       disposed = true;
       passengers?.dispose();
