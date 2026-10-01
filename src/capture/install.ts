@@ -18,7 +18,7 @@
  */
 import { INITIAL_TICK, type FlightFeed, type FlightTick } from '../lib/flightFeed';
 import { DEFAULT_WORKER_API } from '../lib/workerBase';
-import { captureChanged, captureState } from './flag';
+import { captureChanged, captureState, PREVIEW } from './flag';
 import type { FlightGame } from '../lib/landingGame';
 
 /* ── Invented data ─────────────────────────────────────────────────────── */
@@ -103,7 +103,7 @@ Object.assign(window, { phantom: { solana: provider } });
 
 /* ── Nothing on screen that a film should not show ─────────────────────── */
 
-document.documentElement.classList.add('sa-capture');
+if (!PREVIEW) document.documentElement.classList.add('sa-capture');
 const style = document.createElement('style');
 style.textContent = `
   html.sa-capture, html.sa-capture * { cursor: none !important; caret-color: transparent !important; }
@@ -323,3 +323,58 @@ void document.fonts.ready.then(() => {
   };
   requestAnimationFrame(wait);
 });
+
+/* ── The preview's panel ────────────────────────────────────────────────
+   Only in a preview build: buttons for the line's tiers, the weather and the
+   hour, so every world can be tried without waiting for the market. */
+if (PREVIEW) {
+  const TIERS: [string, number][] = [
+    ['Country', 50_000], ['Town', 160_000], ['City', 600_000], ['Clouds', 2_000_000],
+    ['Space', 20_000_000], ['Moon', 70_000_000], ['Mars', 150_000_000],
+  ];
+  const WEATHER = ['clear', 'cloudy', 'overcast', 'rain', 'storm', 'snow', 'fog'];
+  const HOURS: [string, number][] = [['Day', 13], ['Dusk', 19.3], ['Night', 23]];
+  let hour = 13;
+  let weather = 'clear';
+  const panel = document.createElement('div');
+  panel.setAttribute('role', 'region');
+  panel.setAttribute('aria-label', 'Preview controls');
+  panel.style.cssText = 'position:fixed;left:10px;bottom:10px;z-index:2147483000;max-width:min(420px,calc(100vw - 20px));padding:8px 10px;border-radius:10px;background:#071216ee;color:#eef6f7;font:12px/1.3 monospace;box-shadow:0 6px 24px #0008;border:1px solid #ffffff2a';
+  const head = document.createElement('button');
+  head.textContent = 'PREVIEW ▾';
+  head.style.cssText = 'all:unset;cursor:pointer;font-weight:700;color:#00c9f1;letter-spacing:.1em';
+  const body = document.createElement('div');
+  head.onclick = () => { body.hidden = !body.hidden; head.textContent = body.hidden ? 'PREVIEW ▸' : 'PREVIEW ▾'; };
+  const row = (label: string, items: [string, () => void][], current: () => string) => {
+    const r = document.createElement('div');
+    r.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:6px';
+    const l = document.createElement('span');
+    l.textContent = label;
+    l.style.cssText = 'width:56px;color:#90b6be';
+    r.append(l);
+    const buttons = items.map(([name, go]) => {
+      const b = document.createElement('button');
+      b.textContent = name;
+      b.style.cssText = 'cursor:pointer;padding:3px 7px;border-radius:6px;border:1px solid #ffffff33;background:#ffffff12;color:inherit;font:inherit';
+      b.onclick = () => { go(); paint(); };
+      r.append(b);
+      return [name, b] as const;
+    });
+    const paint = () => buttons.forEach(([name, b]) => { b.style.background = current() === name ? '#00c9f1' : '#ffffff12'; b.style.color = current() === name ? '#04161c' : 'inherit'; });
+    paint();
+    body.append(r);
+  };
+  let tier = 'Town';
+  row('Market', TIERS.map(([name, cap]) => [name, () => { tier = name; api.setMarketCap(cap); }]), () => tier);
+  row('Weather', WEATHER.map((w) => [w, () => { weather = w; api.setSky(hour, weather); }]), () => weather);
+  row('Time', HOURS.map(([name, h]) => [name, () => { hour = h; api.setSky(hour, weather); }]), () => HOURS.find(([, h]) => h === hour)?.[0] ?? '');
+  const note = document.createElement('p');
+  note.textContent = 'Invented holders, a wallet that cannot sign. Weather and time take up to 20 s to arrive.';
+  note.style.cssText = 'margin:6px 0 0;color:#90b6be;max-width:380px';
+  body.append(note);
+  panel.append(head, body);
+  const mountPanel = () => document.body.append(panel);
+  if (document.body) mountPanel(); else window.addEventListener('DOMContentLoaded', mountPanel);
+  api.setSky(hour, weather);
+  setTimeout(() => api.setMarketCap(160_000), 500);
+}

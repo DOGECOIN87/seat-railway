@@ -17,3 +17,4 @@ dist-test
 
 # Rendered by scripts/banner.mjs
 banner/
+dist-preview

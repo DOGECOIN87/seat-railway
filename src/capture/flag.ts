@@ -15,10 +15,18 @@ import { useSyncExternalStore } from 'react';
 import type { FlightFeed } from '../lib/flightFeed';
 import type { FlightGame } from '../lib/landingGame';
 
-export const CAPTURE: boolean =
+/**
+ * A preview build (`VITE_PREVIEW=1`, see `npm run build:preview`) is capture
+ * mode switched on for good, for testing away from the live site: the same
+ * invented holders and the same wallet that cannot sign, but the cursor left
+ * alone, and a small panel for the market cap, the weather and the hour.
+ */
+export const PREVIEW: boolean = import.meta.env.VITE_PREVIEW === '1' && typeof window !== 'undefined';
+
+export const CAPTURE: boolean = PREVIEW || (
   import.meta.env.VITE_CAPTURE_MODE === '1'
   && typeof window !== 'undefined'
-  && new URLSearchParams(window.location.search).get('capture') === '1';
+  && new URLSearchParams(window.location.search).get('capture') === '1');
 
 /** What the app hands over so the capture API can drive it without a cursor. */
 export interface CaptureAppControls {
