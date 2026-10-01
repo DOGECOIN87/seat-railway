@@ -12,7 +12,7 @@ The rest of this section says what things are and how to run them. This page say
 * **A floating origin.** Every chunk, car, station and billboard is placed relative to the train each frame, from coordinates kept in JavaScript doubles, so the scene stays near the origin however far the train runs.
 * **Chunks are recycled, not rebuilt from nothing.** Thirteen chunks of country (one is 11 track tiles, 162.5 m) are kept; the one that falls behind the train has its vertex buffers and instance matrices rewritten for the next stretch ahead. A chunk is a whole number of track tiles, so the detailed track never straddles two.
 * **Detailed track near, simple track far.** The supplied rails and sleepers (25,000 triangles per 14.8 m tile) are instanced only across the three chunks round the camera; further out, a light procedural track stands in, and steps aside where the detailed one is drawn.
-* **The livery is painted by height.** The car model's body is one material, so the navy skirt, cyan line, pearl sides and grey roof are a few lines in the material's shader, keyed to the height on the car; the mark, the name and the cab's market-cap display are canvas textures.
+* **The livery is painted by height.** The car model's body is one material, so the gloss black, the cyan line and the charcoal roof are a few lines in the material's shader, keyed to the height on the car; the mark, the name and the cab's market-cap display are canvas textures.
 * **A carriage uncoupled is left behind, not deleted.** It keeps rolling, braking at 3.5 m/s², until it is 900 m back, so a market falling through a milestone is something you watch happen.
 
 ## The inherited interiors

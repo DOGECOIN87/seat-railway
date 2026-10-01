@@ -3,7 +3,7 @@
  * Draws the favicon and the app icons from the logo, so they can never drift
  * from it:
  *
- *   public/seat-airlines-logo.svg  →  favicon.svg, icon-square.svg,
+ *   public/seat-railway-logo.svg  →  favicon.svg, icon-square.svg,
  *                                     favicon.ico (16/32/48), favicon-32.png,
  *                                     favicon-96.png, apple-touch-icon.png,
  *                                     icon-192.png, icon-512.png
@@ -21,7 +21,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 const root = new URL('..', import.meta.url);
 const pub = (name) => new URL(`public/${name}`, root);
 
-const logo = (await readFile(pub('seat-airlines-logo.svg'), 'utf8')).trim();
+const logo = (await readFile(pub('seat-railway-logo.svg'), 'utf8')).trim();
 /* The disc's frame on the logo's canvas: read from the component that draws
    the logo on the page, so the tab and the top bar crop it the same way. */
 const mark = await readFile(new URL('src/components/Mark.tsx', root), 'utf8');

@@ -274,7 +274,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" 
 </svg>`;
 
 /* ── The page it is rendered in: the aircraft, and the mark over its middle ─ */
-const logo = readFileSync(join(ROOT, 'public', 'seat-airlines-logo.svg'), 'utf8')
+const logo = readFileSync(join(ROOT, 'public', 'seat-railway-logo.svg'), 'utf8')
   .replace(/<metadata>[\s\S]*?<\/metadata>/, '');
 const logoUri = `data:image/svg+xml;base64,${Buffer.from(logo).toString('base64')}`;
 

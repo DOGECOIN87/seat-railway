@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/seat-airlines-logo.svg" alt="Seat Railway" width="112" height="112">
+<img src="public/seat-railway-logo.svg" alt="Seat Railway" width="112" height="112">
 
 # SEAT RAILWAY
 
@@ -108,7 +108,7 @@ so the train on your screen *is* the chart — and its 178 seats go to the bigge
 
 ### A real train, in 3D
 
-The site opens on the train **full screen**, running through the country, in the Seat livery — navy, cyan and pearl, with the mark and **SEAT RAILWAY** on its flanks and the market cap on the cab's display. Press **Enter** to go in. Inside, the page opens **outside, on the whole train**; drag to walk round it. Step inside to a seat, or walk the train from the driver's cab to the freight car.
+The site opens on the train **full screen**, running through the country, in the Seat Railway livery — gloss black with a cyan line, the mark and **SEAT RAILWAY** in white on its flanks and the market cap on the cab's display. Press **Enter** to go in. Inside, the page opens **outside, on the whole train**; drag to walk round it. Step inside to a seat, or walk the train from the driver's cab to the freight car.
 
 The train, the track, the station and the billboards are 3D models, converted for the web in [`public/models`](public/models/README.md).
 

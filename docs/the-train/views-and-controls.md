@@ -67,7 +67,7 @@ The server times every run from the moment you take the controls and refuses a s
 
 | View | What you see |
 | --- | --- |
-| **Outside** | The whole train in the Seat livery — navy skirt, cyan line, pearl sides, the mark and **SEAT RAILWAY** on the flanks, the market cap on the cab's display — running along the line through whichever world the market cap has reached. Drag to walk the camera around it. The readout in the corner gives the **market cap**, the number of **carriages**, where the **next** one is coupled on, and the **5m** move. |
+| **Outside** | The whole train in the Seat Railway livery — gloss black with a cyan line, the mark and **SEAT RAILWAY** in white on the flanks, the market cap on the cab's display — running along the line through whichever world the market cap has reached. Drag to walk the camera around it. The readout in the corner gives the **market cap**, the number of **carriages**, where the **next** one is coupled on, and the **5m** move. |
 | **Seat · forward** | The row ahead, the passengers in it, and your seat-back screen. |
 | **Seat · look left / right** | Your head turned. What is beside you depends on your seat — and the seat next to you is always taken. |
 | **Driver's cab** | The controls in 3D, from the driver's seat: the real sky through the windscreen, live displays for both drivers and the overhead panel with the signs lit. Drag to look around. |

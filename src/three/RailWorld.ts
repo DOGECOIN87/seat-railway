@@ -6,7 +6,7 @@ import { formatCap } from '../lib/flightModel';
 import type { Attitude } from '../lib/useAttitude';
 import { HANDS_OFF, type ManualControls } from '../lib/manualControls';
 import { carriagesFor, gradeFor, MAX_CARRIAGES, nextCarriageAt, trainSpeedFor } from '../lib/consist';
-import { MARK_PATH, MARK_NAVY } from '../components/Mark';
+import { MARK_PATH } from '../components/Mark';
 import { noise2 } from './noise';
 import type { ViewPose, WorldHandles } from './WorldScene';
 
@@ -72,11 +72,13 @@ const CAR_PITCH = CAR_LEN + CAR_GAP;
 const BOGIE = 7;
 
 /* ── The brand ────────────────────────────────────────────────────────── */
-const NAVY = new THREE.Color(MARK_NAVY);
+/** The railway's black: the train, its signs and its adverts. */
+const INK = '#0B0B0D';
+const NAVY = new THREE.Color(INK);
 const CYAN = new THREE.Color('#00C9F1');
 const BLUE = new THREE.Color('#0087EA');
-const PEARL = new THREE.Color('#EEF2F7');
-const ROOF = new THREE.Color('#B9C0CA');
+const PEARL = new THREE.Color('#141518');
+const ROOF = new THREE.Color('#202227');
 
 const MODEL = (name: string) => `${import.meta.env.BASE_URL}models/${name}`;
 
@@ -956,9 +958,9 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
 
   /* ── Livery ──────────────────────────────────────────────────────────
      The car body is one material in the model, so the livery is painted by
-     height on the car rather than by texture: navy skirt, a cyan line, pearl
-     sides, a grey roof — the airline's colours, carried over. The name and
-     the mark go on as decals drawn to a canvas, as the airliner's did. */
+     height on the car rather than by texture: the railway's gloss black, a
+     cyan line low down and a charcoal roof. The name and the mark go on in
+     white, as decals drawn to a canvas, as the airliner's did. */
   const liveryMat = (() => {
     const m = keep(new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.32, metalness: 0.15, clearcoat: 0.8, clearcoatRoughness: 0.18 }));
     m.onBeforeCompile = (sh) => {
@@ -1042,14 +1044,14 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
 
   /** `SEAT RAILWAY` with the mark, for the lead car's flanks. */
   const titleArt = canvasTex(2048, 256, (g) => {
-    drawMark(g, 0, -10, 276, MARK_NAVY);
-    g.fillStyle = MARK_NAVY;
+    drawMark(g, 0, -10, 276, '#FFFFFF');
+    g.fillStyle = '#FFFFFF';
     g.font = fontFace(150);
     g.textBaseline = 'middle';
     spaced(g, 'SEAT RAILWAY', 300, 136, 10);
   });
   /** The mark alone, for every carriage. */
-  const markArt = canvasTex(256, 256, (g) => drawMark(g, 0, 0, 256, MARK_NAVY));
+  const markArt = canvasTex(256, 256, (g) => drawMark(g, 0, 0, 256, '#FFFFFF'));
   const decalMat = (map: THREE.Texture) => keep(new THREE.MeshStandardMaterial({ map, transparent: true, roughness: 0.35, metalness: 0.1, polygonOffset: true, polygonOffsetFactor: -2, depthWrite: false }));
   const titleMat = decalMat(titleArt.tex);
   const markMat = decalMat(markArt.tex);
@@ -1183,7 +1185,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
   interface StationSlot { root: THREE.Group; m: number; boards: { redraw: () => void }[] }
   const stationSlots: StationSlot[] = [];
   const boardArt = () => canvasTex(1024, 256, (g) => {
-    g.fillStyle = MARK_NAVY;
+    g.fillStyle = INK;
     g.fillRect(0, 0, 1024, 256);
     g.fillStyle = '#00C9F1';
     g.fillRect(0, 222, 1024, 14);
@@ -1258,8 +1260,8 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
   const imageCache = new Map<string, HTMLImageElement | null>();
   const drawHouseAd = (g: CanvasRenderingContext2D, w: number, h: number, n: number) => {
     const grad = g.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, MARK_NAVY);
-    grad.addColorStop(1, n % 2 ? '#0087EA' : '#003A8C');
+    grad.addColorStop(0, INK);
+    grad.addColorStop(1, n % 2 ? '#22252C' : '#000000');
     g.fillStyle = grad;
     g.fillRect(0, 0, w, h);
     drawMark(g, 24, (h - 330) / 2, 330, '#FFFFFF');
@@ -1284,7 +1286,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     const draw = (img: HTMLImageElement | null) => {
       if (b.shows !== src) return;
       if (!img) { drawHouseAd(g, w, h, b.slot); b.art.tex.needsUpdate = true; return; }
-      g.fillStyle = MARK_NAVY;
+      g.fillStyle = INK;
       g.fillRect(0, 0, w, h);
       g.drawImage(img, 0, 0, h, h);
       drawMark(g, h + 40, 60, 160, '#FFFFFF');

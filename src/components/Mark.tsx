@@ -3,7 +3,7 @@
  *
  * Everywhere the page shows the logo — the top bar, the footer, the boarding
  * pass, the exterior view — it is the supplied vector in
- * public/seat-airlines-logo.svg, the one file. It is minified (whitespace,
+ * public/seat-railway-logo.svg, the one file. It is minified (whitespace,
  * the embedded C2PA metadata, and exact smooth-curve shorthands) and renders
  * the same drawing to the pixel at every size it is shown. The favicon, the
  * app icons and the house adverts are drawn from that same file too.
@@ -29,7 +29,7 @@ export const MARK_NAVY = '#002663';
 export const LOGO_FRAME = '40.43 32.28 420 420';
 
 /** Where the logo is served from, relative to the page like every other asset. */
-export const logoUrl = () => `${import.meta.env.BASE_URL}seat-airlines-logo.svg`;
+export const logoUrl = () => `${import.meta.env.BASE_URL}seat-railway-logo.svg`;
 
 let markup: Promise<string> | null = null;
 

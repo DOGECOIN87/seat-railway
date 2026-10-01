@@ -582,7 +582,7 @@ export async function fetchOwnerBanners(): Promise<Record<string, Banner>> {
 const HOUSE_INK = {
   /* The names are the roles, not the hues, so re-liverying the airline is
      this block and nothing else. */
-  navy: '#005FB8',   // the filled ground of a house advert
+  navy: '#0B0B0D',   // the filled ground of a house advert: the railway's black
   night: '#1B2027',  // the dark one
   amber: '#0087EA',  // what a house advert shouts in
   cyan: '#00C9F1',   // and what it says the quiet half in
