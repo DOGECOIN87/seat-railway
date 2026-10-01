@@ -53,8 +53,8 @@ A blank variable counts as unset, so passing an empty repository variable throug
 
 Seat Railway reads its holders through [Helius](https://www.helius.dev/), as Seat Airlines does, but **with a key of its own**. Keep the railway's key separate from the airline's, so the two sites' traffic and rate limits never mix.
 
-1. In the Helius dashboard, create a project for Seat Railway and copy its **API key**.
-2. Under **Access control**, allow requests only from the Worker. The page never calls Helius itself; the Worker does it for everybody.
+1. In the [Helius dashboard](https://dashboard.helius.dev), create an API key for Seat Railway (on a paid plan, a key or project of its own, apart from Seat Airlines') and copy it.
+2. Leave the key's domain and IP restrictions **off**. Only the Worker calls Helius, and a Cloudflare Worker has no fixed IP or browser origin, so a restriction would lock it out. The key stays private because it lives only in the Worker's secrets.
 3. In this repository, **Settings → Secrets and variables → Actions → Secrets**, add **one** of:
    * `HELIUS_API_KEY`: just the key, or
    * `RPC_URL`: the whole endpoint, `https://mainnet.helius-rpc.com/?api-key=<key>`.
