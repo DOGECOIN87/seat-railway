@@ -11,7 +11,7 @@ import Wordmark from './components/Wordmark';
 import WalletPicker from './components/WalletPicker';
 import SeatChange from './components/SeatChange';
 import SeatTicker, { type TickerItem } from './components/SeatTicker';
-import Landing from './components/Landing';
+import Landing from './components/RailwayLanding';
 import { SectionDock, SectionPanel, SHEET_QUERY, panelFromHash, type PanelKey } from './components/SectionPanels';
 import type { LogEntry } from './components/RadioLog';
 import {
@@ -133,7 +133,6 @@ const Loaded = ({ children, minHeight = '6rem' }: { children: ReactNode; minHeig
 
 const POSITIONS: { key: SeatPosition; label: string }[] = [
   { key: 'window', label: 'Window' },
-  { key: 'middle', label: 'Middle' },
   { key: 'aisle', label: 'Aisle' },
 ];
 
@@ -840,7 +839,7 @@ export default function App() {
             >
               {camera === 'hold' ? (
                 <Suspense fallback={<SceneLoading />}>
-                  <CargoHold feed={feed} band={band} belowCutoff={belowCutoff} controls={controls} />
+                  <CargoHold feed={feed} sky={sky} band={band} belowCutoff={belowCutoff} controls={controls} />
                 </Suspense>
               ) : camera === 'exterior' ? (
                 <Suspense fallback={<SceneLoading exterior />}>

@@ -52,6 +52,8 @@ const ExteriorView = ({ feed, sky, band, taken, claimed, viewing, controls = HAN
   /** Dragging swings the camera around the aeroplane. */
   const orbit = useRef({ angle: 0, active: false, x: 0 });
   const [webgl, setWebgl] = useState(true);
+  const [wide, setWide] = useState(false);
+  const wideRef = useRef(false); wideRef.current = wide;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -119,6 +121,7 @@ const ExteriorView = ({ feed, sky, band, taken, claimed, viewing, controls = HAN
       spunAt.current = 0;
     }
     pose.current.orbit = orbit.current.angle;
+    pose.current.dolly = wideRef.current ? 1 : 0;
     world.current?.render(a, latest.current.sky, latest.current.band, pose.current);
     if (tick) {
       world.current?.setMarket(tick.marketCap, tick.change5m);
@@ -163,6 +166,11 @@ const ExteriorView = ({ feed, sky, band, taken, claimed, viewing, controls = HAN
       style={{ touchAction: 'none' }}
     >
       <canvas ref={canvasRef} className="block h-full w-full" />
+      <div className="absolute right-3 top-3 flex gap-1 rounded-md bg-black/70 p-1" onPointerDown={(e) => e.stopPropagation()}>
+        <button className="px-2 py-1.5 text-[11px] text-white" onClick={() => { orbit.current.angle = 0; setWide(false); }}>Front</button>
+        <button className="px-2 py-1.5 text-[11px] text-white" onClick={() => { orbit.current.angle = 52; setWide(false); }}>Side</button>
+        <button className={`px-2 py-1.5 text-[11px] ${wide ? 'text-[#00C9F1]' : 'text-white'}`} aria-pressed={wide} onClick={() => { orbit.current.angle = 52; setWide((value) => !value); }}>Full train</button>
+      </div>
 
       {/* Scrims: the overlay has to stay readable whether it is over a bright
           cloud top or a night ground, and dimming the whole frame to manage

@@ -40,7 +40,7 @@ let lastBoard: { rows: BoardEntry[]; at: number } | null = null;
 export async function fetchBoard(signal?: AbortSignal): Promise<BoardEntry[] | null> {
   if (!hasBoard) return null;
   try {
-    const res = await fetch(`${WORKER_API}/scores`, { signal });
+    const res = await fetch(`${WORKER_API}/rail-scores`, { signal });
     if (!res.ok) return null;
     const body = (await res.json()) as { scores?: BoardEntry[] };
     if (!Array.isArray(body.scores)) return null;
@@ -60,7 +60,7 @@ export function recentBoard(maxAge = 60_000): BoardEntry[] | null {
 export async function startRun(): Promise<string | null> {
   if (!hasBoard) return null;
   try {
-    const res = await fetch(`${WORKER_API}/runs`, { method: 'POST' });
+    const res = await fetch(`${WORKER_API}/rail-runs`, { method: 'POST' });
     if (!res.ok) return null;
     const body = (await res.json()) as { run?: string };
     return typeof body.run === 'string' ? body.run : null;
@@ -83,7 +83,7 @@ export async function postScore(p: {
 }): Promise<Posted> {
   const issued = new Date().toISOString();
   const signature = await p.sign(scoreChallenge(p.address, p.run, p.score, issued));
-  const res = await fetch(`${WORKER_API}/scores`, {
+  const res = await fetch(`${WORKER_API}/rail-scores`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
@@ -104,7 +104,7 @@ export const shortWallet = (address: string) => `${address.slice(0, 4)}…${addr
  * Here rather than in the landing because the landing is not the only place
  * that reads it: the high scores open from inside the site too.
  */
-const BEST_KEY = 'sa.game.best';
+const BEST_KEY = 'sr.station-stop.best';
 export const readBest = (): number => {
   try {
     return Number(window.localStorage.getItem(BEST_KEY)) || 0;

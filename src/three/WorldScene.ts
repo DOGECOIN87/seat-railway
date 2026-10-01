@@ -67,6 +67,8 @@ const GROUND = 120000;
 
 /** Where the camera is sitting, and which way it is looking. */
 export interface ViewPose {
+  /** Absolute distance on the railway, for a driving challenge. */
+  railDistance?: number;
   /** Seat index across the cabin, 0–5, or null for the flight deck. */
   seatIndex: number | null;
   row: number;

@@ -61,7 +61,7 @@ const Seat = ({ id, zone, entry, banner, mine, onOpen, onInspect }: SeatProps) =
 
   const label = sold
     ? `Seat ${id}, rank ${entry.rank}, ${shortAddress(entry.address)}${banner ? `. Advert: ${banner.alt}` : ''}`
-    : `Seat ${id}, open${lavatory ? ', middle seat by the lavatory, does not recline' : ''}`;
+    : `Seat ${id}, open${lavatory ? ', aisle seat by the lavatory' : ''}`;
 
   return (
     <button
@@ -169,18 +169,18 @@ const SeatMap = memo(function SeatMap({ manifest, banners, mine, canAdvertise, o
          view is a phone's width on the widest screen. Six seats and an
          aisle, the row numbers and the gaps between them come to six seats
          and nine rem. */
-      style={{ '--seat-base': 'clamp(26px, calc((100cqi - 9rem) / 6.2), 78px)', '--seat': 'var(--seat-base)', '--cabin-w': 'min(100%, 41rem)' } as CSSProperties}
+      style={{ '--seat-base': 'clamp(26px, calc((100cqi - 9rem) / 4.2), 78px)', '--seat': 'var(--seat-base)', '--cabin-w': 'min(100%, 41rem)' } as CSSProperties}
     >
       <div className="sa-map__body">
         {/* ── Nose ── */}
         <svg viewBox="0 0 320 54" preserveAspectRatio="none" className="mx-auto block h-11 w-full max-w-[var(--cabin-w)]" aria-hidden>
           <path
-            d="M160 6 C202 6 244 25 258 53 L62 53 C76 25 118 6 160 6 Z"
+            d="M82 53 V24 Q82 6 100 6 H220 Q238 6 238 24 V53 Z"
             fill="#E8E9ED"
             stroke="rgba(163,167,180,0.55)"
             strokeWidth="1.25"
           />
-          <path d="M132 34 h56" stroke="rgba(163,167,180,0.6)" strokeWidth="1.5" />
+          <path d="M100 17h120v20H100z" fill="#26343b" stroke="#00c9f1" strokeWidth="1.5" />
           <circle cx="160" cy="22" r="2.5" fill="#0087EA" />
         </svg>
 
@@ -275,7 +275,7 @@ const SeatMap = memo(function SeatMap({ manifest, banners, mine, canAdvertise, o
               <span className="sa-zone-head__mark" aria-hidden>CRG</span>
               <div className="sa-zone-head__title">
                 <h3>{CARGO_HOLD.name}</h3>
-                <span className="sa-zone-head__visual">Below the cutoff&nbsp;/ unpressurized</span>
+                <span className="sa-zone-head__visual">Below the cutoff&nbsp;/ rear carriage</span>
               </div>
               <span className="sa-zone-head__note">{CARGO_HOLD.note}</span>
             </header>
@@ -286,12 +286,12 @@ const SeatMap = memo(function SeatMap({ manifest, banners, mine, canAdvertise, o
         {/* ── Tail ── */}
         <svg viewBox="0 0 320 64" preserveAspectRatio="none" className="mx-auto block h-12 w-full max-w-[var(--cabin-w)]" aria-hidden>
           <path
-            d="M62 0 L258 0 C247 28 211 52 160 58 C109 52 73 28 62 0 Z"
+            d="M82 0 H238 V37 Q238 48 226 48 H94 Q82 48 82 37 Z"
             fill="#E8E9ED"
             stroke="rgba(163,167,180,0.55)"
             strokeWidth="1.25"
           />
-          <path d="M160 10 L160 48" stroke="#0087EA" strokeWidth="2.5" opacity="0.7" />
+          <path d="M145 48v10h30V48" fill="#26343b" stroke="#0087EA" strokeWidth="2.5" />
         </svg>
       </div>
 

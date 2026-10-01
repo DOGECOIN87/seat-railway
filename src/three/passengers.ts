@@ -814,6 +814,8 @@ export interface SeatLayout {
   seatX: readonly number[];
   floorY: number;
   rowZ: (row: number) => number;
+  seatLetters?: readonly string[];
+  seatXFor?: (row: number, index: number) => number;
 }
 
 export interface PassengerHandles {
@@ -914,10 +916,10 @@ export function createPassengers(layout: SeatLayout): PassengerHandles {
       const want = detailFor(row, viewerRow);
       const lod = lods[want] ?? lods[want + 1] ?? lods[2]!;
       for (let s = 0; s < layout.seatX.length; s++) {
-        const id = `${row}${LETTERS[s]}`;
+        const id = `${row}${(layout.seatLetters ?? LETTERS)[s]}`;
         if (id === viewer || id === skip || !sold.has(id)) continue;
         const who = passengerFor(row, s);
-        body.position.set(layout.seatX[s], layout.floorY + SEAT_HEIGHT, layout.rowZ(row));
+        body.position.set(layout.seatXFor?.(row, s) ?? layout.seatX[s], layout.floorY + SEAT_HEIGHT, layout.rowZ(row));
         body.rotation.set(0, who.lean * 1.5, who.lean);
         body.scale.setScalar(who.scale);
         neck.rotation.set(who.nod, who.turn, who.tilt, 'YXZ');

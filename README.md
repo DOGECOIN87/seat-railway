@@ -7,7 +7,7 @@
 **One train. Everyone's on it. Your bag is your seat.**
 
 A train run by one number: its length, the line it runs on and the world it runs through are read live from its token's market,<br>
-so the train on your screen *is* the chart — and its 178 seats go to the biggest holders, in order.
+so the train on your screen *is* the chart — and its 118 seats go to the biggest holders, in order.
 
 [![Ride now](https://img.shields.io/badge/ride%20now-seat--railway.space-00C9F1?style=for-the-badge&logo=googlechrome&logoColor=white)](https://seat-railway.space/)
 [![Read the docs](https://img.shields.io/badge/read%20the%20docs-docs%2F-0E2E5E?style=for-the-badge&logo=gitbook&logoColor=white)](docs/README.md)
@@ -39,7 +39,7 @@ so the train on your screen *is* the chart — and its 178 seats go to the bigge
 | **Market cap is the length of the train** | A carriage is coupled on at every 1-2-5 step from $10K — $10K, $20K, $50K, $100K … — up to fourteen at $200M. Fall back under a milestone and a carriage is left behind on the line. |
 | **Market cap is where the line goes** | Country under $1M, a viaduct above the clouds at $1M, space at $10M, the moon at $50M, Mars at $100M. |
 | **The five-minute move is the grade** | A rising market lays the line ahead uphill, a falling one downhill, so the track behind the train is the chart. |
-| **Your bag is your seat** | The 178 biggest holders are seated by rank, driver's cab first. Everyone else rides in the freight car. |
+| **Your bag is your seat** | The 118 biggest holders are seated by rank, driver's cab first. Everyone else rides in the freight car. |
 | **Seats are finite** | Out-hold the holder in front of you and you take their seat — and the PA tells the whole train. |
 | **Every seat is a billboard** | A seated holder can put a square image on their seat. It moves with them, and goes up on the billboards beside the line. |
 | **Your seat is which room you are in** | In the directory you see and reach your own coach, and nobody else's. |
@@ -119,7 +119,7 @@ The train, the track, the station and the billboards are 3D models, converted fo
 
 ### The seat ladder
 
-178 seats across five coaches — **driver's cab, first class, business, exit row, standard** — filled strictly by rank. Your seat is your placement on the wall, the size of your tile, and which coach's directory and room you belong to.
+118 seats across five sections — **driver's cab, first class, business, exit row, standard** — filled strictly by rank. First Class has four private window suites, each with its own door, reclining chair, desk and reading light. Business and Standard use 2+2 seating around a central aisle. Your seat is your placement on the wall, the size of your tile, and which section's directory and room you belong to.
 
 Check in with **Phantom, Solflare, Backpack or Nightly** and your ticket is issued on the spot.
 

@@ -59,8 +59,8 @@ const rowRange = (from: number, to: number, left: string[], right: string[]): Ca
   return out;
 };
 
-const LR = ['A', 'B', 'C'];
-const RR = ['D', 'E', 'F'];
+const LR = ['A', 'B'];
+const RR = ['C', 'D'];
 
 export const CABIN_ZONES: readonly CabinZone[] = [
   {
@@ -71,7 +71,7 @@ export const CABIN_ZONES: readonly CabinZone[] = [
     group: '1',
     perk: 'You have the PA and the horn. One announcement a day. Use it well.',
     accent: 'cerise',
-    code: 'FDK',
+    code: 'DRV',
     visual: 'At the controls',
     rows: [{ n: null, left: ['CPT'], right: ['FO'] }],
   },
@@ -81,11 +81,11 @@ export const CABIN_ZONES: readonly CabinZone[] = [
     note: 'Rows 1–2',
     className: 'FIRST',
     group: '1',
-    perk: 'Window table. Champagne on every green candle.',
+    perk: 'Your own private suite: a panoramic window, reclining armchair, desk and reading light.',
     accent: 'cerise',
     code: 'FST',
-    visual: 'Private compartment',
-    rows: rowRange(1, 2, ['A', 'B'], ['E', 'F']),
+    visual: 'Private window suites',
+    rows: rowRange(1, 2, ['A'], ['D']),
   },
   {
     key: 'business',
@@ -188,10 +188,10 @@ export function findSeat(id: string | null): CabinSeat | null {
 }
 
 /** The worst seat on the aircraft, kept free so anyone can always board. */
-export const LAVATORY_SEATS = ['30B', '30E'] as const;
+export const LAVATORY_SEATS = ['30B', '30C'] as const;
 
 export const LAVATORY_NOTE =
-  'Middle seat, last row, by the lavatory. Does not recline. Merch this.';
+  'Aisle seat, last row, by the lavatory. Merch this.';
 
 /** Seats below the cutoff ride down here. It is not a punishment. */
 export const CARGO_HOLD = {

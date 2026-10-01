@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CAPTURE, captureState } from '../capture/flag';
-import { createWorld, type ViewPose, type WorldHandles } from '../three/WorldScene';
+import type { ViewPose } from '../three/WorldScene';
+import { createRailWorld, type RailHandles } from '../three/RailWorld';
 import type { FlightFeed } from '../lib/flightFeed';
 import type { BandState } from '../lib/flightModel';
 import type { SkyState } from '../lib/sky';
@@ -21,7 +22,7 @@ import type { CabinSeat, CabinZone, Facing } from '../content/cabin';
 const YAW_FOR: Record<Facing, number> = { left: -64, forward: 0, right: 64 };
 
 /** Seat letter to its place across the cabin: A B C, aisle, D E F. */
-const SEAT_INDEX: Record<string, number> = { A: 0, B: 1, C: 2, D: 3, E: 4, F: 5 };
+const SEAT_INDEX: Record<string, number> = { A: 0, B: 1, C: 2, D: 3 };
 
 interface CabinView3DProps {
   feed: FlightFeed;
@@ -46,7 +47,8 @@ interface CabinView3DProps {
 
 const CabinView3D = ({ feed, sky, band, seat, zone, facing, taken, adverts, controls = HANDS_OFF }: CabinView3DProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const world = useRef<WorldHandles | null>(null);
+  const [doorOpen, setDoorOpen] = useState(false);
+  const world = useRef<RailHandles | null>(null);
   const pose = useRef<ViewPose>({ seatIndex: 0, row: 1, yaw: 0, id: '1A' });
   /** Free look, added on top of whichever way the buttons are pointing. */
   const drag = useRef({ active: false, x: 0, y: 0, yaw: 0 });
@@ -57,9 +59,9 @@ const CabinView3D = ({ feed, sky, band, seat, zone, facing, taken, adverts, cont
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    let handles: WorldHandles;
+    let handles: RailHandles;
     try {
-      handles = createWorld(canvas);
+      handles = createRailWorld(canvas, { interior: 'coach' });
     } catch {
       // No WebGL. The page still works; this view simply stays dark.
       return;
@@ -96,13 +98,16 @@ const CabinView3D = ({ feed, sky, band, seat, zone, facing, taken, adverts, cont
     pose.current.row = seat.row ?? 1;
     pose.current.id = seat.id;
     drag.current.yaw = 0;
+    setDoorOpen(false);
   }, [seat.id, seat.row]);
+  useEffect(() => { world.current?.setSuiteDoor(doorOpen); }, [doorOpen]);
 
   useEffect(() => {
     drag.current.yaw = 0;
   }, [facing]);
 
-  useAttitude(feed, (a) => {
+  useAttitude(feed, (a, tick) => {
+    if (tick) world.current?.setMarket(tick.marketCap, tick.change5m);
     pose.current.yaw = CAPTURE && captureState.yaw !== null ? captureState.yaw : YAW_FOR[facing] + drag.current.yaw;
     world.current?.render(a, latest.current.sky, latest.current.band, pose.current);
   }, controls);
@@ -141,6 +146,10 @@ const CabinView3D = ({ feed, sky, band, seat, zone, facing, taken, adverts, cont
       style={{ touchAction: 'none' }}
     >
       <canvas ref={canvasRef} className="block h-full w-full" />
+      {zone.key === 'first' && <button className="absolute top-3 right-3 rounded-md bg-black/75 px-3 py-2 text-xs text-white"
+        aria-pressed={doorOpen} onPointerDown={(e) => e.stopPropagation()} onClick={() => setDoorOpen((open) => !open)}>
+        {doorOpen ? 'Close suite door' : 'Open suite door'}
+      </button>}
 
       {/* Where you are, and how to look around */}
       <p className="pointer-events-none absolute bottom-3 left-3 border sm:bottom-4 sm:left-4 border-white/12 bg-[#05070F]/80 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-seat-amber backdrop-blur-sm">

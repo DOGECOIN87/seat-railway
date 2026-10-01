@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import type { SkyState } from '../lib/sky';
 import type { BandState, FlightBand } from '../lib/flightModel';
@@ -9,6 +10,9 @@ import { carriagesFor, gradeFor, MAX_CARRIAGES, nextCarriageAt, trainSpeedFor } 
 import { MARK_PATH } from '../components/Mark';
 import { noise2 } from './noise';
 import type { ViewPose, WorldHandles } from './WorldScene';
+import { createRailInterior, type RailInteriorMode } from './railInterior';
+import { coachForRow, COACH_PITCH } from '../lib/railLayout';
+import { FULL_CABIN } from '../lib/seating';
 
 /**
  * The railway, rendered.
@@ -195,11 +199,14 @@ const worldFor = (band: FlightBand): World =>
 export interface RailOptions {
   /** Skip the detailed track and the station, for a low-power view. */
   light?: boolean;
+  interior?: RailInteriorMode;
+  stopAt?: number;
 }
 
 export interface RailHandles extends WorldHandles {
   /** The market cap the train is sized for. */
   setMarket: (marketCap: number, change5m: number) => void;
+  setSuiteDoor: (open: boolean) => void;
 }
 
 interface Frame {
@@ -237,6 +244,14 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
   const camera = new THREE.PerspectiveCamera(42, 1, 0.3, 90000);
   const disposables: { dispose: () => void }[] = [];
   const keep = <T extends { dispose: () => void }>(d: T): T => { disposables.push(d); return d; };
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const room = new RoomEnvironment();
+  const environment = keep(pmrem.fromScene(room, 0.04));
+  scene.environment = environment.texture;
+  scene.environmentIntensity = 0.4;
+  room.dispose(); pmrem.dispose();
+  const inside = options.interior ? createRailInterior(options.interior) : null;
+  if (inside) scene.add(inside.group);
 
   /* ── Light ── */
   const hemi = new THREE.HemisphereLight(0xbfd8ff, 0x4a4030, 1.1);
@@ -1079,6 +1094,17 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
   const ledFace = keep(new THREE.MeshBasicMaterial({ map: ledArt.tex, toneMapped: false }));
 
   const decalGeo = keep(new THREE.PlaneGeometry(1, 1));
+  const stopMarker = options.stopAt === undefined ? null : new THREE.Group();
+  if (stopMarker) {
+    const art = canvasTex(256, 256, (g) => {
+      g.fillStyle = '#eef4f5'; g.fillRect(0, 0, 256, 256);
+      g.fillStyle = '#0b0b0d'; g.font = '800 68px Arial'; g.textAlign = 'center';
+      g.fillText('STOP', 128, 108); g.fillText('SR350', 128, 200);
+    });
+    const mat = keep(new THREE.MeshBasicMaterial({ map: art.tex, side: THREE.DoubleSide, toneMapped: false }));
+    const sign = new THREE.Mesh(decalGeo, mat); sign.scale.set(0.85, 0.85, 1); sign.position.set(1.65, 2.2, 0);
+    stopMarker.add(sign); scene.add(stopMarker);
+  }
   /** Body half-width at a height, from the model, so decals sit on the skin. */
   const skinAt = (root: THREE.Object3D, y0: number, y1: number) => {
     let max = 0;
@@ -1233,6 +1259,9 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
       root.add(scaled);
       const boards: { redraw: () => void }[] = [];
       for (const z of [-30, 0, 30]) {
+        const pool = new THREE.PointLight(0xffecd3, lowPower ? 32 : 55, 25, 2);
+        pool.position.set(PLATFORM_EDGE + 3.2, 5.2, z);
+        root.add(pool);
         const art = boardArt();
         boards.push(art);
         const mat = keep(new THREE.MeshStandardMaterial({ map: art.tex, emissive: 0xffffff, emissiveMap: art.tex, emissiveIntensity: 0.35 }));
@@ -1443,8 +1472,10 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     /* The grade the line ahead is laid at, and the speed along it. */
     slopeTarget = Math.tan(THREE.MathUtils.degToRad(gradeFor(a.pitch)));
     const want = pose.speed ?? trainSpeedFor(a.speed);
-    speed += (want - speed) * Math.min(1, dt * 0.6);
-    if (!pose.freeze) s += speed * dt * (pose.timeScale ?? 1);
+    if (pose.speed !== undefined) speed = pose.speed;
+    else speed += (want - speed) * Math.min(1, dt * 0.6);
+    if (pose.railDistance !== undefined) s = pose.railDistance;
+    else if (!pose.freeze) s += speed * dt * (pose.timeScale ?? 1);
     if (import.meta.env.DEV) {
       const jump = (window as unknown as { __railJump?: number });
       if (jump.__railJump) { s += jump.__railJump; jump.__railJump = 0; }
@@ -1552,6 +1583,11 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
 
     /* Signals: green on a rising market, red on a falling one */
     signalLamp.color.set(change > 2 ? 0x30ff6a : change < -2 ? 0xff3030 : 0xffb020);
+    if (stopMarker && options.stopAt !== undefined) {
+      const stop = frameAt(options.stopAt, fa);
+      stopMarker.position.set(stop.x - origin.x, stop.y - origin.y, stop.z - origin.z);
+      stopMarker.rotation.y = -stop.h;
+    }
 
     /* ── Sky and light ── */
     const pal = sky.palette;
@@ -1594,6 +1630,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     if (sky.weather === 'storm' && world === 'country' && Math.random() < dt * 0.25) hemi.intensity += 6;
 
     const night = 1 - day;
+    scene.environmentIntensity = lerp(0.22, 0.55, day);
     headlamp.intensity = night * 260;
     const groundNight = world === 'country' ? smooth(0.18, 0.85, night) : 0;
     platformFill.intensity = groundNight * 0.5;
@@ -1603,7 +1640,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     const glow = night * 1.1 + 0.08;
     cars.forEach((car, i) => {
       if (!car.glass) return;
-      const lit = i === 0 || i / Math.max(1, wantCars) <= taken / 178 + 0.05;
+      const lit = i === 0 || i / Math.max(1, wantCars) <= taken / FULL_CABIN + 0.05;
       car.glass.emissiveIntensity = lit ? glow : 0;
     });
     if (tailGlass) tailGlass.emissiveIntensity = glow;
@@ -1650,12 +1687,14 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
 
     /* ── The camera ── */
     const dbg = import.meta.env.DEV ? (window as unknown as { __railCam?: { dist?: number; lift?: number; orbit?: number; back?: number } }).__railCam : undefined;
-    const leadFrame = frameAt(s - 6 - (dbg?.back ?? 0), fa);
+    const pull = Math.max(0, Math.min(1, pose.dolly ?? 0));
+    const trainLength = (wantCars + 1) * CAR_PITCH;
+    const leadFrame = frameAt(s - lerp(6, trainLength * 0.46, pull) - (dbg?.back ?? 0), fa);
     target.set(leadFrame.x - origin.x, leadFrame.y - origin.y + 2.2, leadFrame.z - origin.z);
     const chase = pose.chase ?? 0;
     const orbit = THREE.MathUtils.degToRad(dbg?.orbit ?? (pose.orbit ?? 0) + 38);
-    const dist = dbg?.dist ?? lerp(34, 40, chase) * (1 + (pose.dolly ?? 0) * 0.6);
-    const lift = dbg?.lift ?? lerp(7.5, 10, chase);
+    const dist = dbg?.dist ?? lerp(lerp(34, 40, chase), Math.max(50, trainLength * 0.85), pull);
+    const lift = dbg?.lift ?? lerp(lerp(7.5, 10, chase), Math.max(12, trainLength * 0.18), pull);
     const hdg = origin.h;
     // Orbit measured from dead ahead, swinging round to starboard.
     const ox = Math.sin(hdg) * Math.cos(orbit) + Math.cos(hdg) * Math.sin(orbit);
@@ -1674,6 +1713,23 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
       const n = new THREE.Vector3(Math.sin(b.rotation.y), 0, Math.cos(b.rotation.y));
       camera.position.copy(b.position).addScaledVector(n, 22).add(new THREE.Vector3(0, 7, 0));
       camera.lookAt(b.position.x, b.position.y + 7, b.position.z);
+    }
+    if (inside) {
+      const eye = inside.eye(pose);
+      const slot = options.interior === 'cab' ? 0 : options.interior === 'freight' ? Math.max(1, wantCars) : Math.min(Math.max(1, wantCars), coachForRow(pose.row) + 1);
+      placeAlong(inside.group, s - slot * COACH_PITCH, origin);
+      inside.group.updateMatrixWorld(true);
+      camera.position.copy(eye).applyMatrix4(inside.group.matrixWorld);
+      const yaw = THREE.MathUtils.degToRad(pose.yaw);
+      const tilt = THREE.MathUtils.degToRad((pose.pitch ?? 0) + (options.interior === 'cab' ? -7 : 0));
+      tmpV.set(Math.sin(yaw) * Math.cos(tilt), Math.sin(tilt), -Math.cos(yaw) * Math.cos(tilt));
+      tmpV.transformDirection(inside.group.matrixWorld).add(camera.position);
+      camera.up.set(0, 1, 0).transformDirection(inside.group.matrixWorld);
+      camera.lookAt(tmpV);
+      camera.fov = options.interior === 'cab' ? 68 : 72;
+      camera.updateProjectionMatrix();
+      consist.visible = false; placeholder.visible = false;
+      inside.update(a, speed, night, now);
     }
     if (pose.frame) {
       // Offsets from the middle, as fractions of the frame: right and up.
@@ -1714,8 +1770,9 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     camera.updateProjectionMatrix();
   };
 
-  const setOccupancy = (t: ReadonlySet<string>) => { taken = t.size; };
+  const setOccupancy = (t: ReadonlySet<string>) => { taken = t.size; inside?.setOccupancy(t); };
   const setAdverts = (bySeat: Readonly<Record<string, string>>) => {
+    inside?.setAdverts(bySeat);
     // Front of the train first: seats in ladder order.
     const order = Object.keys(bySeat).sort((a, b) => parseInt(a, 10) - parseInt(b, 10) || a.localeCompare(b));
     adverts = order.map((k) => bySeat[k]).filter(Boolean);
@@ -1725,7 +1782,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
   const travelled = () => s;
   const groundAt = () => 0;
   const planeOnScreen = () => lastFrame;
-  const setDeckReadout = () => {};
+  const setDeckReadout: WorldHandles['setDeckReadout'] = (readout) => { inside?.setReadout(readout); };
 
   ensureChunks(0);
   void loadAll();
@@ -1738,6 +1795,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
 
   const dispose = () => {
     disposed = true;
+    inside?.dispose();
     for (const c of chunks) {
       c.terrain.geometry.dispose();
       c.water.geometry.dispose();
@@ -1758,7 +1816,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     renderer.dispose();
   };
 
-  return { render, resize, setOccupancy, setAdverts, setControls, travelled, groundAt, planeOnScreen, setDeckReadout, setMarket, dispose };
+  return { render, resize, setOccupancy, setAdverts, setControls, travelled, groundAt, planeOnScreen, setDeckReadout, setMarket, setSuiteDoor: (open) => inside?.setSuiteDoor(open), dispose };
 }
 
 /** A few small geometries into one, positions and normals only. */

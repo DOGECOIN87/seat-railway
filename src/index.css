@@ -3225,6 +3225,35 @@ p { text-wrap-style: pretty; }
 }
 .sa-landing.is-leaving { opacity: 0; pointer-events: none; }
 .sa-landing__scene { position: absolute; inset: 0; }
+.rail-splash { position: absolute; inset: 0; z-index: 20; display: grid; place-content: center; gap: 2rem; padding: 2rem; background: #090e12; }
+.rail-splash .sa-board { width: min(80vw, 650px); }
+.rail-splash button { justify-self: center; padding: 0.6rem 1rem; color: #adc0ca; }
+.rail-driving .sa-landing__scrim { background: linear-gradient(180deg, #0008, transparent 30%, transparent 72%, #0009); }
+.rail-game-top { position: absolute; top: 6rem; left: 50%; transform: translateX(-50%); width: min(calc(100% - 2rem), 660px); display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 1.25rem; padding: 1rem; background: #071216e8; border: 1px solid #ffffff26; border-radius: 8px; color: #eef6f7; }
+.rail-game-top > div > span { display: block; font: 11px monospace; text-transform: uppercase; color: #90b6be; }
+.rail-game-top strong { display: block; margin-top: 0.35rem; font: 600 26px monospace; white-space: nowrap; }
+.rail-game-top small { font-size: 12px; color: #90b6be; }
+.rail-game-top button { padding: 0 0.4rem; font-size: 26px; }
+.rail-game-controls { position: absolute; left: 50%; bottom: max(1rem, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(calc(100% - 2rem), 660px); display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1px solid #ffffff26; border-radius: 8px; background: #071216f2; }
+.rail-game-lever { flex: 1; min-width: 0; }
+.rail-game-lever label { display: block; color: #eef6f7; font: 12px monospace; }
+.rail-game-lever input { width: 100%; min-height: 44px; accent-color: #00c9f1; }
+.rail-game-lever > div { display: flex; justify-content: space-between; font: 10px monospace; color: #90b6be; }
+.rail-emergency { min-height: 48px; padding: 0.5rem 0.8rem; background: #a43037; border: 1px solid #f78585; border-radius: 6px; color: white; font: 600 12px monospace; max-width: 8rem; }
+.rail-result { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(calc(100% - 2rem), 540px); padding: 2rem; border: 1px solid #ffffff26; border-radius: 8px; background: #071216f5; color: #eef6f7; }
+.rail-result h2 { font: 700 28px Montserrat, sans-serif; margin: 0.5rem 0; }
+.rail-result > p { color: #adc0ca; margin: 0.6rem 0; font-size: 13px; }
+.rail-result > strong { display: block; margin: 1rem 0; font: 700 40px monospace; color: #00c9f1; }
+.rail-result small { font-size: 14px; }
+.rail-driving .sa-pilots { margin-left: 0; }
+@media (max-width: 600px) {
+  .rail-game-top { top: 7.5rem; gap: 0.65rem; padding: 0.7rem; }
+  .rail-game-top > div > span { font-size: 9px; }
+  .rail-game-top strong { font-size: 20px; }
+  .rail-game-top small { font-size: 10px; }
+  .rail-game-controls { gap: 0.65rem; padding: 0.7rem; }
+  .rail-result { padding: 1.25rem; }
+}
 .sa-landing__canvas {
   display: block;
   width: 100%;

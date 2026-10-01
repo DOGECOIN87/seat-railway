@@ -233,7 +233,7 @@ console.log('\nhouse adverts');
 check('the seated-by-rank advert names the real cabin size', () => {
   const svg = decodeURIComponent(Object.values(houseAdverts(Array.from({ length: 20 }, (_, i) => `S${i}`))).map((b) => b.image).join(''));
   assert(!/TOP 40 ONLY/.test(svg), 'still says TOP 40');
-  assert(/TOP 178 ONLY/.test(svg), 'does not say TOP 178');
+  assert(/TOP 118 ONLY/.test(svg), 'does not say TOP 118');
 });
 
 console.log(`\n${pass} passed, ${fail} failed\n`);

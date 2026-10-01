@@ -60,6 +60,7 @@ import { cabinSize, canSeat, readLadder, rpcUrl } from './ladder';
 import { HANDS_OFF, clamped, handsOff, type ManualControls } from '../../src/lib/manualControls';
 import { scoreChallenge } from '../../src/lib/scoring';
 import { BOARD_SIZE, RUN_TTL_MS, RUNS_PER_HOUR, implausible, newRunId, readScorePost } from './leaderboard';
+import { implausibleRail } from './railLeaderboard';
 import { CARD_TTL_SECONDS, cardId, cardPage, cardProblem, isCardId } from './cards';
 import {
   ANNOUNCEMENT, canAnnounce, canMessage, canPostToChannel, canViewContact,
@@ -539,30 +540,34 @@ function ensureLogbook(db: D1Database): Promise<unknown> {
    either is a run starting — the one leaderboard write that needs no
    signature, because it records nothing but the time, and is rate-limited
    per address. */
-let leaderboardTables: Promise<unknown> | null = null;
+const leaderboardTables = new Map<string, Promise<unknown>>();
 
-function ensureLeaderboard(db: D1Database): Promise<unknown> {
-  leaderboardTables ??= db.batch([
-    db.prepare(`CREATE TABLE IF NOT EXISTS game_runs (
+function ensureLeaderboard(db: D1Database, rail = false): Promise<unknown> {
+  const prefix = rail ? 'rail_game' : 'game';
+  const cached = leaderboardTables.get(prefix);
+  if (cached) return cached;
+  const ready = db.batch([
+    db.prepare(`CREATE TABLE IF NOT EXISTS ${prefix}_runs (
       id         TEXT PRIMARY KEY,
       started_at INTEGER NOT NULL,
       ip         TEXT NOT NULL,
       used       INTEGER NOT NULL DEFAULT 0
     )`),
-    db.prepare('CREATE INDEX IF NOT EXISTS game_runs_by_ip ON game_runs (ip, started_at)'),
-    db.prepare(`CREATE TABLE IF NOT EXISTS game_scores (
+    db.prepare(`CREATE INDEX IF NOT EXISTS ${prefix}_runs_by_ip ON ${prefix}_runs (ip, started_at)`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS ${prefix}_scores (
       address   TEXT PRIMARY KEY,
       score     INTEGER NOT NULL,
       survived  REAL NOT NULL,
       climb     REAL NOT NULL,
       posted_at INTEGER NOT NULL
     )`),
-    db.prepare('CREATE INDEX IF NOT EXISTS game_scores_by_score ON game_scores (score DESC)'),
+    db.prepare(`CREATE INDEX IF NOT EXISTS ${prefix}_scores_by_score ON ${prefix}_scores (score DESC)`),
   ]).catch((e) => {
-    leaderboardTables = null;
+    leaderboardTables.delete(prefix);
     throw e;
   });
-  return leaderboardTables;
+  leaderboardTables.set(prefix, ready);
+  return ready;
 }
 
 /* ── A card's social links ───────────────────────────────────────────────
@@ -1107,15 +1112,19 @@ async function handle(request: Request, env: Env): Promise<Response> {
        message, never a transaction), a run this server started, and a
        score that run could have earned in the time since. Each wallet
        keeps its best; each run posts once. */
-    if (url.pathname === '/scores' || url.pathname === '/runs') {
+    if (['/scores', '/runs', '/rail-scores', '/rail-runs'].includes(url.pathname)) {
+      const rail = url.pathname.startsWith('/rail-');
+      const scorePath = rail ? '/rail-scores' : '/scores';
+      const runPath = rail ? '/rail-runs' : '/runs';
+      const prefix = rail ? 'rail_game' : 'game';
       const db = env.DIRECTORY;
       if (!db) return json({ error: 'This deployment has no leaderboard configured.' }, 503, cors);
       const priv = { ...cors, 'cache-control': 'no-store' };
 
-      if (request.method === 'GET' && url.pathname === '/scores') {
+      if (request.method === 'GET' && url.pathname === scorePath) {
         try {
           const { results } = await db
-            .prepare('SELECT address, score, survived, climb, posted_at FROM game_scores ORDER BY score DESC, posted_at ASC LIMIT ?')
+            .prepare(`SELECT address, score, survived, climb, posted_at FROM ${prefix}_scores ORDER BY score DESC, posted_at ASC LIMIT ?`)
             .bind(BOARD_SIZE)
             .all<{ address: string; score: number; survived: number; climb: number; posted_at: number }>();
           const scores = results.map((r) => ({ address: r.address, score: r.score, survived: r.survived, climb: r.climb, postedAt: r.posted_at }));
@@ -1126,12 +1135,12 @@ async function handle(request: Request, env: Env): Promise<Response> {
         }
       }
 
-      if (request.method === 'POST' && url.pathname === '/runs') {
-        await ensureLeaderboard(db);
+      if (request.method === 'POST' && url.pathname === runPath) {
+        await ensureLeaderboard(db, rail);
         const now = Date.now();
         const ip = await sha256Hex(new TextEncoder().encode(request.headers.get('cf-connecting-ip') ?? 'unknown'));
         const recent = await db
-          .prepare('SELECT COUNT(*) AS n FROM game_runs WHERE ip = ? AND started_at > ?')
+          .prepare(`SELECT COUNT(*) AS n FROM ${prefix}_runs WHERE ip = ? AND started_at > ?`)
           .bind(ip, now - 60 * 60 * 1000)
           .first<{ n: number }>();
         if ((recent?.n ?? 0) >= RUNS_PER_HOUR) {
@@ -1139,14 +1148,14 @@ async function handle(request: Request, env: Env): Promise<Response> {
         }
         const run = newRunId();
         await db.batch([
-          db.prepare('INSERT INTO game_runs (id, started_at, ip, used) VALUES (?, ?, ?, 0)').bind(run, now, ip),
+          db.prepare(`INSERT INTO ${prefix}_runs (id, started_at, ip, used) VALUES (?, ?, ?, 0)`).bind(run, now, ip),
           // Nothing else sweeps these up, and starting one is already a write.
-          db.prepare('DELETE FROM game_runs WHERE started_at < ?').bind(now - 24 * 60 * 60 * 1000),
+          db.prepare(`DELETE FROM ${prefix}_runs WHERE started_at < ?`).bind(now - 24 * 60 * 60 * 1000),
         ]);
         return json({ run, started: now }, 200, priv);
       }
 
-      if (request.method === 'POST' && url.pathname === '/scores') {
+      if (request.method === 'POST' && url.pathname === scorePath) {
         let body: unknown;
         try {
           body = await request.json();
@@ -1162,29 +1171,29 @@ async function handle(request: Request, env: Env): Promise<Response> {
         if (!(await verifySignature(post.address, scoreChallenge(post.address, post.run, post.score, post.issued), post.signature))) {
           return json({ error: 'That signature does not match the wallet.' }, 401, priv);
         }
-        await ensureLeaderboard(db);
+        await ensureLeaderboard(db, rail);
         const run = await db
-          .prepare('SELECT started_at, used FROM game_runs WHERE id = ?')
+          .prepare(`SELECT started_at, used FROM ${prefix}_runs WHERE id = ?`)
           .bind(post.run)
           .first<{ started_at: number; used: number }>();
         if (!run) return json({ error: 'That flight is not one this server started.' }, 400, priv);
         if (run.used) return json({ error: 'That flight has already been posted.' }, 409, priv);
         const now = Date.now();
         if (now - run.started_at > RUN_TTL_MS) return json({ error: 'That flight is too long ago to post.' }, 400, priv);
-        const wrong = implausible(post, run.started_at, now);
+        const wrong = rail ? implausibleRail(post, run.started_at, now) : implausible(post, run.started_at, now);
         if (wrong) return json({ error: wrong }, 422, priv);
         // Spend the run first: the same flight posted twice, however fast, finds it used.
-        const spent = await db.prepare('UPDATE game_runs SET used = 1 WHERE id = ? AND used = 0').bind(post.run).run();
+        const spent = await db.prepare(`UPDATE ${prefix}_runs SET used = 1 WHERE id = ? AND used = 0`).bind(post.run).run();
         if (!spent.meta.changes) return json({ error: 'That flight has already been posted.' }, 409, priv);
         await db
-          .prepare(`INSERT INTO game_scores (address, score, survived, climb, posted_at) VALUES (?, ?, ?, ?, ?)
+          .prepare(`INSERT INTO ${prefix}_scores (address, score, survived, climb, posted_at) VALUES (?, ?, ?, ?, ?)
             ON CONFLICT(address) DO UPDATE SET
               score = excluded.score, survived = excluded.survived, climb = excluded.climb, posted_at = excluded.posted_at
-            WHERE excluded.score > game_scores.score`)
+            WHERE excluded.score > ${prefix}_scores.score`)
           .bind(post.address, post.score, post.survived, post.climb, now)
           .run();
-        const best = (await db.prepare('SELECT score FROM game_scores WHERE address = ?').bind(post.address).first<{ score: number }>())?.score ?? post.score;
-        const rank = (await db.prepare('SELECT COUNT(*) + 1 AS rank FROM game_scores WHERE score > ?').bind(best).first<{ rank: number }>())?.rank ?? null;
+        const best = (await db.prepare(`SELECT score FROM ${prefix}_scores WHERE address = ?`).bind(post.address).first<{ score: number }>())?.score ?? post.score;
+        const rank = (await db.prepare(`SELECT COUNT(*) + 1 AS rank FROM ${prefix}_scores WHERE score > ?`).bind(best).first<{ rank: number }>())?.rank ?? null;
         return json({ best, rank, improved: best === post.score }, 200, priv);
       }
 

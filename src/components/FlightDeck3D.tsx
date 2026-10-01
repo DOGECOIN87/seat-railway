@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { CAPTURE, captureState } from '../capture/flag';
-import { createWorld, type ViewPose, type WorldHandles } from '../three/WorldScene';
+import type { ViewPose } from '../three/WorldScene';
+import { createRailWorld, type RailHandles } from '../three/RailWorld';
 import type { FlightFeed, FlightTick } from '../lib/flightFeed';
 import type { Annunciators, BandState } from '../lib/flightModel';
 import type { SkyState } from '../lib/sky';
@@ -30,7 +31,7 @@ interface FlightDeck3DProps {
 
 const FlightDeck3D = ({ feed, lamps, sky, band, controls = HANDS_OFF }: FlightDeck3DProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const world = useRef<WorldHandles | null>(null);
+  const world = useRef<RailHandles | null>(null);
   const [noGl, setNoGl] = useState(false);
   const pose = useRef<ViewPose>({ seatIndex: null, row: 1, yaw: 0, pitch: 0, id: 'CPT' });
   const drag = useRef({ active: false, x: 0, y: 0 });
@@ -40,9 +41,9 @@ const FlightDeck3D = ({ feed, lamps, sky, band, controls = HANDS_OFF }: FlightDe
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    let handles: WorldHandles;
+    let handles: RailHandles;
     try {
-      handles = createWorld(canvas);
+      handles = createRailWorld(canvas, { interior: 'cab' });
     } catch {
       setNoGl(true);
       return;
@@ -82,6 +83,7 @@ const FlightDeck3D = ({ feed, lamps, sky, band, controls = HANDS_OFF }: FlightDe
   useAttitude(feed, (a, tick) => {
     if (tick && tick !== latest.current.tick) {
       latest.current.tick = tick;
+      world.current?.setMarket(tick.marketCap, tick.change5m);
       push();
     }
     if (CAPTURE && captureState.yaw !== null) pose.current.yaw = captureState.yaw;

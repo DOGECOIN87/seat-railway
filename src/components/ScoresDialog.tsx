@@ -34,7 +34,7 @@ export default function ScoresDialog({ address, onClose }: ScoresDialogProps) {
       <header className="sa-modal__head">
         <div className="min-w-0">
           <p className="sa-modal__eyebrow">High scores</p>
-          <h2 id={title} className="sa-modal__title">Top pilots</h2>
+          <h2 id={title} className="sa-modal__title">Top drivers</h2>
         </div>
         <button type="button" onClick={onClose} className="sa-modal__close" aria-label="Close the high scores" data-autofocus>
           <span aria-hidden>×</span>
@@ -42,7 +42,7 @@ export default function ScoresDialog({ address, onClose }: ScoresDialogProps) {
       </header>
       <div className="sa-modal__body">
         <p className="sa-scores__lead">
-          Climb to 10,000 ft, lose an engine, stay up.
+          Station stops. Precision and time earn points.
         </p>
 
         {board === undefined ? (
@@ -66,7 +66,7 @@ export default function ScoresDialog({ address, onClose }: ScoresDialogProps) {
                       {you && <span className="sa-scores__you">You</span>}
                     </span>
                     <span className="sa-scores__meta">
-                      {row.survived > 0 ? `${Math.round(row.survived)} s on one engine` : 'Short of 10,000 ft'}
+                      {`${row.climb.toFixed(1)} m from the marker · ${Math.round(row.survived)} s`}
                     </span>
                   </span>
                   <span className="sa-scores__score">{row.score.toLocaleString('en-US')}</span>
@@ -81,7 +81,7 @@ export default function ScoresDialog({ address, onClose }: ScoresDialogProps) {
           <strong>{best > 0 ? best.toLocaleString('en-US') : '—'}</strong>
         </p>
         <p className="sa-scores__fine">
-          Fly from the landing to score. Posting signs a message, never a transaction.
+          Drive from the landing to score. Posting signs a message, never a transaction.
         </p>
       </div>
     </ModalWindow>
