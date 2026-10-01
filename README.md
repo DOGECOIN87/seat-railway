@@ -1,24 +1,23 @@
 <div align="center">
 
-<a href="https://seat-airlines.space"><img src="public/seat-airlines-logo.svg" alt="Seat Airlines" width="112" height="112"></a>
+<img src="public/seat-airlines-logo.svg" alt="Seat Railway" width="112" height="112">
 
-# SEAT AIRLINES
+# SEAT RAILWAY
 
-**One plane. Everyone's in it. Your bag is your seat.**
+**One train. Everyone's on it. Your bag is your seat.**
 
-A flight simulator flown by one number: the aircraft's altitude and attitude are read live from its token's market,<br>
-so the aeroplane on your screen *is* the chart — and its 178 seats go to the biggest holders, in order.
+A train run by one number: its length, the line it runs on and the world it runs through are read live from its token's market,<br>
+so the train on your screen *is* the chart — and its 178 seats go to the biggest holders, in order.
 
-[![Fly now](https://img.shields.io/badge/fly%20now-seat--airlines.space-00C9F1?style=for-the-badge&logo=googlechrome&logoColor=white)](https://seat-airlines.space)
-[![Read the docs](https://img.shields.io/badge/read%20the%20docs-GitBook-0E2E5E?style=for-the-badge&logo=gitbook&logoColor=white)](https://seat-airlines.gitbook.io/seat-airlines-docs/)
+[![Ride now](https://img.shields.io/badge/ride%20now-dogecoin87.github.io%2Fseat--railway-00C9F1?style=for-the-badge&logo=googlechrome&logoColor=white)](https://dogecoin87.github.io/seat-railway/)
+[![Read the docs](https://img.shields.io/badge/read%20the%20docs-docs%2F-0E2E5E?style=for-the-badge&logo=gitbook&logoColor=white)](docs/README.md)
 
-[![Deploy to GitHub Pages](https://github.com/DOGECOIN87/Seat-Airlines/actions/workflows/deploy.yml/badge.svg)](https://github.com/DOGECOIN87/Seat-Airlines/actions/workflows/deploy.yml)
-[![Deploy the banners Worker](https://github.com/DOGECOIN87/Seat-Airlines/actions/workflows/worker.yml/badge.svg)](https://github.com/DOGECOIN87/Seat-Airlines/actions/workflows/worker.yml)
+[![Deploy to GitHub Pages](https://github.com/DOGECOIN87/seat-railway/actions/workflows/deploy.yml/badge.svg)](https://github.com/DOGECOIN87/seat-railway/actions/workflows/deploy.yml)
 [![MIT licence](https://img.shields.io/badge/licence-MIT-0E2E5E)](LICENSE)
 
-<img src="docs/.gitbook/assets/exterior.jpg" alt="Flight SA350 banking into a turn over rolling farmland" width="100%">
+<img src="docs/.gitbook/assets/exterior.jpg" alt="The Seat Railway train running through farmland" width="100%">
 
-<sub>Flight **SA350** · Nonstop · rendered live in the browser — the same scene the cabin windows look out on</sub>
+<sub>Train **SR350** · Express · rendered live in the browser</sub>
 
 </div>
 
@@ -27,7 +26,7 @@ so the aeroplane on your screen *is* the chart — and its 178 seats go to the b
 ## Contents
 
 - [The premise](#the-premise)
-- [How it flies](#how-it-flies)
+- [How the train shows the market cap](#how-the-train-shows-the-market-cap)
 - [On board](#on-board)
 - [Explore the documentation](#explore-the-documentation)
 - [For developers](#for-developers) — [architecture](#architecture) · [quick start](#quick-start) · [project structure](#project-structure) · [configuration](#configuration) · [deploying](#deploying)
@@ -37,71 +36,69 @@ so the aeroplane on your screen *is* the chart — and its 178 seats go to the b
 
 | | |
 | :-- | :-- |
-| **Market cap is altitude** | $163K flies at 163,000 ft. $1M breaks out above the clouds, $10M is space, $50M is the moon, $100M is Mars. |
-| **The five-minute move is attitude** | A rising market pitches the nose up; a falling one pitches it down. |
-| **Your bag is your seat** | The 178 biggest holders are seated by rank, flight deck first. Everyone else rides in the cargo hold. |
-| **Seats are finite** | Out-hold the holder in front of you and you take their seat — and the PA tells the whole cabin. |
-| **Every seat is a billboard** | A seated holder can put a square image on their seat, and it moves with them. |
-| **Your seat is which room you are in** | In the cabin directory you see and reach your own section, and nobody else's. |
+| **Market cap is the length of the train** | A carriage is coupled on at every 1-2-5 step from $10K — $10K, $20K, $50K, $100K … — up to fourteen at $200M. Fall back under a milestone and a carriage is left behind on the line. |
+| **Market cap is where the line goes** | Country under $1M, a viaduct above the clouds at $1M, space at $10M, the moon at $50M, Mars at $100M. |
+| **The five-minute move is the grade** | A rising market lays the line ahead uphill, a falling one downhill, so the track behind the train is the chart. |
+| **Your bag is your seat** | The 178 biggest holders are seated by rank, driver's cab first. Everyone else rides in the freight car. |
+| **Seats are finite** | Out-hold the holder in front of you and you take their seat — and the PA tells the whole train. |
+| **Every seat is a billboard** | A seated holder can put a square image on their seat. It moves with them, and goes up on the billboards beside the line. |
+| **Your seat is which room you are in** | In the directory you see and reach your own coach, and nobody else's. |
 
 > [!IMPORTANT]
-> Seat Airlines never asks your wallet to approve a transaction. Every signature it requests is a plain-text message, and [Wallet safety](docs/safety/wallet-safety.md) prints each one word for word.
+> Seat Railway never asks your wallet to approve a transaction. Every signature it requests is a plain-text message, and [Wallet safety](docs/safety/wallet-safety.md) prints each one word for word.
 
-## How it flies
-
-One input drives everything the aircraft does — its token's market data — and nothing else.
+## How the train shows the market cap
 
 | The market's… | …becomes |
 | :-- | :-- |
-| Market cap | **Altitude**, read straight off the number |
-| Five-minute change | **Pitch**; its rate of change becomes **bank** |
-| Holder count | **Souls on board** |
-| Attitude | The **overhead annunciators**, and the PA announcements they trigger |
+| Market cap | **Length**: a carriage per milestone, coupling on from behind and uncoupled when lost |
+| Market cap | **The cab's display**, and **the world** the line runs through |
+| Five-minute change | **The grade** of the line ahead, the **speed**, and the **signals** (green, amber, red) |
+| Holder count | **Lit carriages**, front first, and **passengers** on board |
+| Milestones | The **horn** when a carriage couples on, the **crossing bell** when one is left behind |
 
-### The five levels
+→ [One number runs the train](docs/how-it-runs/one-number-runs-the-train.md) · [How the train shows the market cap](docs/the-railway/market-cap-on-the-train.md)
 
-Market cap *is* altitude, so the milestones are places — five of them so far, each a different world outside the windows. → [The five levels](docs/how-it-flies/altitude-bands.md)
+### The five worlds
 
 <table>
 <tr>
 <td width="50%" valign="top">
-<img src="docs/.gitbook/assets/levels/1-weather.jpg" alt="Flight SA350 over rolling farmland, in the weather">
+<img src="docs/.gitbook/assets/levels/1-country.jpg" alt="The train running through farmland">
 
-**In the weather** · under $1M<br>
-<sub>Low over rolling farmland among the cumulus: woods that stand up in three dimensions, villages and farms whose windows light up after dark, rivers and lakes, and a coast and open sea every few minutes, with ships under way. Your own sky, from your clock and your local weather.</sub>
+**In the country** · under $1M<br>
+<sub>Farmland, forest, snowy mountains, desert and coast, blending one into the next and never repeating. A station every couple of kilometres, billboards in between, and your own sky and weather.</sub>
 </td>
 <td width="50%" valign="top">
-<img src="docs/.gitbook/assets/levels/2-clouds.jpg" alt="Flight SA350 above a sea of cloud">
+<img src="docs/.gitbook/assets/levels/2-clouds.jpg" alt="The train on a viaduct above the clouds">
 
 **Above the clouds** · $1M<br>
-<sub>On top of the deck: a sea of billowing cumulus to the horizon, gaps down to the country that open and close with the real weather, and a deeper blue overhead.</sub>
+<sub>The line climbs onto a viaduct, its piers dropping away into a sea of cloud.</sub>
 </td>
 </tr>
 <tr>
 <td width="50%" valign="top">
-<img src="docs/.gitbook/assets/levels/3-space.jpg" alt="Flight SA350 at the edge of space over a curved Earth">
+<img src="docs/.gitbook/assets/levels/3-space.jpg" alt="The train on a guideway through space">
 
 **Space** · $10M<br>
-<sub>The sky drains to black and the horizon bends into a planet — oceans, coastlines and weather under a thin glowing band of atmosphere, with the stars out.</sub>
+<sub>A guideway through the dark, rails glowing cyan, a planet far below.</sub>
 </td>
 <td width="50%" valign="top">
-<img src="docs/.gitbook/assets/levels/4-moon.jpg" alt="Flight SA350 over the cratered moon with Earth on the horizon">
+<img src="docs/.gitbook/assets/levels/4-moon.jpg" alt="The train crossing the moon">
 
 **The moon** · $50M<br>
-<sub>Craters in real relief under a low sun, rays across the maria, a knife-sharp airless horizon — and Earth hanging off the port side.</sub>
+<sub>Craters, boulders and a black sky, with Earth hanging over the horizon.</sub>
 </td>
 </tr>
 <tr>
 <td colspan="2" valign="top">
-<img src="docs/.gitbook/assets/levels/5-mars.jpg" alt="Flight SA350 over the mesas and dunes of Mars under a butterscotch sky">
+<img src="docs/.gitbook/assets/levels/5-mars.jpg" alt="The train crossing the red plains of Mars">
 
 **Mars** · $100M — the furthest out, so far<br>
-<sub>Layered mesas, sand-filled craters and dune fields fading into a dusty butterscotch sky, under a smaller sun, with Phobos and Deimos off the port side.</sub>
+<sub>Red plains and boulders under a butterscotch sky, with two small moons — and by now thirteen carriages behind the cab.</sub>
 </td>
 </tr>
 </table>
-
-The sky is the visitor's own: the sun is placed from their clock and time zone, and the weather is live from [Open-Meteo](https://open-meteo.com/) — no location prompt, ever. → [The sky outside](docs/how-it-flies/the-sky.md)
 
 ## On board
 
@@ -109,42 +106,42 @@ The sky is the visitor's own: the sun is placed from their clock and time zone, 
 <tr>
 <td width="50%" valign="top">
 
-### A real flight, in 3D
+### A real train, in 3D
 
-The site opens on the aeroplane **full screen**: press **Enter** to go in, or connect a Solana wallet and **Fly** — arrow keys or a drag to climb, dive and turn, low over the hills, with a brief to reach 10,000 ft. At 10,000 ft an engine blows; the ground, when it comes, sends you in. Inside, the page opens **outside, on the whole aeroplane**, flying over ground that goes past for real: farmland with rolling hills, woods, villages and farms that stand up in three dimensions, rivers and lakes, a coast every few minutes and a stretch of open sea with ships under way. It banks into gentle turns, ailerons and rudder working, and every window lit from outside is a row somebody has genuinely booked.
+The site opens on the train **full screen**, running through the country, in the Seat livery — navy, cyan and pearl, with the mark and **SEAT RAILWAY** on its flanks and the market cap on the cab's display. Press **Enter** to go in. Inside, the page opens **outside, on the whole train**; drag to walk round it. Step inside to a seat, or walk the train from the driver's cab to the freight car.
 
-Step inside to a seat, turn your head, walk the aircraft, climb into the **flight deck** or drop into the **cargo hold**.
+The train, the track, the station and the billboards are 3D models, converted for the web in [`public/models`](public/models/README.md).
 
-→ [Views and controls](docs/the-cabin/views-and-controls.md)
+→ [Views and controls](docs/the-train/views-and-controls.md)
 
 </td>
 <td width="50%" valign="top">
 
 ### The seat ladder
 
-178 seats across five cabins — **flight deck, first, business, exit row, economy** — filled strictly by rank. Your seat is your placement on the wall, the size of your tile, and which cabin's directory and room you belong to.
+178 seats across five coaches — **driver's cab, first class, business, exit row, standard** — filled strictly by rank. Your seat is your placement on the wall, the size of your tile, and which coach's directory and room you belong to.
 
-Check in with **Phantom, Solflare, Backpack or Nightly** and your boarding pass is issued on the spot.
+Check in with **Phantom, Solflare, Backpack or Nightly** and your ticket is issued on the spot.
 
-→ [The seat ladder](docs/the-cabin/seat-ladder.md) · [Cabins and seats](docs/the-cabin/cabins-and-seats.md)
+→ [The seat ladder](docs/the-train/seat-ladder.md) · [Coaches and seats](docs/the-train/coaches-and-seats.md)
 
 </td>
 </tr>
 <tr>
 <td width="50%" valign="top">
 
-### The wall
+### The wall, and the line
 
-Every seat is a square, so every held seat is a billboard. Holders put a 1:1 image on the seat they hold; the whole aircraft reads as a mosaic, best placements at the front. Adverts belong to the wallet, so they follow their holder up and down the cabin.
+Every seat is a square, so every held seat is a billboard. Holders put a 1:1 image on the seat they hold, best placements at the front — and the same adverts go up on the billboards beside the line.
 
-→ [Every seat is a billboard](docs/the-wall/every-seat-is-a-billboard.md)
+→ [Every seat is a billboard](docs/the-wall/every-seat-is-a-billboard.md) · [Proposal: buy trackside ad space with the token](docs/the-railway/billboards-for-the-token.md)
 
 </td>
 <td width="50%" valign="top">
 
 ### Section network
 
-A holder directory with the cabin's own manners: publish a card, read your own section's cards, introduce yourself, talk in your cabin's room — and from the flight deck, one PA announcement a day that the whole aircraft hears.
+A holder directory with the train's own manners: publish a card, read your own coach's cards, introduce yourself, talk in your coach's room — and from the driver's cab, one PA announcement a day that the whole train hears.
 
 → [Your seat is which room you are in](docs/section-network/how-far-you-can-see.md)
 
@@ -153,13 +150,16 @@ A holder directory with the cabin's own manners: publish a card, read your own s
 </table>
 
 <div align="center">
-<img src="docs/.gitbook/assets/departure-board.png" alt="The split-flap departure board the site opens on" width="720">
+<img src="docs/.gitbook/assets/departure-board.png" alt="The split-flap departure board the site opens on" width="560">
 <br><sub>The site opens on a split-flap departure board, flap by flap — <a href="docs/for-developers/departure-board.md">how it works</a></sub>
 </div>
 
+> [!NOTE]
+> Seat Railway began as a copy of [Seat Airlines](https://github.com/DOGECOIN87/Seat-Airlines). The inside views (seat, driver's cab, freight car) still use the airline's 3D interiors, and the **Connect & fly** side game on the landing still flies the airline's plane.
+
 ## Explore the documentation
 
-The full guide lives on **[GitBook](https://seat-airlines.gitbook.io/seat-airlines-docs/)**, synced from the [`docs/`](docs) folder of this repository.
+The full guide is the [`docs/`](docs/README.md) folder of this repository, laid out for GitBook (`gitbook-docs.yaml`) whenever it is connected.
 
 <table>
 <tr>
@@ -174,28 +174,30 @@ The full guide lives on **[GitBook](https://seat-airlines.gitbook.io/seat-airlin
 </td>
 <td width="25%" valign="top">
 
-**How it flies**
+**How it runs**
 
-- [One number flies the plane](docs/how-it-flies/flight-model.md)
-- [The five levels](docs/how-it-flies/altitude-bands.md)
-- [The overhead panel and the PA](docs/how-it-flies/overhead-panel.md)
-- [The sky outside](docs/how-it-flies/the-sky.md)
-
-</td>
-<td width="25%" valign="top">
-
-**The cabin**
-
-- [The seat ladder](docs/the-cabin/seat-ladder.md)
-- [Cabins and seats](docs/the-cabin/cabins-and-seats.md)
-- [Views and controls](docs/the-cabin/views-and-controls.md)
-- [Your boarding pass](docs/the-cabin/boarding-pass.md)
+- [One number runs the train](docs/how-it-runs/one-number-runs-the-train.md)
+- [The five worlds](docs/how-it-runs/the-five-worlds.md)
+- [The lamps and the PA](docs/how-it-runs/lamps-and-the-pa.md)
+- [The sky outside](docs/how-it-runs/the-sky.md)
 
 </td>
 <td width="25%" valign="top">
 
-**The wall**
+**The train**
 
+- [The seat ladder](docs/the-train/seat-ladder.md)
+- [Coaches and seats](docs/the-train/coaches-and-seats.md)
+- [Views and controls](docs/the-train/views-and-controls.md)
+- [Your ticket](docs/the-train/your-ticket.md)
+
+</td>
+<td width="25%" valign="top">
+
+**The railway & the wall**
+
+- [How the train shows the market cap](docs/the-railway/market-cap-on-the-train.md)
+- [Buy trackside ad space (proposal)](docs/the-railway/billboards-for-the-token.md)
 - [Every seat is a billboard](docs/the-wall/every-seat-is-a-billboard.md)
 - [Put an advert on your seat](docs/the-wall/put-an-advert-on-your-seat.md)
 
@@ -252,9 +254,9 @@ The page is a static single-page app on GitHub Pages. Anything that has to be sh
 
 ```mermaid
 flowchart LR
-    subgraph Browser["seat-airlines.space · GitHub Pages"]
+    subgraph Browser["dogecoin87.github.io/seat-railway · GitHub Pages"]
         UI["React 19 + Tailwind 4<br/>the page, the seat map, the directory"]
-        GL["three.js<br/>the aircraft, the cabin, the world"]
+        GL["three.js<br/>the train, the line, the five worlds"]
         UI --- GL
     end
     JUP[("Jupiter<br/>market data")] -->|"market cap · 5m move · holders"| UI
@@ -266,7 +268,10 @@ flowchart LR
     W -->|"holder scan, cached a minute"| RPC[("Solana RPC")]
 ```
 
-The seat ladder itself lives in [`src/lib/seating.ts`](src/lib/seating.ts) — no browser and no Cloudflare in it — and the page and the Worker import the same file, so they cannot disagree about who sits where. → [How it is built](docs/for-developers/how-it-is-built.md) · [Engineering notes](docs/for-developers/engineering-notes.md)
+The train is built in [`src/three/RailWorld.ts`](src/three/RailWorld.ts) and sized by the pure functions in [`src/lib/consist.ts`](src/lib/consist.ts). The seat ladder lives in [`src/lib/seating.ts`](src/lib/seating.ts) — no browser and no Cloudflare in it — and the page and the Worker import the same file, so they cannot disagree about who sits where. → [How it is built](docs/for-developers/how-it-is-built.md) · [Engineering notes](docs/for-developers/engineering-notes.md)
+
+> [!WARNING]
+> **The Worker is shared with Seat Airlines for now**, and so is the token: the committed build reads `seat-airlines-banners.trashmarket.workers.dev`. That Worker only answers origins in its `ALLOWED_ORIGINS`, so until this site's origin is added there, the published railway shows the train and the market but no seats, adverts or directory. For a token of its own, deploy `worker/` under a new name and set `VITE_BANNERS_API`. → [Deploying](docs/for-developers/deploying.md)
 
 ### Quick start
 
@@ -279,7 +284,7 @@ npm test             # the page's unit suites
 npm run build        # typecheck, then bundle to dist/
 ```
 
-With no configuration at all, a build flies the committed token against the production Worker. To run the Worker locally too — Miniflare, with simulated KV, R2 and D1 — see [Run it locally](docs/for-developers/run-it-locally.md) and the [Worker's README](worker/README.md).
+To run the Worker locally too — Miniflare, with simulated KV, R2 and D1 — see [Run it locally](docs/for-developers/run-it-locally.md) and the [Worker's README](worker/README.md).
 
 ### Project structure
 
@@ -287,13 +292,16 @@ With no configuration at all, a build flies the committed token against the prod
 ├── src/
 │   ├── App.tsx              the landing, then the page: the view, its section panels
 │   ├── components/          views, the seat map, the directory, the departure board
-│   ├── three/               the 3D world: sky, terrain, the aeroplane, the cabin
-│   ├── lib/                 flight model, market feed, seating, wallet, directory client
-│   └── content/cabin.ts     the cabin's layout and copy
+│   ├── three/               the 3D worlds: RailWorld.ts (the train and the line), and the interiors
+│   ├── lib/                 consist (carriages, grade), market feed, seating, wallet, directory client
+│   └── content/cabin.ts     the coaches' layout and copy
+├── public/
+│   ├── models/              the train, track, station and billboard (GLB)
+│   └── rail/                the track loop, horns and crossing bell
 ├── worker/                  the Cloudflare Worker: adverts, directory, holders
-├── docs/                    the GitBook documentation (synced both ways)
+├── docs/                    the documentation (GitBook-ready)
+├── scripts/models/          how the models were converted
 ├── test/                    unit suites for the page
-├── public/                  icons, logo, audio, CNAME
 └── gitbook-docs.yaml        the GitBook site contract
 ```
 
@@ -303,10 +311,10 @@ Every setting is optional, and every `VITE_` value is **public** — Vite writes
 
 | Variable | What it does |
 | :-- | :-- |
-| `VITE_TOKEN_MINT` | The token the aircraft flies; overrides the committed address |
+| `VITE_TOKEN_MINT` | The token the train reads; overrides the committed address |
 | `VITE_BANNERS_API` | The Worker: the advert wall, and by default everything else |
 | `VITE_HOLDERS_URL` | An indexer for the holder list, if you have one |
-| `VITE_DOCS_URL` | Where the footer's *Docs on GitBook* link goes |
+| `VITE_DOCS_URL` | Where the **Docs** link goes (today: the `docs/` folder on GitHub) |
 
 > [!WARNING]
 > Leave `VITE_RPC_URL` unset in production. Its URL — key and all — would ship to every visitor. The Worker holds the RPC endpoint as a secret instead.
@@ -317,12 +325,11 @@ The full list, and the Worker's bindings and secrets: [Configuration](docs/for-d
 
 | What | How |
 | :-- | :-- |
-| **The page** | Every push to `main` runs the tests, builds and publishes to GitHub Pages at [seat-airlines.space](https://seat-airlines.space). |
-| **The Worker** | Pushes that touch `worker/` type-check, test and deploy it — when the repository has a `CLOUDFLARE_API_TOKEN` secret. |
-| **The docs** | GitBook Git Sync publishes `docs/`; a push that changes only the docs does not redeploy the site. |
-| **A new token** | `npm run token:update -- <new CA>`: checks on-chain that it is a token mint and shows its name, asks you to type yes, writes it everywhere it is printed (page, Worker, index.html, docs), runs the tests and a build, pushes to main, and waits for both deploys to go live. `--no-push` stops before committing. |
+| **The page** | Every push to `main` runs the tests, builds and publishes to GitHub Pages at [dogecoin87.github.io/seat-railway](https://dogecoin87.github.io/seat-railway/) — once Pages is turned on (**Settings → Pages → Source: GitHub Actions**). |
+| **The Worker** | Pushes that touch `worker/` type-check, test and deploy it — when the repository has a `CLOUDFLARE_API_TOKEN` secret. Give the railway's Worker a name of its own first, so it cannot replace Seat Airlines'. |
+| **A new token** | `npm run token:update -- <new CA>`: checks on-chain that it is a token mint, writes it everywhere it is printed (page, Worker, `index.html`, docs), runs the tests and a build, and pushes. `--no-push` stops before committing. |
 
-Step by step, including DNS for the custom domain: [Deploying](docs/for-developers/deploying.md).
+Step by step, including a custom domain: [Deploying](docs/for-developers/deploying.md).
 
 ## Licence
 
@@ -330,5 +337,5 @@ Step by step, including DNS for the custom domain: [Deploying](docs/for-develope
 
 <div align="center">
 <br>
-<sub><b>SEAT AIRLINES</b> · Flight SA350 · Nonstop · <i>Hold more. Fly higher.</i></sub>
+<sub><b>SEAT RAILWAY</b> · Train SR350 · Express · <i>Hold more. Ride longer.</i></sub>
 </div>

@@ -1,18 +1,20 @@
 ---
-description: Exactly what Seat Airlines asks your wallet for — and what it never will.
+description: Exactly what Seat Railway asks your wallet for — and what it never will.
 ---
 
 # Wallet safety
 
-## Seat Airlines never asks for a transaction
+## Seat Railway never asks for a transaction
 
 Nothing on the site sends, swaps, approves or spends anything. Connecting a wallet shares your **public address** and nothing else, and every signature the site asks for is a **plain-text message** you can read in full in your wallet before you approve it.
 
 {% hint style="danger" %}
-If a page claiming to be Seat Airlines asks you to **approve a transaction**, to sign something you cannot read, or for your **seed phrase** or **private key** — stop and reject it. That is not Seat Airlines, which never asks for any of them.
+If a page claiming to be Seat Railway asks you to **approve a transaction**, to sign something you cannot read, or for your **seed phrase** or **private key** — stop and reject it. That is not Seat Railway, which never asks for any of them.
 {% endhint %}
 
 ## The only three messages you will be asked to sign
+
+Each still begins `SEAT AIRLINES`, and the sign-in still names the _cabin directory_: Seat Railway shares its server with Seat Airlines, and the server checks every message word for word. The wording below is exactly what your wallet will show.
 
 **1. Putting an advert on your seat** — every time you publish one:
 
@@ -36,7 +38,7 @@ advert: <the stored name of that advert's image>
 issued: <the time you pressed the button>
 ```
 
-**3. Signing in to the cabin directory** — once a day at most:
+**3. Signing in to the directory** — once a day at most:
 
 ```
 SEAT AIRLINES
@@ -53,7 +55,7 @@ All three are checked by the server, and all three expire: a signature more than
 
 ## Check you are in the right place
 
-* The site is **seat-airlines.space**.
+* The site is **dogecoin87.github.io/seat-railway**, and its source is [github.com/DOGECOIN87/seat-railway](https://github.com/DOGECOIN87/seat-railway).
 * The token's contract address is on the **CA** strip at the top of the site. Compare the **whole** address before you buy — see [The token](../getting-started/the-token.md).
 
 ## What is public
@@ -64,7 +66,7 @@ All three are checked by the server, and all three expire: a signature more than
 
 ## What is stored, and where
 
-**On the Seat Airlines server** (a Cloudflare Worker): your published adverts, your card, the messages you send, and your directory sessions. A session is stored only as a one-way fingerprint (SHA-256), so a copy of the session table cannot be used to get into anybody's account.
+**On the server** (a Cloudflare Worker, shared with Seat Airlines): your published adverts, your card, the messages you send, and your directory sessions. A session is stored only as a one-way fingerprint (SHA-256), so a copy of the session table cannot be used to get into anybody's account.
 
 **In your browser:**
 

@@ -568,7 +568,7 @@ export async function fetchOwnerBanners(): Promise<Record<string, Banner>> {
 
    Every airline in the world has this exact problem and every one of them
    solves it the same way: inventory nobody has bought yet carries the
-   airline's own campaigns. So these are Seat Airlines' — eight layouts drawn
+   operator's own campaigns. So these are Seat Railway's — eight layouts drawn
    from the same palette, mark and typography as the rest of the page, sized
    and weighted to be legible at the thirty pixels a seat tile actually gets.
    They are drawn rather than fetched, so they cost no request and cannot be
@@ -633,15 +633,15 @@ const HOUSE_ADS: HouseAd[] = [
       `<rect width="200" height="200" fill="${HOUSE_INK.navy}"/>` +
       `<rect x="0" y="0" width="200" height="6" fill="${HOUSE_INK.amber}"/>` +
       stack(['YOUR', 'BAG IS', 'YOUR', 'SEAT'], { x: 18, y: 62, size: 32, fill: HOUSE_INK.bone }) +
-      micro('SEAT AIRLINES', 18, 182, HOUSE_INK.cyan),
+      micro('SEAT RAILWAY', 18, 182, HOUSE_INK.cyan),
   },
   {
-    line: 'Seat Airlines — SA350, nonstop',
+    line: 'Seat Railway — SR350, express',
     svg: (logo) =>
       `<rect width="200" height="200" fill="${HOUSE_INK.bone}"/>` +
       houseLogo(logo, 58, 26, 84) +
-      stack(['SEAT', 'AIRLINES'], { x: 100, y: 148, size: 26, fill: HOUSE_INK.navy, anchor: 'middle' }) +
-      micro('SA350 · NONSTOP', 100, 182, HOUSE_INK.cloth, 9, 'middle'),
+      stack(['SEAT', 'RAILWAY'], { x: 100, y: 148, size: 26, fill: HOUSE_INK.navy, anchor: 'middle' }) +
+      micro('SR350 · EXPRESS', 100, 182, HOUSE_INK.cloth, 9, 'middle'),
   },
   {
     line: 'This square is for sale — out-hold whoever is in it',
@@ -652,17 +652,17 @@ const HOUSE_ADS: HouseAd[] = [
       micro('OUT-HOLD ROW 1', 18, 188, HOUSE_INK.night),
   },
   {
-    line: 'Hold more. Fly higher.',
+    line: 'Hold more. Ride longer.',
     svg: (logo) =>
       `<rect width="200" height="200" fill="${HOUSE_INK.night}"/>` +
       `<circle cx="100" cy="86" r="52" fill="none" stroke="${HOUSE_INK.cyan}" stroke-width="2" opacity="0.4"/>` +
       houseLogo(logo, 66, 52, 68) +
-      stack(['HOLD MORE.', 'FLY HIGHER.'], {
+      stack(['HOLD MORE.', 'RIDE LONGER.'], {
         x: 100, y: 166, size: 15, fill: HOUSE_INK.bone, anchor: 'middle', spacing: 1.18,
       }),
   },
   {
-    line: 'Row 1 is better — the front of the cabin is the front of the wall',
+    line: 'Row 1 is better — the front of the train is the front of the wall',
     svg: () =>
       `<rect width="200" height="200" fill="${HOUSE_INK.cloth}"/>` +
       // The seat map itself, as a motif: the one square at the front is lit.
@@ -678,7 +678,7 @@ const HOUSE_ADS: HouseAd[] = [
       stack(['ROW 1', 'IS BETTER'], { x: 20, y: 160, size: 22, fill: HOUSE_INK.bone }),
   },
   {
-    line: 'Market cap is altitude — $50M is the moon',
+    line: 'Market cap is the train — $50M is the moon',
     svg: () =>
       `<rect width="200" height="200" fill="${HOUSE_INK.night}"/>` +
       `<path d="M -20 178 A 150 150 0 0 1 220 178 Z" fill="${HOUSE_INK.navy}"/>` +
@@ -686,27 +686,27 @@ const HOUSE_ADS: HouseAd[] = [
       `<circle cx="144" cy="41" r="4" fill="${HOUSE_INK.cloth}" opacity="0.45"/>` +
       `<circle cx="156" cy="52" r="2.6" fill="${HOUSE_INK.cloth}" opacity="0.4"/>` +
       stack(['$50M', 'IS THE', 'MOON'], { x: 18, y: 74, size: 30, fill: HOUSE_INK.amber }) +
-      micro('MARKET CAP = ALTITUDE', 18, 190, HOUSE_INK.cyan, 8),
+      micro('THE LINE RUNS TO THE MOON', 18, 190, HOUSE_INK.cyan, 8),
   },
   {
-    line: 'Cabin crew, arm doors and cross-check',
+    line: 'Mind the gap between the train and the platform',
     svg: () =>
       `<rect width="200" height="200" fill="${HOUSE_INK.bone}"/>` +
       `<rect x="0" y="0" width="200" height="42" fill="${HOUSE_INK.navy}"/>` +
-      micro('CABIN CREW', 14, 27, HOUSE_INK.bone, 12) +
-      stack(['ARM', 'DOORS', 'AND', 'CROSS-', 'CHECK'], {
+      micro('PLATFORM 1', 14, 27, HOUSE_INK.bone, 12) +
+      stack(['MIND', 'THE', 'GAP', 'ALL', 'ABOARD'], {
         x: 14, y: 74, size: 24, fill: HOUSE_INK.navy, spacing: 1.06,
       }) +
       `<rect x="0" y="194" width="200" height="6" fill="${HOUSE_INK.amber}"/>`,
   },
   {
-    line: 'Boarding pass — seats go to the top holders, in order',
+    line: 'Ticket — seats go to the top holders, in order',
     svg: () =>
       `<rect width="200" height="200" fill="${HOUSE_INK.cyan}"/>` +
       `<rect x="0" y="120" width="200" height="80" fill="${HOUSE_INK.bone}"/>` +
       // The tear line, punched the way a real stub is.
       Array.from({ length: 13 }, (_, i) => `<circle cx="${8 + i * 16}" cy="120" r="3.4" fill="${HOUSE_INK.night}" opacity="0.16"/>`).join('') +
-      micro('BOARDING PASS', 14, 30, HOUSE_INK.navy, 10) +
+      micro('TICKET', 14, 30, HOUSE_INK.navy, 10) +
       stack(['SEATED', 'BY RANK'], { x: 14, y: 66, size: 25, fill: HOUSE_INK.navy, spacing: 1.08 }) +
       // A barcode: varied bar widths, so it reads as one rather than as stripes.
       Array.from({ length: 30 }, (_, i) => {
@@ -740,7 +740,7 @@ export function houseAdverts(seats: readonly string[], logo: string | null = nul
     const n = i % HOUSE_ADS.length;
     out[seat] = {
       image: images[n],
-      alt: `Seat Airlines house advert: ${HOUSE_ADS[n].line}. This seat's holder can replace it.`,
+      alt: `Seat Railway house advert: ${HOUSE_ADS[n].line}. This seat's holder can replace it.`,
       house: true,
     };
   });

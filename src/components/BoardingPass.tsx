@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import Mark from './Mark';
 import type { CabinZone } from '../content/cabin';
 import { LAVATORY_NOTE, LAVATORY_SEATS } from '../content/cabin';
-import { formatFeet } from '../lib/flightModel';
+import { formatCap } from '../lib/flightModel';
 
 /**
  * The boarding pass.
@@ -71,18 +71,18 @@ const BoardingPass = ({ passenger, seat, zone, boardedAt }: BoardingPassProps) =
           <div className="flex items-center gap-2.5">
             <Mark size={22} className="flex-none" />
             <p className="font-heading text-lg tracking-tight text-ui-ink">
-              SEAT <span className="text-ui-deep">AIRLINES</span>
+              SEAT <span className="text-ui-deep">RAILWAY</span>
             </p>
-            <span className="ml-auto text-[11px] uppercase tracking-[0.18em] text-ui-faint">Boarding pass</span>
+            <span className="ml-auto text-[11px] uppercase tracking-[0.18em] text-ui-faint">Ticket</span>
           </div>
 
           <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4">
             <Field label="Passenger" value={passenger} />
-            <Field label="Flight" value="SA350" />
+            <Field label="Train" value="SR350" />
             <Field label="Seat" value={seat ?? '—'} big />
             <Field label="Class" value={zone?.className ?? 'STANDBY'} />
             <Field label="Boarding group" value={zone?.group ?? '—'} />
-            <Field label="Boarded at" value={boardedAt === null ? '—' : `${formatFeet(boardedAt)} FT`} />
+            <Field label="Boarded at" value={boardedAt === null ? '—' : formatCap(boardedAt)} />
           </div>
         </div>
 

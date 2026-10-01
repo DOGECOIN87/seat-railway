@@ -120,7 +120,7 @@ export interface BandState {
 }
 
 const BAND_LABEL: Record<FlightBand, string> = {
-  atmosphere: 'In the weather',
+  atmosphere: 'In the country',
   'above-clouds': 'Above the clouds',
   space: 'Space',
   moon: 'The moon',

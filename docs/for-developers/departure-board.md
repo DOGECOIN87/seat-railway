@@ -6,15 +6,15 @@ description: The split-flap board the site opens on — how it works and how to 
 
 ![](../.gitbook/assets/departure-board.png)
 
-The site opens on a split-flap board in the middle of the screen, drawn after the mechanical ones in terminals: a split across the middle of every flap and a hinge pin at each end of it, painted in the site's own colours — navy flaps, white letters, and the site's blue along the top edge. Every character is a drum of flaps. Changing a phrase, each letter falls through the last few flaps before the one it wants, so you see the letters count up to it, and the columns land at different moments in a wave from left to right. It turns through four phrases, then fades onto the aeroplane, and the landing's own words rise in underneath it. Under the board are the airline's name and a **Docs on GitBook** link.
+The site opens on a split-flap board in the middle of the screen, drawn after the mechanical ones in railway stations: a split across the middle of every flap and a hinge pin at each end of it, painted in the site's own colours — navy flaps, white letters, and the site's blue along the top edge. Every character is a drum of flaps. Changing a phrase, each letter falls through the last few flaps before the one it wants, so you see the letters count up to it, and the columns land at different moments in a wave from left to right. It turns through four phrases, then fades onto the train, and the landing's own words rise in underneath it. Under the board are the railway's name and a **Docs** link.
 
 ## What it says
 
-The airline's line first and the call to board last, with two of the others between them, picked fresh on every visit — so anybody who comes back sees the rest in time.
+The line's saying first and the call to board last, with two of the others between them, picked fresh on every visit — so anybody who comes back sees the rest in time.
 
 | When | Top row | Bottom row |
 | --- | --- | --- |
-| First | HOLD MORE | FLY HIGHER |
+| First | HOLD MORE | RIDE LONGER |
 | Two of | TAKE A | SEAT |
 | | NETWORK | |
 | | BUILD | |
@@ -29,7 +29,7 @@ The airline's line first and the call to board last, with two of the others betw
 The phrases are in `src/content/cabin.ts`, with the rest of the site's copy:
 
 ```ts
-export const SPLASH_FIRST: readonly string[] = ['HOLD MORE', 'FLY HIGHER'];
+export const SPLASH_FIRST: readonly string[] = ['HOLD MORE', 'RIDE LONGER'];
 export const SPLASH_BETWEEN: readonly (readonly string[])[] = [
   ['TAKE A', 'SEAT'],
   ['NETWORK'],
@@ -51,7 +51,7 @@ export const SPLASH_LAST: readonly string[] = ['NOW', 'BOARDING'];
 | **Each flap** | About 95 ms — slow enough to see it fold, with a shadow thrown on the half below — and each drum runs a little faster or slower than its neighbours, like real mechanisms. |
 | **Each letter** | Falls through the last 3 to 7 flaps before its target, a different number for each, so a whole phrase lands in about a second. Columns start a beat apart, left to right. |
 | **Between phrases** | 0.8 s once the first has landed, 0.55 s for each of the others. |
-| **After the last** | It holds for 0.9 s — longer if the aeroplane behind it is still loading — then the splash fades out over 0.8 s: about eight and a half seconds in all. A tap or any key clears it straight away, and does nothing else; the docs link opens the docs. |
+| **After the last** | It holds for 0.9 s — longer if the train behind it is still loading — then the splash fades out over 0.8 s: about eight and a half seconds in all. A tap or any key clears it straight away, and does nothing else; the docs link opens the docs. |
 | **Off screen, or in a background tab** | It finishes the turn in progress and waits. Nothing new is queued until it can be seen. |
 | **Reduced motion** | The phrases change on the same schedule, but the flaps do not turn — each phrase simply appears. On Android this is the **Remove animations** setting. |
 

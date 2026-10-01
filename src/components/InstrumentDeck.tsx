@@ -4,22 +4,20 @@ import type { SkyState } from '../lib/sky';
 import {
   formatCap,
   formatChange,
-  formatFeet,
-  phaseFor,
   pitchFor,
-  verticalSpeedFor,
   type BandState,
   type FlightBand,
 } from '../lib/flightModel';
+import { carriagesFor, gradeFor, MAX_CARRIAGES, nextCarriageAt } from '../lib/consist';
 
 /**
  * The instrument deck's readings, drawn as instruments.
  *
- * The panel under the window is the aircraft's face, so its readings are
+ * The panel under the window is the train's face, so its readings are
  * displays let into it the way the window is: dark glass, lit figures, and a
  * small instrument beside each one that shows the same number the way a
- * cockpit would — a tape for the altitude, a ball for the attitude, and a
- * cabin window for the sky. Every figure is still printed as text; the
+ * driver's desk would — the carriages stacked up for the market cap, a ball
+ * for the grade, and a window for the sky. Every figure is still printed as text; the
  * drawings are the flourish, not the message.
  */
 
@@ -27,13 +25,14 @@ import {
    One stroke weight, one grid, drawn for this page. */
 
 export type DeckIconName =
-  | 'plane' | 'deck' | 'first' | 'business' | 'exit' | 'economy' | 'hold'
+  | 'train' | 'deck' | 'first' | 'business' | 'exit' | 'economy' | 'hold'
   | 'belt' | 'cup' | 'mask' | 'brace'
   | 'wall' | 'network' | 'chat' | 'pass' | 'trophy'
   | 'reset' | 'expand' | 'shrink' | 'sound' | 'mute';
 
 const ICON_PATHS: Record<DeckIconName, string[]> = {
-  plane: ['M12 2.6c.9 0 1.5.9 1.5 2.2V10l7.3 4.1v2.1l-7.3-2.2v4.5l2.1 1.6v1.6L12 21l-3.6.7v-1.6l2.1-1.6V14l-7.3 2.2v-2.1L10.5 10V4.8c0-1.3.6-2.2 1.5-2.2z'],
+  // A train, nose on: the line's own mark for the view from outside.
+  train: ['M8 3.5h8a3 3 0 0 1 3 3v8.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 5 15V6.5a3 3 0 0 1 3-3z', 'M5 10.5h14', 'M8.5 14h.01M15.5 14h.01', 'M8 17.5 6 21M16 17.5l2 4'],
   deck: ['M4.5 16.5a7.5 7.5 0 0 1 15 0', 'M12 16.5l3.4-4.4', 'M7.2 12.4l1 .8M12 9v1.3M16.8 12.4l-1 .8', 'M8.5 20h7'],
   first: ['M12 3.6l2.5 5.2 5.7.8-4.1 4 1 5.6L12 16.5l-5.1 2.7 1-5.6-4.1-4 5.7-.8z'],
   business: ['M5 7.5h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19.5H5A1.5 1.5 0 0 1 3.5 18V9A1.5 1.5 0 0 1 5 7.5z', 'M9 7.5V6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6v1.5', 'M3.5 12.5h17'],
@@ -78,40 +77,40 @@ export const DeckIcon = ({ name, className }: { name: DeckIconName; className?: 
 
 /* ── Instruments ─────────────────────────────────────────────────────── */
 
-/** A strip of altimeter tape. It scrolls down as the aircraft climbs, the way the real one does. */
-function AltitudeTape({ feet }: { feet: number }) {
-  const STEP = 50;
-  const GAP = 7;
-  const offset = ((((feet % STEP) + STEP) % STEP) / STEP) * GAP;
-  const firstMark = Math.floor(feet / STEP) - 6;
-  const ticks = Array.from({ length: 13 }, (_, i) => {
-    const mark = firstMark + i;
-    const y = 36 + (Math.floor(feet / STEP) - mark) * GAP + offset;
-    return { y, major: mark % 5 === 0, key: mark };
-  });
+/** The train, drawn as a stack of its carriages: one lit block for each the market has earned. */
+function CarriageStack({ cars }: { cars: number }) {
+  const H = 72;
+  const gap = 1.2;
+  const h = (H - gap * (MAX_CARRIAGES - 1)) / MAX_CARRIAGES;
   return (
-    <svg viewBox="0 0 34 72" className="sa-tape" aria-hidden focusable="false">
-      <defs>
-        <linearGradient id="sa-tape-fade" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fff" stopOpacity="0" />
-          <stop offset="0.3" stopColor="#fff" stopOpacity="1" />
-          <stop offset="0.7" stopColor="#fff" stopOpacity="1" />
-          <stop offset="1" stopColor="#fff" stopOpacity="0" />
-        </linearGradient>
-        <mask id="sa-tape-mask">
-          <rect width="34" height="72" fill="url(#sa-tape-fade)" />
-        </mask>
-      </defs>
-      <g mask="url(#sa-tape-mask)">
-        <line x1="31" y1="0" x2="31" y2="72" className="sa-tape__spine" />
-        {ticks.map((t) => (
-          <line key={t.key} x1={t.major ? 17 : 23} y1={t.y} x2="31" y2={t.y} className={t.major ? 'sa-tape__major' : 'sa-tape__minor'} />
-        ))}
-      </g>
-      <path d="M2 36 9 31.5v9z" className="sa-tape__pointer" />
-      <line x1="9" y1="36" x2="31" y2="36" className="sa-tape__index" />
+    <svg viewBox={`0 0 34 ${H}`} className="sa-tape" aria-hidden focusable="false">
+      {Array.from({ length: MAX_CARRIAGES }, (_, i) => {
+        const y = H - (i + 1) * h - i * gap;
+        return (
+          <rect
+            key={i}
+            x="9"
+            y={y}
+            width="22"
+            height={h}
+            rx="1.2"
+            className={i < cars ? 'sa-tape__major' : 'sa-tape__minor'}
+            fill={i < cars ? 'rgba(0, 201, 241, 0.55)' : 'none'}
+            opacity={i < cars ? 1 : 0.35}
+          />
+        );
+      })}
     </svg>
   );
+}
+
+/** The five-minute move, said the way a driver would. */
+function railPhase(change: number): string {
+  if (change > 40) return 'FULL POWER';
+  if (change > 8) return 'UPHILL';
+  if (change > -6) return 'CRUISING';
+  if (change > -22) return 'DOWNHILL';
+  return 'BRAKING';
 }
 
 /** A small attitude indicator: the horizon rides the five-minute move. */
@@ -228,34 +227,26 @@ const Readout = ({ label, tag, tagLive, value, unit, sub, viz, wide }: ReadoutPr
 export function FlightReadouts({ tick, sky }: { tick: FlightTick; sky: SkyState }) {
   const change = tick.change5m;
   const level = Math.abs(change) < 0.05;
-  const vs = verticalSpeedFor(change, tick.marketCap);
-  const rate = Math.abs(vs);
-  const vsFigure =
-    rate >= 1_000_000 ? `${(rate / 1_000_000).toFixed(2)}M` : rate >= 10_000 ? `${Math.round(rate / 1000)}K` : Math.round(rate).toLocaleString('en-US');
-  // In feet a minute; "fpm" on a phone, where the tag shares its line with the tape.
-  const vsText = (
-    <>
-      {vs >= 0 ? '+' : '−'}
-      {vsFigure}
-      <span className="sa-readout__unit-long"> ft/min</span>
-      <span className="sa-readout__unit-short"> fpm</span>
-    </>
-  );
+  const cars = carriagesFor(tick.marketCap);
+  const next = nextCarriageAt(tick.marketCap);
+  // The grade the line ahead is being laid at, from the same five-minute move.
+  const grade = gradeFor(pitchFor(change));
+  const gradeText = `${grade >= 0 ? '+' : '−'}${Math.abs(grade).toFixed(1)}° grade`;
   return (
     <dl className="sa-readouts">
       <Readout
-        label="Altitude"
-        tag={vsText}
-        value={formatFeet(tick.marketCap)}
-        unit="ft"
-        sub={`${formatCap(tick.marketCap)} market cap`}
-        viz={<AltitudeTape feet={tick.marketCap} />}
+        label="Train"
+        tag={gradeText}
+        value={String(cars)}
+        unit={cars === 1 ? 'carriage' : 'carriages'}
+        sub={`${formatCap(tick.marketCap)} market cap${next ? ` · next at ${formatCap(next)}` : ' · full length'}`}
+        viz={<CarriageStack cars={cars} />}
       />
       <Readout
         label="5m"
-        tag={phaseFor(change)}
+        tag={railPhase(change)}
         value={formatChange(change)}
-        sub={level ? 'Level flight' : change > 0 ? 'Climbing' : 'Descending'}
+        sub={level ? 'Level track' : change > 0 ? 'Uphill' : 'Downhill'}
         viz={<AttitudeBall change={change} />}
       />
       <Readout
@@ -280,7 +271,7 @@ export function FlightReadouts({ tick, sky }: { tick: FlightTick; sky: SkyState 
    and trails off the edge of the screen beyond that. */
 
 const STOPS: { band: FlightBand; name: string; price: string; short?: string }[] = [
-  { band: 'atmosphere', name: 'Weather', price: 'Under $1M', short: '<$1M' },
+  { band: 'atmosphere', name: 'Country', price: 'Under $1M', short: '<$1M' },
   { band: 'above-clouds', name: 'Clouds', price: '$1M' },
   { band: 'space', name: 'Space', price: '$10M' },
   { band: 'moon', name: 'Moon', price: '$50M' },
@@ -300,7 +291,7 @@ export function ClimbRoute({ band }: { band: BandState }) {
   return (
     <div className="sa-route">
       <div className="sa-route__head">
-        <span className="sa-route__title">Flight progress</span>
+        <span className="sa-route__title">The line</span>
         <span className="sa-route__next">
           {band.next ? (
             <>
@@ -324,7 +315,7 @@ export function ClimbRoute({ band }: { band: BandState }) {
         ))}
         <span className={`sa-route__stop is-unknown ${state(STOPS.length)}`} style={{ left: stopAt(STOPS.length) }} />
         <span className="sa-route__plane" style={{ left: pct }}>
-          <DeckIcon name="plane" />
+          <DeckIcon name="train" />
         </span>
       </div>
       <ol className="sa-route__stops" aria-label="Levels">

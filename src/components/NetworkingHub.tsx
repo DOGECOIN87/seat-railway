@@ -376,7 +376,7 @@ const NetworkingHub = ({ manifest, address, viewerZone, sign, part = 'all' }: Ne
       : null;
 
   return (
-    <section className="ui-card" aria-label={part === 'chat' ? 'Cabin chat' : 'Section networking'}>
+    <section className="ui-card" aria-label={part === 'chat' ? 'Coach chat' : 'Section networking'}>
       {showDirectory && (
       <header className="ui-rule-b px-5 py-5 sm:px-7">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -438,7 +438,7 @@ const NetworkingHub = ({ manifest, address, viewerZone, sign, part = 'all' }: Ne
                   onChange={setPaDraft}
                   onSend={() => void announce()}
                   label="Announcement"
-                  placeholder="Cabin crew, doors to arrival…"
+                  placeholder="All aboard, doors closing…"
                   busy={directory.saving && statusAt === 'pa'}
                   disabled={directory.saving}
                   action="Announce"
@@ -561,7 +561,7 @@ const NetworkingHub = ({ manifest, address, viewerZone, sign, part = 'all' }: Ne
                             other cabins do not reach this branch at all. */}
                       </div>
                     ) : (
-                      <p className="text-[12px] leading-relaxed text-ui-soft">Another cabin. Only its own passengers can open this card.</p>
+                      <p className="text-[12px] leading-relaxed text-ui-soft">Another coach. Only its own passengers can open this card.</p>
                     )}
                   </div>
                 )}
@@ -630,7 +630,7 @@ const NetworkingHub = ({ manifest, address, viewerZone, sign, part = 'all' }: Ne
               ))}
 
               <p className="rounded-lg border border-ui-line bg-white px-3 py-2.5 text-[11px] leading-relaxed text-ui-soft">
-                Holders only: seen by your own cabin and nobody else.
+                Holders only: seen by your own coach and nobody else.
               </p>
               <button type="submit" disabled={directory.saving} className="sa-cta w-full justify-center disabled:opacity-60">
                 {directory.saving && statusAt === 'card' ? 'Publishing…' : 'Publish card'} <span aria-hidden>→</span>
@@ -764,7 +764,7 @@ const NetworkingHub = ({ manifest, address, viewerZone, sign, part = 'all' }: Ne
       {part === 'chat' && !(directory.session && viewerZone) && (
         <div className="px-5 py-6 sm:px-7">
           {!address ? (
-            <p className="text-[12px] leading-relaxed text-ui-soft">Connect a wallet to join your cabin.</p>
+            <p className="text-[12px] leading-relaxed text-ui-soft">Connect a wallet to join your coach.</p>
           ) : !directory.session ? (
             <div className="space-y-3 text-[12px] leading-relaxed text-ui-soft">
               <p>Sign a message to join. No transaction.</p>
@@ -773,7 +773,7 @@ const NetworkingHub = ({ manifest, address, viewerZone, sign, part = 'all' }: Ne
               </button>
             </div>
           ) : (
-            <p className="text-[12px] leading-relaxed text-ui-soft">Take a seat to join a cabin.</p>
+            <p className="text-[12px] leading-relaxed text-ui-soft">Take a seat to join a coach.</p>
           )}
         </div>
       )}

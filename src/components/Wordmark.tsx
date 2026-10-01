@@ -1,7 +1,7 @@
 import Mark from './Mark';
 
 /**
- * The airline's wordmark: the mark, and the name beside it on one line in
+ * The railway's wordmark: the mark, and the name beside it on one line in
  * Montserrat's heaviest capitals, half the mark's height and centred on it
  * by the capitals rather than by the line box.
  *
@@ -14,7 +14,7 @@ export default function Wordmark({ className }: { className?: string }) {
   return (
     <span className={`sa-wordmark${className ? ` ${className}` : ''}`}>
       <Mark className="sa-wordmark__mark" />
-      <span className="sa-wordmark__name">Seat Airlines</span>
+      <span className="sa-wordmark__name">Seat Railway</span>
     </span>
   );
 }

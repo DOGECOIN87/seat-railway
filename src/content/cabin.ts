@@ -65,26 +65,26 @@ const RR = ['D', 'E', 'F'];
 export const CABIN_ZONES: readonly CabinZone[] = [
   {
     key: 'deck',
-    name: 'Flight Deck',
+    name: "Driver's Cab",
     note: 'Top 2 holders',
-    className: 'FLIGHT DECK',
+    className: "DRIVER'S CAB",
     group: '1',
-    perk: 'You have the PA. One announcement a day. Use it well.',
+    perk: 'You have the PA and the horn. One announcement a day. Use it well.',
     accent: 'cerise',
     code: 'FDK',
-    visual: 'Command',
+    visual: 'At the controls',
     rows: [{ n: null, left: ['CPT'], right: ['FO'] }],
   },
   {
     key: 'first',
-    name: 'First',
+    name: 'First Class',
     note: 'Rows 1–2',
     className: 'FIRST',
     group: '1',
-    perk: 'Lie-flat. Champagne on every green candle.',
+    perk: 'Window table. Champagne on every green candle.',
     accent: 'cerise',
     code: 'FST',
-    visual: 'Private suite',
+    visual: 'Private compartment',
     rows: rowRange(1, 2, ['A', 'B'], ['E', 'F']),
   },
   {
@@ -93,10 +93,10 @@ export const CABIN_ZONES: readonly CabinZone[] = [
     note: 'Rows 3–7',
     className: 'BUSINESS',
     group: '2',
-    perk: 'Priority boarding, and first off the aircraft in an emergency landing.',
+    perk: 'Priority boarding, and first off the train at every station.',
     accent: 'violet',
     code: 'BUS',
-    visual: 'Widebody comfort',
+    visual: 'Wide seats, quiet coach',
     rows: rowRange(3, 7, LR, RR),
   },
   {
@@ -105,7 +105,7 @@ export const CABIN_ZONES: readonly CabinZone[] = [
     note: 'Sign to sit here',
     className: 'EXIT ROW',
     group: '3',
-    perk: 'You have agreed to open that door. Sign the message.',
+    perk: 'You have agreed to work the emergency door. Sign the message.',
     accent: 'cyan',
     code: 'EXR',
     visual: 'Extra legroom',
@@ -113,14 +113,14 @@ export const CABIN_ZONES: readonly CabinZone[] = [
   },
   {
     key: 'economy',
-    name: 'Economy',
+    name: 'Standard',
     note: 'Rows 8–15, 18–30',
-    className: 'ECONOMY',
+    className: 'STANDARD',
     group: '4',
-    perk: 'Seat back and tray table. Welcome aboard.',
+    perk: 'Seat back and fold-down table. Welcome aboard.',
     accent: 'cyan',
     code: 'ECO',
-    visual: 'Main cabin',
+    visual: 'Standard coach',
     rows: [...rowRange(8, 15, LR, RR), ...rowRange(18, 30, LR, RR)],
   },
 ];
@@ -195,9 +195,9 @@ export const LAVATORY_NOTE =
 
 /** Seats below the cutoff ride down here. It is not a punishment. */
 export const CARGO_HOLD = {
-  name: 'Cargo Hold',
+  name: 'Freight Car',
   note: 'Everyone below the cutoff',
-  body: 'The biggest room on the aircraft.',
+  body: 'The biggest car on the train.',
 } as const;
 
 /** Radio chatter. `tone` picks the colour the line reads in. */
@@ -207,27 +207,27 @@ export interface RadioLine {
 }
 
 export const CHATTER: readonly RadioLine[] = [
-  { text: 'Cabin crew, doors to arrival and crosscheck.', tone: 'pa' },
-  { text: 'Passenger in 14C has deplaned mid-flight.', tone: 'alert' },
+  { text: 'Doors closing. Please stand clear of the doors.', tone: 'pa' },
+  { text: 'Passenger in 14C has stepped off at an unscheduled stop.', tone: 'alert' },
   { text: 'Seat 2A claimed. Previous occupant reseated to 27E.', tone: 'pa' },
-  { text: 'Captain: "This is your captain speaking. We are not turning around."', tone: 'pa' },
-  { text: 'Beverage cart rolling. Fee rewards distributed to rows 1–7.', tone: 'plain' },
-  { text: 'Air marshal reassigned. Nobody knows who.', tone: 'plain' },
-  { text: 'Someone in the cargo hold is knocking.', tone: 'plain' },
-  { text: 'Exit row signature verified. 16A may open the door.', tone: 'plain' },
-  { text: 'Galley reports the ice has not survived the descent.', tone: 'plain' },
-  { text: 'Row 9 has been asked twice to stow the bag. It will not fit.', tone: 'plain' },
+  { text: 'Driver: "This is your driver speaking. This train does not reverse."', tone: 'pa' },
+  { text: 'Trolley service rolling. Fee rewards distributed to rows 1–7.', tone: 'plain' },
+  { text: 'Ticket inspector reassigned. Nobody knows who.', tone: 'plain' },
+  { text: 'Someone in the freight car is knocking.', tone: 'plain' },
+  { text: 'Exit row signature verified. 16A may work the emergency door.', tone: 'plain' },
+  { text: 'The buffet car reports the ice has not survived the downhill.', tone: 'plain' },
+  { text: 'Row 9 has been asked twice to clear the bag from the aisle. It will not fit the rack.', tone: 'plain' },
 ];
 
 /** Announcements tied to a change in the aircraft's state, not to the clock. */
 export const CALLOUTS = {
-  boarded: 'Boarding complete. Cabin doors armed.',
-  oxygenOn: 'Oxygen masks deployed. Secure your own before assisting others.',
-  oxygenOff: 'Masks stowed. We have levelled off.',
+  boarded: 'All aboard. Doors closing.',
+  oxygenOn: 'Emergency brake applied. Hold on to something.',
+  oxygenOff: 'Brake released. The line has levelled off.',
   brace: 'Brace. Brace. Heads down, stay down.',
-  dive: 'Beginning our descent. It was not scheduled.',
-  climb: 'Cabin crew, prepare for climb.',
-  turbulence: 'Rough air ahead. Seat belt sign is on.',
+  dive: 'Steep downhill ahead. It was not on the timetable.',
+  climb: 'Uphill section. Full power.',
+  turbulence: 'Rough track ahead. Please hold on.',
 } as const;
 
 /* ── The departure board ──────────────────────────────────────────────────
@@ -242,7 +242,7 @@ export const CALLOUTS = {
    on it — ten characters keeps them big enough to read on a phone. The drums
    carry A–Z, 0–9 and  + - / : ( ) % . , ! ? & $ '  and anything else comes
    up blank. */
-export const SPLASH_FIRST: readonly string[] = ['HOLD MORE', 'FLY HIGHER'];
+export const SPLASH_FIRST: readonly string[] = ['HOLD MORE', 'RIDE LONGER'];
 export const SPLASH_BETWEEN: readonly (readonly string[])[] = [
   ['TAKE A', 'SEAT'],
   ['NETWORK'],

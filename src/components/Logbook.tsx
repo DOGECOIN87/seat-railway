@@ -271,7 +271,7 @@ const Logbook = ({ manifest, address, sign, controls, onControls, onClose }: Log
       onControls(landed);
     } catch (e) {
       onControls(before);
-      setRefused(e instanceof Error ? e.message : 'The aeroplane would not take that.');
+      setRefused(e instanceof Error ? e.message : 'The train would not take that.');
     }
   };
 
@@ -449,7 +449,7 @@ const Logbook = ({ manifest, address, sign, controls, onControls, onClose }: Log
               }}
               className="rounded-lg border border-ui-line px-3 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-ui-soft"
             >
-              Fly it
+              Show me
             </button>
             <button
               type="button"
@@ -476,7 +476,7 @@ const Logbook = ({ manifest, address, sign, controls, onControls, onClose }: Log
           <div className="flex items-center justify-between gap-3 border-b border-ui-line px-5 py-3 sm:px-6">
             <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-ui-deep">Manual controls</p>
             <p className="text-[11px] text-ui-faint">
-              {handsOff(controls) ? 'Flying the market' : 'Flown by hand'}
+              {handsOff(controls) ? 'Driven by the market' : 'Driven by hand'}
             </p>
           </div>
           <div className="px-5 py-4 sm:px-6">

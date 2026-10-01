@@ -8,19 +8,19 @@
 * [The token](getting-started/the-token.md)
 * [Connecting a wallet](getting-started/connecting-a-wallet.md)
 
-## How it flies
+## How it runs
 
-* [One number flies the plane](how-it-flies/flight-model.md)
-* [The five levels](how-it-flies/altitude-bands.md)
-* [The overhead panel and the PA](how-it-flies/overhead-panel.md)
-* [The sky outside](how-it-flies/the-sky.md)
+* [One number runs the train](how-it-runs/one-number-runs-the-train.md)
+* [The five worlds](how-it-runs/the-five-worlds.md)
+* [The lamps and the PA](how-it-runs/lamps-and-the-pa.md)
+* [The sky outside](how-it-runs/the-sky.md)
 
-## The cabin
+## The train
 
-* [The seat ladder](the-cabin/seat-ladder.md)
-* [Cabins and seats](the-cabin/cabins-and-seats.md)
-* [Views and controls](the-cabin/views-and-controls.md)
-* [Your boarding pass](the-cabin/boarding-pass.md)
+* [The seat ladder](the-train/seat-ladder.md)
+* [Coaches and seats](the-train/coaches-and-seats.md)
+* [Views and controls](the-train/views-and-controls.md)
+* [Your ticket](the-train/your-ticket.md)
 
 ## The railway
 

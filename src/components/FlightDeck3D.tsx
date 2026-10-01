@@ -110,7 +110,7 @@ const FlightDeck3D = ({ feed, lamps, sky, band, controls = HANDS_OFF }: FlightDe
     <div
       className="sd-view sd-frame sa-flightdeck relative w-full cursor-grab overflow-hidden bg-[#05070F] active:cursor-grabbing"
       role="img"
-      aria-label="The flight deck of SA350, from the captain's seat: the windshield onto the real sky, the glareshield, both pilots' flight and navigation displays, the overhead panel and the throttles. Every reading is driven by the token's 5-minute change, and the values are published as text below. Drag to look around."
+      aria-label="The driver's cab of SR350, from the driver's seat: the windscreen onto the real sky, the desk, both drivers' displays, the overhead panel and the power handles. Every reading is driven by the token's 5-minute change, and the values are published as text below. Drag to look around."
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
@@ -119,7 +119,7 @@ const FlightDeck3D = ({ feed, lamps, sky, band, controls = HANDS_OFF }: FlightDe
     >
       <canvas ref={canvasRef} className="block h-full w-full" />
       <p className="pointer-events-none absolute bottom-3 left-3 border border-white/12 bg-[#05070F]/80 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-seat-amber backdrop-blur-sm sm:bottom-4 sm:left-4">
-        CPT · Flight deck
+        DRV · Driver's cab
       </p>
       <p className="pointer-events-none absolute bottom-3 right-3 hidden text-[11px] uppercase tracking-[0.18em] text-white/45 min-[420px]:block sm:bottom-4 sm:right-4">
         Drag to look

@@ -1,6 +1,8 @@
 {
-  "name": "SEAT AIRLINES — SA350",
-  "description": "A flight simulator flown by one number. Market cap is altitude: $1M is above the clouds, $10M is space, $50M is the moon.",
+  "name": "SEAT RAILWAY \u2014 SR350",
+  "description": "A train run by one number. Market cap is length: a carriage for every milestone from $10K, the clouds at $1M, space at $10M, the moon at $50M.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

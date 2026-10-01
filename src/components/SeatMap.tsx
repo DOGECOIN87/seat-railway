@@ -367,7 +367,7 @@ const SeatMap = memo(function SeatMap({ manifest, banners, mine, canAdvertise, o
             </>
           ) : (
             <p className="sa-map__note">
-              Open any seat to see who holds it. Seat Airlines adverts mark open seats.
+              Open any seat to see who holds it. Seat Railway adverts mark open seats.
             </p>
           )}
         </div>

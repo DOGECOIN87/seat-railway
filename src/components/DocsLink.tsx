@@ -19,7 +19,7 @@ const DocsLink = ({ night = false }: { night?: boolean }) => (
       <path d={GITBOOK_MARK} />
     </svg>
     <span className="sa-docs__label">
-      Docs <span className="sa-docs__on">on GitBook</span>
+      Docs
     </span>
   </a>
 );

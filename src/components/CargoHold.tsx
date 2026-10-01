@@ -88,7 +88,7 @@ const CargoHold = ({ feed, band, belowCutoff, controls = HANDS_OFF }: CargoHoldP
     <div
       className="sd-view sd-frame relative w-full"
       role="img"
-      aria-label={`The cargo hold: unpressurized, below the cabin floor, and the biggest room on the aircraft. ${belowCutoff} passengers are riding below the seat cutoff.`}
+      aria-label={`The freight car: at the back of the train, and the biggest car on it. ${belowCutoff} passengers are riding below the seat cutoff.`}
     >
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" className="h-full w-full" aria-hidden>
         <defs>
@@ -228,10 +228,10 @@ const CargoHold = ({ feed, band, belowCutoff, controls = HANDS_OFF }: CargoHoldP
         <g>
           <rect x="40" y="72" width="620" height="88" fill="#05070C" opacity="0.62" />
           <text x="60" y="112" fontSize="26" fill="#E8EDF5" opacity="0.92" letterSpacing="4" fontFamily={MONO}>
-            CARGO HOLD
+            FREIGHT CAR
           </text>
           <text x="60" y="140" fontSize="13" fill="#B7C0D0" opacity="0.85" letterSpacing="2" fontFamily={MONO}>
-            UNPRESSURIZED · NO SMOKING · {belowCutoff.toLocaleString('en-US')} BELOW THE CUTOFF
+            NO SMOKING · MIND THE GAP · {belowCutoff.toLocaleString('en-US')} BELOW THE CUTOFF
           </text>
           <text x={W - 60} y="112" fontSize="12" textAnchor="end" fill={CYAN} opacity="0.7" letterSpacing="2" fontFamily={MONO}>
             {band.label.toUpperCase()}

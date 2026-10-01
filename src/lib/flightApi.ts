@@ -61,7 +61,7 @@ export async function fetchFlight(): Promise<ManualControls> {
  * the aeroplane roll already knows somebody rolled it.
  */
 export async function setFlight(session: Session, controls: ManualControls): Promise<ManualControls> {
-  if (!WORKER_API) throw new Error('This deployment has no flight controls.');
+  if (!WORKER_API) throw new Error('This deployment has no train controls.');
   const res = await fetch(`${WORKER_API}/flight`, {
     method: 'PUT',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${session.token}` },
@@ -69,7 +69,7 @@ export async function setFlight(session: Session, controls: ManualControls): Pro
   });
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as { error?: string } | null;
-    throw new Error(body?.error ?? `The flight controls refused that (${res.status}).`);
+    throw new Error(body?.error ?? `The train controls refused that (${res.status}).`);
   }
   return clamped((await res.json()) as Partial<ManualControls>);
 }

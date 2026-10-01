@@ -10,13 +10,13 @@
 const KEY = 'seat_airlines_passenger';
 
 const FIRST = [
-  'Aisle', 'Overhead', 'Tray', 'Galley', 'Jetway', 'Terminal', 'Tarmac', 'Winglet',
-  'Cargo', 'Standby', 'Duty', 'Transit', 'Layover', 'Redeye', 'Bulkhead', 'Turbulent',
+  'Aisle', 'Luggage', 'Table', 'Buffet', 'Platform', 'Station', 'Sleeper', 'Signal',
+  'Freight', 'Standby', 'Express', 'Transit', 'Junction', 'Overnight', 'Coupling', 'Rattling',
 ];
 
 const LAST = [
-  'Hopper', 'Trolley', 'Recliner', 'Upgrade', 'Voucher', 'Carousel', 'Boarding', 'Holder',
-  'Baggage', 'Middle', 'Window', 'Legroom', 'Cabin', 'Runway',
+  'Hopper', 'Trolley', 'Recliner', 'Upgrade', 'Season', 'Turnstile', 'Boarding', 'Holder',
+  'Baggage', 'Middle', 'Window', 'Legroom', 'Carriage', 'Siding',
 ];
 
 function mint(): string {

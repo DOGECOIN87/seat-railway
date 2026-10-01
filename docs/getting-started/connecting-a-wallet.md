@@ -6,7 +6,7 @@ description: Which wallets work, what connecting shares, and how to check in on 
 
 ## Supported wallets
 
-Seat Airlines talks directly to the wallets your browser puts into the page. These work:
+Seat Railway talks directly to the wallets your browser puts into the page. These work:
 
 * **Phantom**
 * **Solflare**
@@ -17,26 +17,26 @@ Any other Solana wallet that registers itself with the page (the Wallet Standard
 
 **More than one installed?** **Connect wallet** asks which, showing each wallet's own name and icon. The one you pick signs everything after, and is the one reconnected next time.
 
-On a computer, use the wallet's browser extension. **On a phone, open seat-airlines.space inside your wallet app's own browser** — for example, the browser tab in Phantom, Solflare, Backpack or Nightly. An ordinary mobile browser has no wallet in the page to connect to; with none installed, the page offers **Open in Phantom**, **Open in Solflare** and **Open in Backpack**, and a link to get Nightly.
+On a computer, use the wallet's browser extension. **On a phone, open the site inside your wallet app's own browser** — for example, the browser tab in Phantom, Solflare, Backpack or Nightly. An ordinary mobile browser has no wallet in the page to connect to; with none installed, the page offers **Open in Phantom**, **Open in Solflare** and **Open in Backpack**, and a link to get Nightly.
 
 ## Checking in
 
 1. Open **Check in** in the tab bar.
 2. Press **Connect wallet**, pick your wallet if you have more than one, and approve the connection in it.
-3. The card turns into your receipt: **Passenger** (your address, shortened), **Cabin**, **Holding** and **Share of supply**.
+3. The card turns into your receipt: **Passenger** (your address, shortened), **Coach**, **Holding** and **Share of supply**.
 
 Your balance is merged into the seating the moment it is read, so you do not wait for the next refresh to see where you sit.
 
-## Flying the plane
+## The flying game
 
-The game on the way in needs a connected wallet too: **Connect & fly** connects it and takes off. It is the same connection as checking in, so connect once and both are done. See [Views and controls](../the-cabin/views-and-controls.md#fly-the-plane).
+The side game on the way in — fly Seat Airlines' plane — needs a connected wallet too: **Connect & fly** connects it and takes off. It is the same connection as checking in, so connect once and both are done. See [Views and controls](../the-train/views-and-controls.md#the-flying-game).
 
 ## What connecting shares
 
 Connecting gives the site your **public address**, which is already public on the chain. It does not sign anything, move anything, or grant the site any permission over your funds.
 
 {% hint style="info" %}
-A few features ask for a signature later, and every one is a plain-text message, never a transaction: putting an advert on your seat, taking it down, and signing in to the cabin directory. [Wallet safety](../safety/wallet-safety.md) shows each message in full.
+A few features ask for a signature later, and every one is a plain-text message, never a transaction: putting an advert on your seat, taking it down, and signing in to the coach directory. [Wallet safety](../safety/wallet-safety.md) shows each message in full.
 {% endhint %}
 
 ## Coming back

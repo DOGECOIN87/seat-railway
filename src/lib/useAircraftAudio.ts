@@ -281,8 +281,11 @@ export function useAircraftAudio(lamps: Annunciators, _change5m: number, band: F
           target.seatbeltBuffer = chime;
           target.occasionalSeatbeltBuffer = chime;
         }
-        scheduleIntercom(target, true);
-        scheduleOccasionalSeatbelt(target);
+        /* The airline's recorded announcements (public/intercom) are a
+           captain and a cabin crew, so the railway leaves them off; the
+           train's voice is its horn and its bell. */
+        void scheduleIntercom;
+        void scheduleOccasionalSeatbelt;
         const [horns, bell] = await Promise.all([
           Promise.all(HORN_FILES.map((f) => decode(RAIL(f)).catch(() => null))),
           decode(RAIL('crossing-bell.mp3')).catch(() => null),

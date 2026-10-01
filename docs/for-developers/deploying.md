@@ -1,5 +1,5 @@
 ---
-description: The page on GitHub Pages, the Worker on Cloudflare, the token, and these docs on GitBook.
+description: The page on GitHub Pages, the Worker on Cloudflare, the token, and these docs.
 ---
 
 # Deploying
@@ -11,25 +11,21 @@ description: The page on GitHub Pages, the Worker on Cloudflare, the token, and 
 1. **Turn Pages on first.** Repository → **Settings → Pages → Source: GitHub Actions**. Without it the workflow builds and then fails at the deploy step with a permissions error.
 2. **Configuration** goes in repository **variables**, not secrets: **Settings → Secrets and variables → Actions → Variables**. See [Configuration](configuration.md) for why.
 
-### The domain
+### The address
 
-`public/CNAME` holds `seat-airlines.space`, and the build copies it into `dist/`, so the custom domain survives every deploy. At the registrar:
+With no `public/CNAME`, the site is published at **https://dogecoin87.github.io/seat-railway/**. The build uses relative paths (`base: './'` in `vite.config.ts`), so it works under that sub-path as it is.
 
-| Type | Name | Value |
-| --- | --- | --- |
-| A | `@` | `185.199.108.153` |
-| A | `@` | `185.199.109.153` |
-| A | `@` | `185.199.110.153` |
-| A | `@` | `185.199.111.153` |
-| AAAA | `@` | `2606:50c0:8000::153` |
-| AAAA | `@` | `2606:50c0:8001::153` |
-| AAAA | `@` | `2606:50c0:8002::153` |
-| AAAA | `@` | `2606:50c0:8003::153` |
-| CNAME | `www` | `dogecoin87.github.io.` |
+To give it a domain of its own, put the domain in `public/CNAME`, point the domain's DNS at GitHub Pages (four `A` records to `185.199.108.153`–`185.199.111.153`, and a `CNAME` for `www` to `dogecoin87.github.io.`), set **Settings → Pages → Custom domain**, and update the address in `index.html`, `public/robots.txt`, `public/sitemap.xml`, `src/lib/shareCard.ts` and `scripts/update-token.mjs`.
 
-Then **Settings → Pages → Custom domain → `seat-airlines.space`**, wait for the DNS check, and tick **Enforce HTTPS** once it is offered.
+{% hint style="warning" %}
+Do **not** reuse `seat-airlines.space`: it belongs to Seat Airlines' own Pages site.
+{% endhint %}
 
 ## The Worker — Cloudflare
+
+{% hint style="warning" %}
+**Seat Railway currently uses Seat Airlines' Worker** (`seat-airlines-banners.trashmarket.workers.dev`), and so the same token's holders, adverts and directory. That Worker only answers the origins in its `ALLOWED_ORIGINS`, so until `https://dogecoin87.github.io` (or the railway's own domain) is added there, the published railway shows the train and the market but **no seats, adverts or directory**. For a token of its own, the railway needs a Worker of its own — deploy `worker/` under a new name, then set `VITE_BANNERS_API` to it.
+{% endhint %}
 
 `.github/workflows/worker.yml` runs on pushes to `main` that touch `worker/`. It type-checks and tests the Worker, and deploys it **only if** the repository has a `CLOUDFLARE_API_TOKEN` secret (with Workers Scripts, Workers KV Storage and Workers R2 Storage edit rights). Without one it stops after the tests and says so in the job summary — a green run does not by itself mean the Worker was deployed, so check the **Deploy** step.
 
@@ -67,9 +63,9 @@ A new mint is a new holder set: the seats and the holder count come from the new
 The documentation is the `docs/` folder of the repository, and `gitbook-docs.yaml` at the repository root is the contract GitBook reads: it names the site and maps that folder onto it as one space — one book, whose page tree is `docs/SUMMARY.md`. (`.gitbook.yaml` is the older, space-level version of the same pointer, kept for anything still reading it.) To connect a GitBook docs site:
 
 1. In the site, open **Git Sync** and choose **GitHub**.
-2. Install or authorise the GitBook app for `DOGECOIN87/Seat-Airlines`, and pick the branch — `main`. Leave the project directory at the repository root, where GitBook finds `gitbook-docs.yaml`.
+2. Install or authorise the GitBook app for `DOGECOIN87/seat-railway`, and pick the branch — `main`. Leave the project directory at the repository root, where GitBook finds `gitbook-docs.yaml`.
 3. For the first sync, keep the direction **GitHub → GitBook**, so GitBook imports these pages rather than overwriting them with an empty site.
 4. Publish the site from GitBook.
-5. The footer's **Docs on GitBook** link already opens the published site — its address is committed in `src/lib/docs.ts`. If the address ever changes, either update that constant or set the repository variable `VITE_DOCS_URL` to the new one and re-run the Pages deploy (**Actions → Deploy to GitHub Pages → Run workflow**); the variable wins over the committed address.
+5. Point the page's **Docs** link at the published site: update the address committed in `src/lib/docs.ts` (today it opens the `docs/` folder on GitHub), or set the repository variable `VITE_DOCS_URL` to it and re-run the Pages deploy (**Actions → Deploy to GitHub Pages → Run workflow**); the variable wins over the committed address.
 
 After that the sync runs both ways: a push to `docs/` updates GitBook, and an edit made in GitBook arrives as a commit.

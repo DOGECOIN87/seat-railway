@@ -44,18 +44,18 @@ export {
 
 export function sectionLabel(zone: ZoneKey): string {
   switch (zone) {
-    case 'deck': return 'Flight Deck';
+    case 'deck': return "Driver's Cab";
     case 'first': return 'First Class';
     case 'business': return 'Business';
     case 'exit': return 'Exit Row';
-    case 'economy': return 'Economy';
+    case 'economy': return 'Standard';
     default: return zone;
   }
 }
 
 export function defaultRole(zone: ZoneKey): string {
   switch (zone) {
-    case 'deck': return 'Flight operations';
+    case 'deck': return 'Train operations';
     case 'first': return 'Business development';
     case 'business': return 'Partnerships';
     case 'exit': return 'Campaigns & growth';

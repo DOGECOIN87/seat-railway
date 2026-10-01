@@ -6,7 +6,7 @@ description: Step by step, what you sign, and the rules an advert has to meet.
 
 ## Before you start
 
-* **You need a seat.** Only a holder seated on the aircraft can advertise, and only on their own seat.
+* **You need a seat.** Only a holder seated on the train can advertise, and only on their own seat.
 * **Check in first.** Connect your wallet in the **Check in** section — see [Connecting a wallet](../getting-started/connecting-a-wallet.md).
 
 ## Steps
@@ -26,6 +26,8 @@ description: Step by step, what you sign, and the rules an advert has to meet.
 The PA confirms it: _"Advert up on seat 8A."_
 
 ## What your wallet signs
+
+The message still begins `SEAT AIRLINES`: the server that checks it is shared with Seat Airlines, and it verifies the wording exactly.
 
 ```
 SEAT AIRLINES
@@ -68,7 +70,7 @@ advert: <the stored name of that advert's image>
 issued: <the time you pressed the button>
 ```
 
-**Remove** only appears when there is an advert of yours on the seat — the airline's house adverts are not yours to remove.
+**Remove** only appears when there is an advert of yours on the seat — the railway's house adverts are not yours to remove.
 
 ## When something goes wrong
 

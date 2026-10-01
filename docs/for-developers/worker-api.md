@@ -4,7 +4,7 @@ description: Every public route on the Worker, what it takes and what it answers
 
 # Worker API
 
-Base URL in production: `https://seat-airlines-banners.trashmarket.workers.dev`. Every route answers JSON, and errors come back as `{ "error": "<a sentence you can show a person>" }`.
+Base URL in production: `https://seat-airlines-banners.trashmarket.workers.dev` — Seat Airlines' Worker, which Seat Railway shares for now (see [Deploying](deploying.md#the-worker-cloudflare)). Every route answers JSON, and errors come back as `{ "error": "<a sentence you can show a person>" }`.
 
 ## Public routes
 
@@ -17,7 +17,7 @@ Base URL in production: `https://seat-airlines-banners.trashmarket.workers.dev`.
 | `POST /banner` | Publish an advert — see below |
 | `DELETE /banner` | Take your own advert down — see below |
 | `GET /images/<key>` | Advert artwork, when it is stored in KV rather than R2 |
-| `GET /flight` | The crew's current flight controls |
+| `GET /flight` | The crew's current manual controls |
 
 `GET /holding` answers **503** when the chain cannot be asked, never a zero balance: a holder told they hold nothing would be moved to the hold and shut out of the directory.
 
@@ -27,7 +27,7 @@ Base URL in production: `https://seat-airlines-banners.trashmarket.workers.dev`.
 | --- | --- |
 | `storage` | `"r2"` or `"kv"` — where artwork is kept |
 | `directory` | Whether the D1 database is bound |
-| `sections` | Whether the cabins can be told apart **right now**. False means no card shows contact details and no introduction sends. |
+| `sections` | Whether the coaches (the API calls them cabins) can be told apart **right now**. False means no card shows contact details and no introduction sends. |
 | `configured` | Whether a `TOKEN_MINT` or `HOLDERS_URL` was ever set — separates "nobody configured it" from "the endpoint refused" |
 | `seated` / `cabin` | How many of the seats actually filled. A cabin stuck at 20 of 178 means the RPC refused the full holder scan. |
 
@@ -105,8 +105,8 @@ Every directory route needs a session: send `Authorization: Bearer <token>`.
 | `GET /messages` | `{ inbox, sent, overheard, channels, announcements }` — your own cabin's room only; `overheard` is always empty and kept for older pages |
 | `POST /messages` | `{ to, body }`, where `to` is a wallet, `section:<cabin>`, or `announcement` |
 
-The cabins are `deck`, `first`, `business`, `exit` and `economy`. The rules in [Your seat is which room you are in](../section-network/how-far-you-can-see.md) are enforced here, before any row is written or read.
+The coaches are `deck` (the driver's cab), `first`, `business`, `exit` and `economy` (Standard) — the API keeps the airline's names for them. The rules in [Your seat is which room you are in](../section-network/how-far-you-can-see.md) are enforced here, before any row is written or read.
 
 ## CORS
 
-The API routes answer only the origins in `ALLOWED_ORIGINS`. The `/images/` route answers any origin, because the cabin's seat-back screens load artwork as WebGL textures.
+The API routes answer only the origins in `ALLOWED_ORIGINS`. The `/images/` route answers any origin, because the seat-back screens and the trackside billboards load artwork as WebGL textures.

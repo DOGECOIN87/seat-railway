@@ -1,14 +1,14 @@
 ---
-description: Outside, in a seat, on the flight deck, in the hold — and how to move between them.
+description: Outside, in a seat, in the driver's cab, in the freight car — and how to move between them.
 ---
 
 # Views and controls
 
-The site opens on a departure board in the middle of the screen, turning through a few of the airline's lines — _Hold more. Fly higher._ first, _Now boarding_ last — then fading onto the aircraft **full screen**. A tap or any key skips it. **Docs on GitBook** is under the board, and at the top right of the screen after it. **Enter** goes in. Every other view is a step inward from the one the page then opens on: **outside, on the whole aircraft**, right under the gate sign, whose **Claim a seat** button opens the seat map from anywhere on the page.
+The site opens on a departure board in the middle of the screen, turning through a few of the line's sayings — _Hold more. Ride longer._ first, _Now boarding_ last — then fading onto the train **full screen**, running through the country with the camera drifting slowly round its nose. A tap or any key skips the board. **Docs** is under the board, and at the top right of the screen after it. **Enter** goes in. Every other view is a step inward from the one the page then opens on: **outside, on the whole train**, right under the gate sign, whose **Claim a seat** button opens the seat map from anywhere on the page.
 
-## Fly the plane
+## The flying game
 
-On the way in you can take the controls. Press **Fly** — or just press an arrow key — and the aircraft dives down to a few hundred metres over the hills while the camera swings round behind it. Your brief: **climb to 10,000 ft**.
+On the way in there is a side game: take the controls of the sister airline's plane. Press **Fly** — or just press an arrow key — and the train makes way for an airliner, which dives down to a few hundred metres over the hills while the camera swings round behind it. Your brief: **climb to 10,000 ft**.
 
 **You need a Solana wallet connected to fly.** Until one is, the button reads **Connect & fly**: press it, approve the connection in your wallet, and it takes off — and your score can go straight on the leaderboard when you land. An arrow key with no wallet connected brings up the same card. With no wallet installed, the card says where to get one; on a phone it offers **Open in Phantom** and **Open in Solflare**, which reopen the page inside that wallet's own browser. Connecting shares your address and nothing else.
 
@@ -42,7 +42,7 @@ Left alone it is down in under twenty seconds; holding the nose up buys about ha
 
 **Post** on the **WASTED** screen shares the flight to X, tagging @solana and @pumpdotfun. The card is made from the flight itself: the moment the engine went — the fireball, or the bolt — with your score, what happened and where.
 
-* **On a phone**, Post opens your phone's share sheet with a short video: the card, then the departure board turning up **HOLD MORE / FLY HIGHER** and **NOW BOARDING**, then the logo. Choose X and it goes into a post, words and all. (Where the browser cannot make the video, the card goes as a picture.)
+* **On a phone**, Post opens your phone's share sheet with a short video: the card, then the departure board turning up **HOLD MORE / RIDE LONGER** and **NOW BOARDING**, then the logo. Choose X and it goes into a post, words and all. (Where the browser cannot make the video, the card goes as a picture.)
 * **On a computer**, Post opens X with the post written and a link whose preview is the card, and saves the video beside it to drop into the post if you want it.
 
 ### Scoring and the leaderboard
@@ -67,16 +67,20 @@ The server times every run from the moment you take the controls and refuses a s
 
 | View | What you see |
 | --- | --- |
-| **Outside** | The whole aircraft in its livery, over the ground it is actually flying above. Drag to walk the camera around it. The corner reads **Souls on board** — how many holders are seated. |
+| **Outside** | The whole train in the Seat livery — navy skirt, cyan line, pearl sides, the mark and **SEAT RAILWAY** on the flanks, the market cap on the cab's display — running along the line through whichever world the market cap has reached. Drag to walk the camera around it. The readout in the corner gives the **market cap**, the number of **carriages**, where the **next** one is coupled on, and the **5m** move. |
 | **Seat · forward** | The row ahead, the passengers in it, and your seat-back screen. |
 | **Seat · look left / right** | Your head turned. What is beside you depends on your seat — and the seat next to you is always taken. |
-| **Flight deck** | The cockpit in 3D, from the captain's seat: the real sky and ground through the windshield, the glareshield and autopilot panel, live flight, navigation and engine displays for both pilots, the overhead panel with the cabin signs lit, and the throttles. The yokes turn with the bank. The first officer's seat is taken too. Drag to look around. |
-| **Cargo hold** | Below the floor, where everyone under the cutoff rides: a 3D room of frames and insulation, containers, netted bags and swinging work lamps. Drag to look around; the higher the flight, the more frost on the skin. |
+| **Driver's cab** | The controls in 3D, from the driver's seat: the real sky through the windscreen, live displays for both drivers and the overhead panel with the signs lit. Drag to look around. |
+| **Freight car** | Where everyone under the cutoff rides: a 3D room of frames, containers, netted bags and swinging work lamps. Drag to look around. |
+
+{% hint style="warning" %}
+**The inside views are still the airliner's.** The seats, the driver's cab and the freight car are drawn with the 3D interiors Seat Railway inherited from Seat Airlines — a cabin with oval windows, a cockpit, a cargo hold — while the train's own interiors are built. Everything they show is still live: who sits where, the adverts, the sky, the market.
+{% endhint %}
 
 ## Getting around
 
 * **Step inside** — on the view's own bar — takes you to a seat, looking forward.
-* **Walk the aircraft**, under the view: **Outside**, **Flight Deck**, **First**, **Business**, **Exit Row**, **Economy**, **Cargo hold**.
+* **Walk the train**, under the view: **Outside**, **Driver's Cab**, **First Class**, **Business**, **Exit Row**, **Standard**, **Freight car**.
 * **Seat** — when you are in a seat, choose **Window**, **Middle** or **Aisle**.
 * **← Look left**, **Forward**, **Look right →** turn your head.
 * **Click any seat on the wall** to open it in a window — its advert on the left, whoever holds it on the right.
@@ -84,7 +88,7 @@ The server times every run from the moment you take the controls and refuses a s
 
 ## The sections
 
-The seat map, the section network, the cabin chat and check-in open from a **tab bar along the bottom of the screen** — **Seats**, **Network**, **Chat** and **Check in** — rather than further down the page, so the aircraft stays on the screen whichever one you are in. **Scores**, at the end of the bar, opens the high scores.
+The seat map, the section network, the coach chat and check-in open from a **tab bar along the bottom of the screen** — **Seats**, **Network**, **Chat** and **Check in** — rather than further down the page, so the train stays on the screen whichever one you are in. **Scores**, at the end of the bar, opens the high scores.
 
 * **On a computer** a tab opens its section in a panel beside the view, and the view narrows to make room. Click the tab again, the **×**, or press **Esc** to close it and give the view its width back.
 * **On a phone** a section rises over the page as a sheet. Tap outside it, the **×**, or its tab again to put it away.
@@ -95,13 +99,13 @@ Windows — a seat, the high scores, the advert editor — open over the page wi
 
 ### Turning your head depends on your seat
 
-From **8A** the window is one turn to the left and fills the view. From **8F** that same window is on the far side of the cabin — two seats, the aisle, three more seats, and a porthole the size of a coin. From **8C** you look past 8B's shoulder to see any of it. The row is modelled as it really is — window, seats, aisle, seats, window — and read outward from wherever you sit.
+From **8A** the window is one turn to the left and fills the view. From **8F** that same window is on the far side of the coach — two seats, the aisle, three more seats, and a porthole the size of a coin. From **8C** you look past 8B's shoulder to see any of it. The row is modelled as it really is — window, seats, aisle, seats, window — and read outward from wherever you sit.
 
 ### Who is on board
 
-Every holder's seat has somebody in it: one seated body in a crowd of outfits — suits, shirts and knitwear, short sleeves or long — two builds, a range of skin tones, and a haircut each from seven, from a crop to a bun to hair past the shoulders. Faces have eyes, brows and lips, and people turn their heads — out of the window, now and then, from a window seat. The rows nearest you are drawn finest; the far end of the cabin is drawn plainer, which from twenty rows back is all anyone sees.
+Every holder's seat has somebody in it: one seated body in a crowd of outfits — suits, shirts and knitwear, short sleeves or long — two builds, a range of skin tones, and a haircut each from seven, from a crop to a bun to hair past the shoulders. Faces have eyes, brows and lips, and people turn their heads — out of the window, now and then, from a window seat. The rows nearest you are drawn finest; the far end of the coach is drawn plainer, which from twenty rows back is all anyone sees.
 
-And beside you, whichever seat you view, sits the passenger nobody booked: a hooded figure in a long dark robe, bone for hands, a skull under the hood with embers for eyes, and a sickle across its knee. From a window seat it has the middle; from the middle or the aisle, the seat outboard of you. Every so often it turns its head and looks at you. On the flight deck it flies as first officer.
+And beside you, whichever seat you view, sits the passenger nobody booked: a hooded figure in a long dark robe, bone for hands, a skull under the hood with embers for eyes, and a sickle across its knee. From a window seat it has the middle; from the middle or the aisle, the seat outboard of you. Every so often it turns its head and looks at you. In the driver's cab it rides as second driver.
 
 ## Zoom and pan
 
@@ -120,8 +124,8 @@ A plain scroll without Ctrl scrolls the page, not the view. **Zooming out past 1
 
 ## Sound
 
-Sound is **on by default**: the cabin ambience, the seat-belt chime and the crew announcements start with your first click, tap or key press (browsers allow no sound before that). **Sound on / Sound off**, on the view's control bar, switches it, and the page remembers your choice. See [The overhead panel and the PA](../how-it-flies/overhead-panel.md#sound).
+Sound is **on by default**: the train on the rails, the horns and the crossing bell start with your first click, tap or key press (browsers allow no sound before that). **Sound on / Sound off**, on the view's control bar, switches it, and the page remembers your choice. See [The lamps and the PA](../how-it-runs/lamps-and-the-pa.md#sound).
 
 {% hint style="info" %}
-The drawn views are pictures, so screen readers skip them. Every value they show is also published as text — in the overhead panel and the readouts under the view — and the seat map's seats are real buttons.
+The drawn views are pictures, so screen readers skip them. Every value they show is also published as text — in the warning lamps and the readouts under the view — and the seat map's seats are real buttons.
 {% endhint %}

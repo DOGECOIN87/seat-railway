@@ -85,7 +85,7 @@ export function shareText(f: SharedFlight): string {
     line = `${f.cause === 'lightning' || f.secondCause === 'lightning' ? '⚡🔥' : '🔥🔥'} Lost BOTH engines and kept her in the air ${s}s.`;
   } else if (f.cause === 'lightning') line = `⚡ Lightning hit ENG ${f.engine}${at}. Kept her in the air ${s}s.`;
   else line = `🔥 ENG ${f.engine} blew${at}. Kept her in the air ${s}s.`;
-  return `${line}\n\n${fmt(f.score)} points on Seat Airlines ✈️ Can you beat it?\n\n${SHARE_TAGS}`;
+  return `${line}\n\n${fmt(f.score)} points on Seat Railway ✈️ Can you beat it?\n\n${SHARE_TAGS}`;
 }
 
 /** A post to X, ready to send: the text, and the link its card comes from. */
@@ -366,7 +366,7 @@ export async function composeCard(shot: HTMLCanvasElement | null, f: SharedFligh
   }
   set(`800 ${Math.round(mark * 0.714)}px ${SANS}`, mark * 0.714 * 0.02);
   ctx.fillStyle = '#fff';
-  write('SEAT AIRLINES', M + (logo ? mark * 1.32 : 0), headMid - capOf() / 2);
+  write('SEAT RAILWAY', M + (logo ? mark * 1.32 : 0), headMid - capOf() / 2);
 
   // What happened, as a badge on the right margin: blue-white for lightning, red for fire.
   if (f.cause || f.ufo) {
@@ -402,7 +402,7 @@ export async function composeCard(shot: HTMLCanvasElement | null, f: SharedFligh
   const urlCap = capOf();
   const urlTop = H - B - urlCap;
   ctx.fillStyle = CYAN;
-  write('SEAT-AIRLINES.SPACE', M, urlTop, urlCap);
+  write('DOGECOIN87.GITHUB.IO/SEAT-RAILWAY', M, urlTop, urlCap);
   set(`800 34px ${SANS}`, 0);
   const dare = ink('Can you beat it?');
   const dareTop = urlTop - 16 - dare.down - capOf();
@@ -557,7 +557,7 @@ export const hostsCards = Boolean(SHARE_ORIGIN && WORKER_API);
 
 /** The card, or the video, as a file with a name worth keeping. */
 export const asFile = (blob: Blob): File =>
-  new File([blob], blob.type.startsWith('video/') ? 'seat-airlines-flight.mp4' : 'seat-airlines-score.jpg', { type: blob.type });
+  new File([blob], blob.type.startsWith('video/') ? 'seat-railway-flight.mp4' : 'seat-railway-score.jpg', { type: blob.type });
 
 /**
  * Whether this is a phone that can hand this file to another app — its

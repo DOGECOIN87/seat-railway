@@ -3,7 +3,6 @@ import { CAPTURE, captureState } from '../capture/flag';
 import DocsLink from './DocsLink';
 import { DeckIcon } from './InstrumentDeck';
 import Wordmark from './Wordmark';
-import Flyover from './Flyover';
 import SplitFlapBoard from './SplitFlapBoard';
 import Wasted from './Wasted';
 import { SPLASH_BETWEEN, SPLASH_FIRST, SPLASH_LAST } from '../content/cabin';
@@ -738,7 +737,6 @@ export default function Landing({ feed, sky, band, marketCap, controls, taken, w
             the game starts and the top of the screen is the pilot's. */}
         <span className="sa-landing__brandbox">
           <Wordmark className="sa-landing__brand" />
-          {!inGame && <Flyover />}
         </span>
         <span className="sa-landing__live">
           <span className="sa-live" aria-hidden />
@@ -753,10 +751,10 @@ export default function Landing({ feed, sky, band, marketCap, controls, taken, w
           <h1 className="sa-landing__title">
             Hold more.
             <br />
-            Fly higher.
+            Ride longer.
           </h1>
           <p className="sa-landing__lead">
-            Market cap is altitude. The biggest holders sit up front.
+            Market cap is the length of the train. The biggest holders ride up front.
           </p>
           <div className="sa-landing__actions">
             <button type="button" onClick={leave} className="sa-landing__enter">

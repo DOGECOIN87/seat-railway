@@ -5,7 +5,6 @@ import ContractBar from './components/ContractBar';
 import ViewFrame from './components/ViewFrame';
 import Annunciators from './components/Annunciators';
 import { ClimbRoute, DeckIcon, FlightReadouts, type DeckIconName } from './components/InstrumentDeck';
-import Flyover from './components/Flyover';
 import AdvertDialog from './components/AdvertDialog';
 import DocsLink from './components/DocsLink';
 import Wordmark from './components/Wordmark';
@@ -31,8 +30,8 @@ import {
   bandFor,
   formatCap,
   formatChange,
-  formatFeet,
 } from './lib/flightModel';
+import { carriagesFor } from './lib/consist';
 import { useFlightState } from './lib/useFlightState';
 import { useAircraftAudio } from './lib/useAircraftAudio';
 import { useSky } from './lib/useSky';
@@ -409,11 +408,11 @@ export default function App() {
   useEffect(() => {
     if (band.band !== wasBand.current) {
       const lines: Record<string, string> = {
-        'above-clouds': 'We are on top. Cloud deck below us.',
-        space: 'Cabin crew, the sky has run out. Sky is black.',
-        moon: 'Ladies and gentlemen, we have reached the moon.',
-        mars: 'Ladies and gentlemen, welcome to Mars. Mind the dust.',
-        atmosphere: 'Back in the weather. Seat belt sign is on.',
+        'above-clouds': 'We are on the viaduct. Cloud deck below us.',
+        space: 'Guard to driver: the sky has run out. Sky is black.',
+        moon: 'Ladies and gentlemen, we are now arriving at the moon.',
+        mars: 'Ladies and gentlemen, welcome to Mars. Mind the gap, and the dust.',
+        atmosphere: 'Back down in the country. Please hold on.',
       };
       say(lines[band.band] ?? '', band.band === 'atmosphere' ? 'alert' : 'pa');
       wasBand.current = band.band;
@@ -447,7 +446,7 @@ export default function App() {
     if (berth.hold && boarded && lastSeat.current !== 'HOLD') {
       lastSeat.current = 'HOLD';
       setCamera('hold');
-      say('Passenger assigned to the cargo hold. Mind the step.', 'alert');
+      say('Passenger assigned to the freight car. Mind the step.', 'alert');
       return;
     }
     const id = berth.seat?.id ?? null;
@@ -632,7 +631,7 @@ export default function App() {
       case 'network':
         return (
           <>
-            <p className="sa-lead">See and reach the people in your own cabin.</p>
+            <p className="sa-lead">See and reach the people in your own coach.</p>
             <div className="mt-6">
               <Loaded minHeight="32rem">
                 <NetworkingHub part="directory" manifest={manifest} address={seatKey} viewerZone={claimedSeat?.zone ?? null} sign={wallet.signMessage} />
@@ -643,7 +642,7 @@ export default function App() {
       case 'chat':
         return (
           <>
-            <p className="sa-lead">Talk with the people in your cabin.</p>
+            <p className="sa-lead">Talk with the people in your coach.</p>
             <div className="mt-6">
               <Loaded minHeight="20rem">
                 <NetworkingHub part="chat" manifest={manifest} address={seatKey} viewerZone={claimedSeat?.zone ?? null} sign={wallet.signMessage} />
@@ -722,7 +721,6 @@ export default function App() {
         <div className="mx-auto flex max-w-[94rem] flex-wrap items-center gap-x-4 gap-y-1.5 px-5 py-2 sm:px-8 lg:gap-x-7 lg:py-2.5">
           <a href="#top" className="sa-brand flex shrink-0 items-center text-ui-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ui-blue">
             <Wordmark />
-            <Flyover />
           </a>
 
           {/* The one call to action, where it is always on the screen: beside
@@ -744,7 +742,7 @@ export default function App() {
 
           <dl className="sd-chrome flex w-full min-w-0 items-center justify-between gap-x-7 overflow-x-auto lg:ml-auto lg:w-auto lg:max-w-[62%] lg:justify-start">
             {[
-              { k: 'Altitude', v: `${formatFeet(tick.marketCap)} ft`, tone: 'text-ui-deep' },
+              { k: 'Carriages', v: `${carriagesFor(tick.marketCap)}`, tone: 'text-ui-deep' },
               { k: 'Market cap', v: formatCap(tick.marketCap), tone: 'text-ui-ink' },
               /* Direction is the one thing on the page a single accent cannot
                  carry, so it keeps a sign as well as a colour. */
@@ -774,7 +772,7 @@ export default function App() {
               starts with the view: the way to a seat is up in the gate sign,
               stepping inside is on the view's own bar, and the sections are
               down its edge. */}
-          <h1 id="hero-title" className="sr-only">Seat Airlines. Hold more. Fly higher.</h1>
+          <h1 id="hero-title" className="sr-only">Seat Railway. Hold more. Ride longer.</h1>
 
           {/* ── The cockpit ──────────────────────────────────────────────
               The view and its deck, with the page's sections a tab away down
@@ -790,13 +788,13 @@ export default function App() {
                 camera === 'exterior'
                   ? `Outside · ${band.label}`
                   : camera === 'hold'
-                    ? 'Cargo hold · below the floor'
+                    ? 'Freight car · at the back'
                     : camera === 'deck'
-                      ? 'Flight deck'
+                      ? "Driver's cab"
                       : `${viewZoneDef.name} · ${viewSeat.id} · ${facing === 'forward' ? 'forward' : `looking ${facing}`}`
               }
               onZoomOutBeyond={camera === 'exterior' ? undefined : () => setCamera('exterior')}
-              zoomOutHint="Zoom out of the aircraft"
+              zoomOutHint="Zoom out of the train"
               actions={
                 /* Sound belongs to the view it scores, not to the hero's call
                    to action: in the hero row it wrapped onto a line of its own
@@ -831,7 +829,7 @@ export default function App() {
                   onClick={aircraftAudio.toggle}
                   aria-pressed={aircraftAudio.enabled}
                   className="ui-pill sd-controls__sound"
-                  title="Enable engine, airflow, cabin, and warning sounds"
+                  title="Enable track, horn and warning sounds"
                 >
                   <DeckIcon name={aircraftAudio.enabled ? 'sound' : 'mute'} className="sd-controls__icon" />
                   {/* Out of sight but still the button's name when the rail is too narrow for it. */}
@@ -881,10 +879,10 @@ export default function App() {
               wrapping wherever the whole aeroplane does not fit on one line. */}
           <div className="sa-deck__strip sa-deck__strip--cyan flex-wrap items-center">
             <div className="sa-walk sd-chrome">
-              <span className="sa-strip-label">Walk the aircraft</span>
-              <div className="sa-seg" role="group" aria-label="Walk the aircraft">
+              <span className="sa-strip-label">Walk the train</span>
+              <div className="sa-seg" role="group" aria-label="Walk the train">
                 <button type="button" onClick={() => setCamera('exterior')} aria-pressed={camera === 'exterior'} className={seg(camera === 'exterior')}>
-                  <DeckIcon name="plane" className="sa-seg__icon" />
+                  <DeckIcon name="train" className="sa-seg__icon" />
                   Outside
                 </button>
                 {CABIN_ZONES.map((z) => (
@@ -903,7 +901,7 @@ export default function App() {
                 ))}
                 <button type="button" onClick={() => setCamera('hold')} aria-pressed={camera === 'hold'} className={seg(camera === 'hold')}>
                   <DeckIcon name="hold" className="sa-seg__icon" />
-                  Cargo hold
+                  Freight car
                 </button>
               </div>
             </div>
@@ -932,7 +930,7 @@ export default function App() {
               Three displays let into the panel, the whole route drawn as a
               moving map, and the overhead lamps as keys on the panel. No
               Band cell: the route names every level, and lights this one. */}
-          <section className="sa-flight-state" aria-label="Flight state">
+          <section className="sa-flight-state" aria-label="Train state">
             <FlightReadouts tick={tick} sky={sky} />
             <ClimbRoute band={band} />
             <Annunciators lamps={lamps} />
@@ -961,7 +959,7 @@ export default function App() {
           <div className="sa-footer__docs">
             <DocsLink />
           </div>
-          <p className="sa-footer__line">Hold more. Fly higher.</p>
+          <p className="sa-footer__line">Hold more. Ride longer.</p>
         </div>
       </footer>
 

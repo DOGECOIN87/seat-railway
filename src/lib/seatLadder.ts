@@ -73,7 +73,7 @@ export function berthFromManifest(manifest: Manifest, address: string | null, ba
       seat: null,
       hold: true,
       rank: null,
-      rung: 'Cargo hold',
+      rung: 'Freight car',
       gap: seatsLeft ? 1 : Math.max(0, manifest.cutoff - balance),
       nextLabel: !address
         ? null

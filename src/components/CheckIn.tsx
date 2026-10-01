@@ -85,7 +85,7 @@ const CheckIn = ({ wallet, holding, berth, loading }: CheckInProps) => {
       <dl className="grid grid-cols-2 gap-px bg-transparent">
         {[
           { k: 'Passenger', v: short(address) },
-          { k: 'Cabin', v: berth.hold ? 'CARGO HOLD' : berth.rung },
+          { k: 'Coach', v: berth.hold ? 'FREIGHT CAR' : berth.rung },
           { k: 'Holding', v: holding ? formatTokens(holding.balance) : loading ? '—' : 'unread' },
           { k: 'Share of supply', v: holding ? formatShare(holding.share) : loading ? '—' : 'unread' },
         ].map((cell) => (

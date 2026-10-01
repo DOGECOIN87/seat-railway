@@ -194,7 +194,7 @@ const ExteriorView = ({ feed, sky, band, taken, claimed, viewing, controls = HAN
         <span className="font-heading text-[15px] leading-none tracking-normal text-white/90">SR350</span>
         <span aria-hidden className="hidden h-3.5 w-px bg-white/25 md:block" />
         <span className="hidden whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.2em] text-white/50 md:inline">
-          Souls on board <span className="tabular-nums text-white/80">{taken.size}</span>
+          Passengers <span className="tabular-nums text-white/80">{taken.size}</span>
         </span>
       </div>
 

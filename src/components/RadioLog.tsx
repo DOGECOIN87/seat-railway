@@ -42,7 +42,7 @@ const RadioLog = ({ entries }: { entries: readonly LogEntry[] }) => {
     <div className="flex h-full flex-col ui-card">
       <header className="flex flex-none items-center gap-2.5 ui-rule-b px-4 py-3">
         <span aria-hidden className="sa-pulse-glow h-1.5 w-1.5 bg-ui-blue" style={{ borderRadius: '9999px' }} />
-        <h3 className="font-heading text-base text-ui-ink">Cabin radio</h3>
+        <h3 className="font-heading text-base text-ui-ink">Train radio</h3>
         <span className="ml-auto text-[11px] uppercase tracking-[0.18em] text-ui-faint">Live</span>
       </header>
 

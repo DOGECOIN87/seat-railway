@@ -264,7 +264,7 @@ function drawNd(g: CanvasRenderingContext2D, a: Attitude, r: DeckReadout | null)
   g.fillStyle = WHITE;
   g.fillText(`GS ${Math.round(a.speed * 1.08)}`, 8, 20);
   g.fillStyle = CYAN;
-  g.fillText('SA350 · NONSTOP', 8, 310);
+  g.fillText('SR350 · EXPRESS', 8, 310);
   g.textAlign = 'right';
   g.fillStyle = WHITE;
   g.fillText(`SOULS ${r ? r.holders.toLocaleString('en-US') : '—'}`, 312, 20);

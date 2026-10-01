@@ -96,7 +96,7 @@ const CargoHold3D = ({ feed, band, belowCutoff, controls = HANDS_OFF }: CargoHol
     <div
       className="sd-view sd-frame relative w-full cursor-grab overflow-hidden bg-[#07090E] active:cursor-grabbing"
       role="img"
-      aria-label={`The cargo hold: unpressurized, below the cabin floor, and the biggest room on the aircraft. ${belowCutoff} passengers are riding below the seat cutoff. Drag to look around.`}
+      aria-label={`The freight car: at the back of the train, and the biggest car on it. ${belowCutoff} passengers are riding below the seat cutoff. Drag to look around.`}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
@@ -107,7 +107,7 @@ const CargoHold3D = ({ feed, band, belowCutoff, controls = HANDS_OFF }: CargoHol
 
       {/* Stencilled on the bulkhead, as the drawing had it. */}
       <div className="pointer-events-none absolute left-3 top-3 max-w-[70%] bg-[#05070C]/65 px-3 py-2 font-mono backdrop-blur-[2px] sm:left-4 sm:top-4 sm:px-4 sm:py-3">
-        <p className="text-[15px] tracking-[0.22em] text-[#E8EDF5] sm:text-[20px]">CARGO HOLD</p>
+        <p className="text-[15px] tracking-[0.22em] text-[#E8EDF5] sm:text-[20px]">FREIGHT CAR</p>
         <p className="mt-1 text-[10px] tracking-[0.14em] text-[#B7C0D0] sm:text-[11px]">
           UNPRESSURIZED · NO SMOKING · {belowCutoff.toLocaleString('en-US')} BELOW THE CUTOFF
         </p>

@@ -39,7 +39,7 @@ const BoardingLadder = ({ berth, holding, address, manifestSize }: BoardingLadde
   return (
     <section
       className="ui-card"
-      aria-label="Boarding ladder: what each cabin costs"
+      aria-label="Boarding ladder: what each coach costs"
     >
       <header className="flex items-baseline gap-3 ui-rule-b px-5 py-3.5">
         <h3 className="font-heading text-lg leading-none text-ui-ink">Boarding ladder</h3>
@@ -116,7 +116,7 @@ const BoardingLadder = ({ berth, holding, address, manifestSize }: BoardingLadde
           <span className="w-7 shrink-0 text-center text-[11px] text-ui-faint" aria-hidden>—</span>
           <span className="min-w-0 flex-1">
             <span className={`block text-sm font-bold ${berth.hold && address ? 'text-ui-ink' : 'text-ui-soft'}`}>
-              Cargo hold
+              Freight car
             </span>
             <span className="block text-[11px] text-ui-faint">Unlimited · everyone below the cut</span>
           </span>
@@ -148,7 +148,7 @@ const BoardingLadder = ({ berth, holding, address, manifestSize }: BoardingLadde
             </>
           ) : (
             <p className="text-[12.5px] text-ui-soft/70">
-              Biggest bag on board. Nowhere higher.
+              Biggest bag on board. Nowhere further forward.
             </p>
           )}
         </div>

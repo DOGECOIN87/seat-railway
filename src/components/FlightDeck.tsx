@@ -199,7 +199,7 @@ const FlightDeck = ({ feed, lamps, sky, band, controls = HANDS_OFF }: FlightDeck
       className="sd-view sd-frame sa-flightdeck relative w-full overflow-hidden border border-white/12 bg-[#05070F]"
       
       role="img"
-      aria-label="The flight deck of SA350: overhead panel, windshield, and the captain's primary flight and navigation displays. Every reading is driven by the token's 5-minute change, and the values are published as text below."
+      aria-label="The driver's cab of SR350: overhead panel, windscreen, and the driver's primary and navigation displays. Every reading is driven by the token's 5-minute change, and the values are published as text below."
     >
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" className="h-full w-full" aria-hidden>
         <defs>
@@ -495,7 +495,7 @@ const FlightDeck = ({ feed, lamps, sky, band, controls = HANDS_OFF }: FlightDeck
           <text ref={chgRead} x={ND.x + 10} y={ND.y + 42} fontSize="20" fill={CYAN} fontWeight="700" />
           <text x={ND.x + ND.w - 10} y={ND.y + 20} fontSize="9" textAnchor="end" fill={PANEL_DIM} letterSpacing="1.2">SOULS</text>
           <text ref={paxRead} x={ND.x + ND.w - 10} y={ND.y + 40} fontSize="16" textAnchor="end" fill="#E8EDF5" fontWeight="700" />
-          <text x={ND.x + 10} y={ND.y + ND.h - 10} fontSize="9" fill={PANEL_DIM} letterSpacing="1.2">SA350 · NONSTOP</text>
+          <text x={ND.x + 10} y={ND.y + ND.h - 10} fontSize="9" fill={PANEL_DIM} letterSpacing="1.2">SR350 · EXPRESS</text>
         </g>
 
         {/* Outboard standby instruments */}

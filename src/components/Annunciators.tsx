@@ -47,10 +47,10 @@ const Lamp = ({ label, icon, on, level = 'advisory', detail }: LampProps) => {
 };
 
 const Annunciators = ({ lamps }: { lamps: LampState }) => (
-  <ul aria-label="Overhead annunciator panel" className="sa-lamps">
-    <Lamp label="Fasten seat belt" icon="belt" on={lamps.seatbelt} detail="Rough air" />
-    <Lamp label="Beverage service" icon="cup" on={lamps.service} detail="Cart rolling" />
-    <Lamp label="Oxygen" icon="mask" on={lamps.oxygen} level="caution" detail="Masks down" />
+  <ul aria-label="Driver's warning lamps" className="sa-lamps">
+    <Lamp label="Hold on" icon="belt" on={lamps.seatbelt} detail="Rough track" />
+    <Lamp label="Buffet car" icon="cup" on={lamps.service} detail="Trolley rolling" />
+    <Lamp label="Emergency brake" icon="mask" on={lamps.oxygen} level="caution" detail="Brake applied" />
     <Lamp label="Brace" icon="brace" on={lamps.brace} level="warning" detail="Heads down" />
   </ul>
 );

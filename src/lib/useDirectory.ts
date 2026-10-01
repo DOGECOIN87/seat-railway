@@ -300,7 +300,7 @@ export function useDirectory(
     try {
       const published = await saveProfile(session, profile);
       setProfiles((current) => ({ ...current, [published.address]: published }));
-      setNotice('Your card is published to the cabin directory.');
+      setNotice('Your card is published to the coach directory.');
       return true;
     } catch (e) {
       if (e instanceof SessionExpired) setSession(null);
@@ -327,7 +327,7 @@ export function useDirectory(
       const room = zoneOfChannel(to);
       if (to === ANNOUNCEMENT) {
         setAnnouncements((current) => [message, ...current]);
-        setNotice('Announcement made. The whole aircraft can hear it.');
+        setNotice('Announcement made. The whole train can hear it.');
       } else if (room) {
         setChannels((current) => ({ ...current, [room]: [message, ...(current[room] ?? [])] }));
         setNotice('Posted to your section.');

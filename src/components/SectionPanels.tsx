@@ -35,7 +35,7 @@ interface PanelDef {
 export const PANELS: readonly PanelDef[] = [
   { key: 'wall', label: 'Seats', icon: 'wall', eyebrow: 'Seats', title: 'The wall' },
   { key: 'network', label: 'Network', icon: 'network', eyebrow: 'Network', title: 'Directory' },
-  { key: 'chat', label: 'Chat', icon: 'chat', eyebrow: 'Chat', title: 'Cabin rooms' },
+  { key: 'chat', label: 'Chat', icon: 'chat', eyebrow: 'Chat', title: 'Coach rooms' },
   { key: 'check-in', label: 'Check in', icon: 'pass', eyebrow: 'Check in', title: 'Your seat' },
 ];
 

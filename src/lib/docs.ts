@@ -10,6 +10,8 @@
  * Blank counts as unset, for the reason `workerBase.ts` gives: the deploy
  * workflow passes every variable, created or not.
  */
-const COMMITTED_DOCS_URL = 'https://seat-airlines.gitbook.io/seat-airlines-docs/';
+/* Until the railway has a GitBook site of its own, the docs are read where
+   they live: the docs/ folder on GitHub. */
+const COMMITTED_DOCS_URL = 'https://github.com/DOGECOIN87/seat-railway/tree/main/docs';
 
 export const DOCS_URL = (import.meta.env.VITE_DOCS_URL as string | undefined)?.trim() || COMMITTED_DOCS_URL;

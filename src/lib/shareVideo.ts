@@ -247,7 +247,7 @@ function brand(ctx: CanvasRenderingContext2D, logo: HTMLImageElement | null) {
   const mark = 104;
   ctx.font = `800 ${Math.round(mark * 0.714)}px ${SANS}`;
   if ('letterSpacing' in ctx) (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = `${mark * 0.714 * 0.02}px`;
-  const name = ctx.measureText('SEAT AIRLINES');
+  const name = ctx.measureText('SEAT RAILWAY');
   const nameW = name.actualBoundingBoxLeft + name.actualBoundingBoxRight;
   const gap = logo ? mark * 0.32 : 0;
   const total = (logo ? mark : 0) + gap + nameW;
@@ -261,7 +261,7 @@ function brand(ctx: CanvasRenderingContext2D, logo: HTMLImageElement | null) {
   ctx.fillStyle = '#fff';
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'left';
-  ctx.fillText('SEAT AIRLINES', x + (logo ? mark + gap : 0) + name.actualBoundingBoxLeft, mid + cap / 2);
+  ctx.fillText('SEAT RAILWAY', x + (logo ? mark + gap : 0) + name.actualBoundingBoxLeft, mid + cap / 2);
 }
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));

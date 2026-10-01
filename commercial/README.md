@@ -1,5 +1,8 @@
 # SEAT AIRLINES — 24 s commercial
 
+> [!NOTE]
+> This is **Seat Airlines'** commercial, kept from the repository Seat Railway was copied from. It films the airliner and its voiceover is the airline's; it has not been remade for the railway.
+
 Output: `out/seat-airlines-commercial-A.mp4` (primary) and `-B.mp4` (comparison order), 1920×1080, 30 fps, H.264 + AAC, −14 LUFS.
 
 Everything runs from `commercial/` after `npm ci`. The app's dev server must be running in capture mode for captures:
