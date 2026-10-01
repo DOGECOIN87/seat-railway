@@ -20,7 +20,18 @@ The weather reads as _Clear_, _Scattered cloud_, _Overcast_, _Fog_, _Rain_, _Sno
 
 ## The country outside
 
-The train is always moving — that movement is the one thing that says it is running, so it never stops. The line curves through farmland, forest, mountains, desert and coast, each blending into the next, and the country beside it stands up in three dimensions: hedgerow oaks and farmhouses, conifer woods, snowy pines, mesas and cactus. Rain, snow and fog come from your own weather, and storms bring lightning. See [The five worlds](the-five-worlds.md).
+The train is always moving; that movement is the one thing that says it is running, so it never stops. What it runs through depends on the market cap: open country, a market town or the city. See [The line's tiers](the-line.md).
+
+## The weather, drawn
+
+Your weather is drawn the way it looks from a train:
+
+* **Rain** falls as streaks, each drop drawn along the way it is moving past you. At a standstill it falls straight down; at speed it rakes across the view. The drops stay put in the world and the train runs through them. The ground darkens as it gets wet, and the town's streets and the rails turn glossy. It all dries off over a minute and a half once the rain stops.
+* **Snow** flutters down in soft flakes, then settles on everything that faces up: fields, ballast, rooftops, treetops and pavements (more thinly on the streets). It builds up over about half a minute and melts away after the snow stops.
+* **Storms** throw forked lightning. A bolt comes down from the cloud base somewhere off the line, with branches off it, and its flash flickers twice and lights up the sky, the clouds and the fog. The clouds darken.
+* **Fog** closes the view right in, and low mist drifts over the ground. Lighter mist also hangs about in rain and snow.
+* **The sea** moves. Four swells run across it, and in a storm they steepen and break white at the crests. Red channel buoys rock on the swell, harder in a storm, with their lamps flashing every few seconds. The city's rivers move the same way.
+* **Inside the train**, drops bead on the coach windows and run back along them as the train picks up speed. On the cab's windscreen they are pushed upwards, and two wipers sweep it clear (see [Views and controls](../the-train/views-and-controls.md#inside-the-train)).
 
 ## After dark
 
@@ -37,5 +48,5 @@ If your device is set to reduce motion, the camera stops drifting.
 If the weather cannot be fetched — you are offline, the request is blocked, or your time zone is not one the page recognises — a modelled sky for the date stands in, and the page never waits for it. The **Outside** reading says which you are seeing: **Live weather** or **Modelled weather**.
 
 {% hint style="info" %}
-The lit carriages you see from outside are real: they light front first, in proportion to how many of the 178 seats are taken. See [The seat ladder](../the-train/seat-ladder.md).
+The lit carriages you see from outside are real: they light front first, in proportion to how many of the 118 seats are taken. See [The seat ladder](../the-train/seat-ladder.md).
 {% endhint %}

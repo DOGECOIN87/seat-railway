@@ -18,7 +18,7 @@ No. Every holder is ranked by balance and seated in rank order, so your seat is 
 
 <summary>Why am I in the freight car?</summary>
 
-Either you are ranked below the 178th seat, or your balance has not been read yet — the check-in card says **unread** under Holding when that happens. The Boarding ladder shows what the last seat aboard is holding.
+Either you are ranked below the 118th seat, or your balance has not been read yet — the check-in card says **unread** under Holding when that happens. The Boarding ladder shows what the last seat aboard is holding.
 
 </details>
 
@@ -42,7 +42,7 @@ Your own balance is re-read every 2 minutes, and straight away when you check in
 
 <summary>What is "Passengers" on the outside view?</summary>
 
-The number of holders seated on the train, up to 178. How many ride below the cutoff is on the placard in the freight car.
+The number of holders seated on the train, up to 118. How many ride below the cutoff is on the placard in the freight car.
 
 </details>
 

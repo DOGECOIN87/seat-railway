@@ -27,7 +27,7 @@ The **train radio**, beside your ticket, is the PA written down. It keeps the la
 
 * **Boarding** when the page opens — _"All aboard. Doors closing."_
 * **Your seat** — _"Passenger seated in 8A. STANDARD."_, _"Passenger reseated to 7C. BUSINESS."_, or _"Passenger assigned to the freight car. Mind the step."_
-* **Worlds** as you cross them — see [The five worlds](the-five-worlds.md).
+* **Worlds** as you cross them — see [The line's tiers](the-line.md).
 * **Cautions** — _"Emergency brake applied. Hold on to something."_, then _"Brake released. The line has levelled off."_
 * **Your advert** going up on your seat.
 

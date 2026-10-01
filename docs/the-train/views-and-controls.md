@@ -6,62 +6,9 @@ description: Outside, in a seat, in the driver's cab, in the freight car — and
 
 The site opens on a departure board in the middle of the screen, turning through a few of the line's sayings — _Hold more. Ride longer._ first, _Now boarding_ last — then fading onto the train **full screen**, running through the country with the camera drifting slowly round its nose. A tap or any key skips the board. **Docs** is under the board, and at the top right of the screen after it. **Enter** goes in. Every other view is a step inward from the one the page then opens on: **outside, on the whole train**, right under the gate sign, whose **Claim a seat** button opens the seat map from anywhere on the page.
 
-## The flying game
+## Runaway
 
-On the way in there is a side game: take the controls of the sister airline's plane. Press **Fly** — or just press an arrow key — and the train makes way for an airliner, which dives down to a few hundred metres over the hills while the camera swings round behind it. Your brief: **climb to 10,000 ft**.
-
-**You need a Solana wallet connected to fly.** Until one is, the button reads **Connect & fly**: press it, approve the connection in your wallet, and it takes off — and your score can go straight on the leaderboard when you land. An arrow key with no wallet connected brings up the same card. With no wallet installed, the card says where to get one; on a phone it offers **Open in Phantom** and **Open in Solflare**, which reopen the page inside that wallet's own browser. Connecting shares your address and nothing else.
-
-| With | Climb / dive | Turn |
-| --- | --- | --- |
-| Keyboard | **↑** / **↓** (or **W** / **S**) | **←** / **→** (or **A** / **D**) |
-| Touch or mouse | drag up / down from where you pressed | drag left / right |
-
-There is no clock. The altitude reads your height above the ground and the bar under **Climb to** fills as you go; **PULL UP** means the ground is close. **Enter** (or **Esc**) goes in at any point.
-
-Along the foot of the screen are three instruments: **airspeed** (the red arc is the stall), the **attitude** indicator (the horizon moves behind the fixed yellow aircraft), and the **climb rate**, in thousands of feet a minute. Under them, **ENG 1** and **ENG 2** light green while they run. The ground goes by at the airspeed, so the lower you fly, the faster it rushes past.
-
-### When it goes wrong
-
-Somewhere on the way up an engine goes. Half the time it is at 10,000 ft; the rest, it is anywhere from 4,000 ft up — and you do not know which until it happens. Somebody shouts "FBI, open up!" and, on the bang, one engine explodes — or, one flight in three, a **bolt of lightning** comes down out of the cloud and hits it, with a crack of thunder and a blue-white flash. From then on:
-
-* the aircraft yaws and rolls toward the dead engine, and keeps rolling unless you hold it;
-* the controls go soft, and softer as the fire spreads — and about twenty seconds in, when the fire is at its worst, it starts on the wing: the roll toward the dead side grows until nobody can hold it;
-* it cannot stay up. It sinks whatever you do, drag takes the speed off even with the wings level, and only the nose going down puts speed back. Pull up to stop the sink and it bleeds speed until it **STALL**s and drops like a stone. Every bank costs height too;
-* the engine burns and trails black smoke, and the camera moves over its shoulder so you can see it.
-
-On about a third of flights **the other engine goes too**, somewhere between 12 and 30 seconds later. With no thrust on either side the pull toward the dead engine goes — it is easier to hold level — but it sinks a great deal faster.
-
-Once an engine has gone, look ahead for **rising air**. Thermals turn up every several seconds, most of a kilometre across: each is marked the way real ones are, by a cumulus cloud sitting on top of it, with a faint shimmer of heat and specks of dust rising under it. Steer under one and **UPDRAFT** lights over the instruments, the wind picks up, and a wing held level climbs again — most strongly in the middle — while the controls bite harder and the fire holds back. It lifts a banked wing hardly at all, so it is worth most to whoever is flying best. Each lasts about half a minute before it fades.
-
-And keep an eye on the sky. On some flights **something else is out there**: a glowing saucer that blinks in far ahead, stops dead, and darts off at impossible speed — every turn a right angle — before shooting straight up and away, to eerie music. Now and then it comes for you instead. **DODGE!** — the world drops into slow motion as it streaks in, but your aeroplane keeps more than half its speed and answers the stick crisply: climb, dive or bank the wingtip out of its line and it goes past (**DODGED**, +2,500 — and a *wow*). Hold your course and it clips the wing: the outer wing tears off and tumbles away. **UFO STRIKE · WING DAMAGE** — and from then on the aeroplane rolls toward the short side unless you hold it. (`?ufo` shows it; `?ufohit` makes it hit.)
-
-Left alone it is down in under twenty seconds; holding the nose up buys about half a minute; flown about as well as it can be, it lasts about a minute in still air, and a good deal longer riding the updrafts. The flight lasts until it meets the ground — and as it comes up, the cabin starts screaming, timed from your height, your sink rate and the hills ahead so the screaming stops on the impact. The way to fly it is the way pilots are taught — bank a little toward the good engine, keep the wings as level as the fire allows, and hold the speed just above the stall: nose down for it, never up. When it does meet the ground, it is **WASTED** — to one of three sounds, picked at random each time: the picture freezes and goes grey, then red as the word lands, with a slow dolly zoom. Either way you are taken into the site a few seconds later. Add `?mayday` to the address to have the engine go at 1,500 ft instead (`?strike` makes it lightning, `?dual` loses both).
-
-### Sharing a flight
-
-**Post** on the **WASTED** screen shares the flight to X, tagging @solana and @pumpdotfun. The card is made from the flight itself: the moment the engine went — the fireball, or the bolt — with your score, what happened and where.
-
-* **On a phone**, Post opens your phone's share sheet with a short video: the card, then the departure board turning up **HOLD MORE / RIDE LONGER** and **NOW BOARDING**, then the logo. Choose X and it goes into a post, words and all. (Where the browser cannot make the video, the card goes as a picture.)
-* **On a computer**, Post opens X with the post written and a link whose preview is the card, and saves the video beside it to drop into the post if you want it.
-
-### Scoring and the leaderboard
-
-The run is scored as you fly:
-
-| | Points |
-| --- | --- |
-| Height, before the engine goes | a tenth of a point per foot of your best height |
-| Getting to where the engine goes | 1,000 |
-| Getting there fast | 40 for every second under 75 — in proportion when it goes early, so a fast climb pays the same by the foot |
-| Each second in the air on one engine | 100 |
-| … with the wings within 20° of level | × 1.5 |
-| … with the ground under 500 ft | × 2 |
-| … both | × 2.5 |
-
-The score and its multiplier are under the altimeter; your best is kept in this browser. On the **WASTED** screen you can put the score on the **Top pilots** board with any Solana wallet (Phantom, Solflare, Backpack, Nightly): the wallet signs a short message naming the score — a message, not a transaction, so it moves nothing and approves nothing. Each wallet keeps its best. **Scores**, at the end of the landing's row of buttons, opens the board before you fly; once you are inside, **Scores** in the tab bar along the bottom of the screen opens the same board, with your best in this browser under it.
-
-The server times every run from the moment you take the controls and refuses a score that time could not have earned, and each run can be posted once. That stops a made-up number; it cannot stop somebody patient enough to wait out the time their made-up number needs, so the board is for bragging rights, not prizes. `?mayday` runs are practice and are not posted.
+On the way in there is a short game: press **Runaway** on the front page. You drive a train with no brakes on three parallel tracks, and switch tracks with **←** and **→** (or a tap or swipe) to dodge oncoming trains, wagons, rockfalls and buffer stops. It gets faster until you hit something. Your score can go on the **Top drivers** board. See [Runaway](../the-game/runaway.md).
 
 ## The views
 
@@ -73,15 +20,25 @@ The server times every run from the moment you take the controls and refuses a s
 | **Driver's cab** | The controls in 3D, from the driver's seat: the real sky through the windscreen, live displays for both drivers and the overhead panel with the signs lit. Drag to look around. |
 | **Freight car** | Where everyone under the cutoff rides: a 3D room of frames, containers, netted bags and swinging work lamps. Drag to look around. |
 
-{% hint style="warning" %}
-**The inside views are still the airliner's.** The seats, the driver's cab and the freight car are drawn with the 3D interiors Seat Railway inherited from Seat Airlines — a cabin with oval windows, a cockpit, a cargo hold — while the train's own interiors are built. Everything they show is still live: who sits where, the adverts, the sky, the market.
-{% endhint %}
+### Inside the train
+
+The inside views are the train's own:
+
+* **The coaches:** 2+2 seating either side of a central aisle, luggage racks and a passenger-information screen at each end.
+* **First Class:** four private suites, each with a door that slides open, a bed, a desk, a reading lamp and its own screen.
+* **The driver's cab:** a desk with both drivers' displays, the power handle and a windscreen onto the line.
+* **The freight car:** crates strapped down along both walls.
+
+When it rains or snows where you are, the weather reaches the glass:
+
+* **Coach windows:** drops bead on the windows and run back along them as the train picks up speed.
+* **The windscreen:** drops are pushed up the cab's windscreen, and two wipers sweep it clear while the rain lasts, then finish their sweep and park when it stops.
 
 ## Getting around
 
 * **Step inside** — on the view's own bar — takes you to a seat, looking forward.
 * **Walk the train**, under the view: **Outside**, **Driver's Cab**, **First Class**, **Business**, **Exit Row**, **Standard**, **Freight car**.
-* **Seat** — when you are in a seat, choose **Window**, **Middle** or **Aisle**.
+* **Seat** — when you are in a seat, choose **Window** or **Aisle**.
 * **← Look left**, **Forward**, **Look right →** turn your head.
 * **Click any seat on the wall** to open it in a window — its advert on the left, whoever holds it on the right.
 * When you check in and are seated, the camera walks you to your own seat on its own.
@@ -99,13 +56,13 @@ Windows — a seat, the high scores, the advert editor — open over the page wi
 
 ### Turning your head depends on your seat
 
-From **8A** the window is one turn to the left and fills the view. From **8F** that same window is on the far side of the coach — two seats, the aisle, three more seats, and a porthole the size of a coin. From **8C** you look past 8B's shoulder to see any of it. The row is modelled as it really is — window, seats, aisle, seats, window — and read outward from wherever you sit.
+From **8A** the window is one turn to the left and fills the view. From **8D** the window on that side is just as close, and the far one is across the aisle, past two seats. From an aisle seat you look past your neighbour's shoulder to see out. The coach is modelled as it really is (window, seat, aisle, seat, window) and read outward from wherever you sit.
 
 ### Who is on board
 
 Every holder's seat has somebody in it: one seated body in a crowd of outfits — suits, shirts and knitwear, short sleeves or long — two builds, a range of skin tones, and a haircut each from seven, from a crop to a bun to hair past the shoulders. Faces have eyes, brows and lips, and people turn their heads — out of the window, now and then, from a window seat. The rows nearest you are drawn finest; the far end of the coach is drawn plainer, which from twenty rows back is all anyone sees.
 
-And beside you, whichever seat you view, sits the passenger nobody booked: a hooded figure in a long dark robe, bone for hands, a skull under the hood with embers for eyes, and a sickle across its knee. From a window seat it has the middle; from the middle or the aisle, the seat outboard of you. Every so often it turns its head and looks at you. In the driver's cab it rides as second driver.
+And beside you, whichever seat you view, sits the passenger nobody booked: a hooded figure in a long dark robe, bone for hands, a skull under the hood with embers for eyes, and a sickle across its knee. From a window seat it has the aisle seat beside you; from the aisle, the window seat. Every so often it turns its head and looks at you. In the driver's cab it rides as second driver.
 
 ## Zoom and pan
 

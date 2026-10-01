@@ -12,7 +12,7 @@ Nothing on the site sends, swaps, approves or spends anything. Connecting a wall
 If a page claiming to be Seat Railway asks you to **approve a transaction**, to sign something you cannot read, or for your **seed phrase** or **private key** — stop and reject it. That is not Seat Railway, which never asks for any of them.
 {% endhint %}
 
-## The only three messages you will be asked to sign
+## The only four messages you will be asked to sign
 
 Each begins `SEAT RAILWAY`, and the server checks every message word for word. The wording below is exactly what your wallet will show.
 
@@ -51,7 +51,21 @@ wallet: <your address>
 issued: <the time you pressed the button>
 ```
 
-All three are checked by the server, and all three expire: a signature more than five minutes old is refused. A directory sign-in can be used **once** — a copy of it cannot open a second session. An advert signature covers **one exact image**, so it cannot be reused to put up a different picture, and a takedown names **one exact advert**, so it cannot take down one you put up later.
+**4. Posting a Runaway score**: only if you press **Sign & post** on the end screen:
+
+```
+SEAT RAILWAY
+Post my score to the Runaway leaderboard.
+
+Score: <your score>
+Run: <the run the server started>
+Wallet: <your address>
+Issued: <the time you pressed the button>
+
+This is a message, not a transaction: it moves nothing and approves nothing.
+```
+
+All four are checked by the server, and the first three expire: a signature more than five minutes old is refused. A directory sign-in can be used **once** — a copy of it cannot open a second session. An advert signature covers **one exact image**, so it cannot be reused to put up a different picture, and a takedown names **one exact advert**, so it cannot take down one you put up later. A score names **one run**, and a run can be posted once.
 
 ## Check you are in the right place
 

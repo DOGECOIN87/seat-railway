@@ -24,11 +24,22 @@ The page reads three outside services:
 * **The wall** — stores adverts against the wallet that signed them: records in KV, artwork in R2 (or in KV when R2 has no public URL).
 * **The holder list** — reads every holder from the chain, caches it for a minute, and serves it to every visitor, so no RPC key is ever shipped to a browser.
 * **The directory** — cards, introductions, rooms and the PA, in a D1 database, behind a signed-in session.
-* **The manual controls** — the crew's shared switches (camera, hour, weather), which every open page reads.
+* **The manual controls** — the operator's shared switches (camera, hour, weather), which every open page reads.
+* **The Runaway board** — starts each run on the server's clock and checks every posted score against it (`worker/src/railLeaderboard.ts`).
 
 ## The train
 
-`src/three/RailWorld.ts` builds the outside view: the line's centreline (curves of its own, grade from the market), the country in chunks recycled from behind the train to ahead of it, the detailed track tiled near the camera, the stations and billboards, and the train itself, coupled to the market cap by `src/lib/consist.ts`. The supplied models are in `public/models/` — see its README for where each came from — and the train's sounds are in `public/rail/`.
+`src/three/RailWorld.ts` builds the outside view. That covers:
+
+* the line's centreline (curves of its own, grade from the market);
+* the country in chunks, recycled from behind the train to ahead of it;
+* the detailed track tiled near the camera;
+* the stations and billboards;
+* the train itself, coupled to the market cap by `src/lib/consist.ts`.
+
+Below $1M the ground changes tier with the market (`src/lib/tiers.ts`): country, then a market town, then the city with its river bridges. The supplied models are in `public/models/` (see its README for where each came from), the town's paving textures in `public/textures/`, and the train's sounds in `public/rail/`.
+
+The weather (`src/three/railWeather.ts`) draws rain, snow, lightning and mist round the camera. The interiors (`src/three/railInterior.ts`) are the train's own coaches, First Class suites, driver's cab and freight car, with rain on their glass. Runaway's hazards and tokens are `src/three/railHazards.ts`, placed on the line by the world from the game's state.
 
 ## One seating chart, shared
 
@@ -42,8 +53,10 @@ src/
 ├── index.css                the design system and the animations
 ├── content/cabin.ts         seat layout, coach copy, chatter, the board's phrases
 ├── lib/
-│   ├── flightModel.ts       pitch, bands, lamps — pure functions
+│   ├── flightModel.ts       bands, lamps, formatting — pure functions
+│   ├── tiers.ts             the line's tiers by market cap — pure functions
 │   ├── consist.ts           carriages, grade and speed from the market — pure functions
+│   ├── railGame.ts          Runaway: the game itself, shared with the Worker's checks
 │   ├── marketFeed.ts        the market feed (Jupiter)
 │   ├── seating.ts           the seat ladder, shared with the Worker
 │   ├── holderList.ts        reading every holder, shared with the Worker
@@ -51,12 +64,13 @@ src/
 │   ├── networkingApi.ts     the directory, over the wire
 │   ├── sky.ts               the sun and the weather
 │   └── token.ts             the contract address
-├── three/                   the 3D worlds: RailWorld.ts (the train, the line, the country), and the interiors
+├── three/                   RailWorld.ts (the train, the line, the tiers), railInterior.ts, railWeather.ts, railHazards.ts
 └── components/              the views, the wall, check-in, the hub, the board
 worker/
 ├── src/index.ts             every route
 ├── src/verify.ts            signature and image checks
 ├── src/networking.ts        directory rules and limits
+├── src/railLeaderboard.ts   Runaway's score checks
 └── migrations/              the D1 schema
 docs/                        this documentation
 ```

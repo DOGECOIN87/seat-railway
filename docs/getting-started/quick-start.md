@@ -18,7 +18,7 @@ Open **Check in** in the tab bar and press **Connect wallet**. Phantom, Solflare
 
 ### 4. Take your seat
 
-You do not pick a seat: your holding does. If you are among the 178 biggest holders, the camera walks you to your seat, the PA announces it, and your ticket fills in. If you are not, you ride in the freight car, and the **Boarding ladder** under the check-in card tells you what the last seat aboard is holding.
+You do not pick a seat: your holding does. If you are among the 118 biggest holders, the camera walks you to your seat, the PA announces it, and your ticket fills in. If you are not, you ride in the freight car, and the **Boarding ladder** under the check-in card tells you what the last seat aboard is holding.
 
 Once you are seated, the Boarding ladder shows who is directly ahead of you and how many more tokens it takes to pass them.
 

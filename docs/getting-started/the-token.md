@@ -6,7 +6,7 @@ description: The contract address, where to get it, and what the train reads fro
 
 ## Contract address
 
-The token is on **Solana**. This copy of the site is currently configured with this contract address (CA):
+The token is on **Solana**:
 
 ```
 AWJCyg9PrMtYju9yaQmdQLcwrGobHMTv9JU3mo4upump
@@ -14,13 +14,27 @@ AWJCyg9PrMtYju9yaQmdQLcwrGobHMTv9JU3mo4upump
 
 It trades on pump.fun: [pump.fun/coin/AWJCyg9PrMtYju9yaQmdQLcwrGobHMTv9JU3mo4upump](https://pump.fun/coin/AWJCyg9PrMtYju9yaQmdQLcwrGobHMTv9JU3mo4upump).
 
+<!-- interim-token -->
+{% hint style="info" %}
+**Seat Railway will have its own token.** Until it launches, the address above is the **Seat Airlines** token, so the train has a live market to run on. The train, the seat ladder, the wall and the directory are all built to read whichever Solana token they are pointed at, and switching is one command (below).
+{% endhint %}
+<!-- /interim-token -->
+
 {% hint style="warning" %}
 Always check the **whole** address, not just the first and last few characters. The strip marked **CA** across the top of the site shows the address the train is actually reading, and its **Copy** button copies it exactly. If this page and the site ever disagree, trust the site.
 {% endhint %}
 
-{% hint style="info" %}
-**Launching Seat Railway's own token?** One command switches every place the address is printed — the page, the Worker, `index.html` and these docs: `npm run token:update -- <new CA>`. See [Deploying](../for-developers/deploying.md).
-{% endhint %}
+## Switching tokens
+
+One command switches every place the address is printed (the page, the Worker, `index.html` and these docs):
+
+```bash
+npm run token:update -- <new CA>
+```
+
+It checks on-chain that the address really is a token mint, writes it everywhere, runs the tests and a build, and pushes. Anybody seated under the old token is never seated under the new one: the page clears what it remembered about the old mint. See [Deploying](../for-developers/deploying.md).
+
+The Worker reads balances and the holder list through its own RPC endpoint, which should be a Helius key of the railway's own. See [Configuration](../for-developers/configuration.md#helius).
 
 ## What the train reads
 

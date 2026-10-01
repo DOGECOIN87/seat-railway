@@ -23,7 +23,7 @@ When the market reaches a new step, the next carriage **rolls up from behind and
 
 The cab's destination display shows the market cap itself, and the readout under the view says how many carriages the train has and where the next one is coupled on. The steps are in [`src/lib/consist.ts`](../../src/lib/consist.ts).
 
-The same number also decides which world the line runs through — see [The five worlds](the-five-worlds.md).
+The same number also decides which world the line runs through — see [The line's tiers](the-line.md).
 
 ## Grade — the five-minute move
 
@@ -71,7 +71,7 @@ The readout under the view names what the train is doing:
 
 ## Lit carriages — the holders
 
-The carriages light up front first, in proportion to how many of the 178 seats are taken. At night that is the clearest sign of how full the train is.
+The carriages light up front first, in proportion to how many of the 118 seats are taken. At night that is the clearest sign of how full the train is.
 
 ## Smooth, but never invented
 

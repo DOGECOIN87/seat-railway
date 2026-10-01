@@ -1,5 +1,5 @@
 ---
-description: Seats are not booked or bought. The 178 biggest holders are seated by rank.
+description: Seats are not booked or bought. The 118 biggest holders are seated by rank.
 ---
 
 # The seat ladder
@@ -7,8 +7,8 @@ description: Seats are not booked or bought. The 178 biggest holders are seated 
 ## The rules
 
 1. Every wallet holding the token is ranked by balance, biggest first.
-2. Rank 1 gets the best seat on the train, rank 2 the next best, and so on down all **178 seats**.
-3. Everyone ranked below 178 rides in the **freight car**.
+2. Rank 1 gets the best seat on the train, rank 2 the next best, and so on down all **118 seats**.
+3. Everyone ranked below 118 rides in the **freight car**.
 4. The ranking is live. Out-hold the holder directly ahead of you and you take their seat; they move back one.
 
 You cannot choose a seat, swap one, or reserve one. Your bag is your seat.
@@ -23,21 +23,21 @@ Seats are ordered front to back:
 
 1. **By coach**, front to back: Driver's Cab, First Class, Business, Exit Row, Standard.
 2. **By row**, front to back, inside each coach.
-3. **Inside a row:** window first, then aisle, then middle.
+3. **Inside a row:** windows first (A, then D), then aisles (B, then C).
 
 | Ranks | Coach | Seats |
 | --- | --- | --- |
 | 1–2 | **Driver's Cab** | CPT (rank 1), FO (rank 2) |
-| 3–10 | **First Class** | rows 1–2 |
-| 11–40 | **Business** | rows 3–7 |
-| 41–52 | **Exit Row** | rows 16–17 |
-| 53–178 | **Standard** | rows 8–15 and 18–30 |
-| 179 and below | **Freight car** | everyone else |
+| 3–6 | **First Class** | the four suites, rows 1–2 |
+| 7–26 | **Business** | rows 3–7 |
+| 27–34 | **Exit Row** | rows 16–17 |
+| 35–118 | **Standard** | rows 8–15 and 18–30 |
+| 119 and below | **Freight car** | everyone else |
 
-For example: rank 3 is **1A**, rank 4 is **1F** (the two First Class windows in row 1), rank 5 is **1B** and rank 6 is **1E** (its aisles). Rank 11 is **3A**, the first Business window. The last two seats aboard, ranks 177 and 178, are **30B** and **30E** — the middle seats in the last row, by the lavatory.
+For example: rank 3 is **1A** and rank 4 is **1D**, the two First Class suites in row 1; ranks 5 and 6 are **2A** and **2D**. Rank 7 is **3A**, the first Business window. The last two seats aboard, ranks 117 and 118, are **30B** and **30C**: the aisle seats in the last row, by the lavatory.
 
 {% hint style="warning" %}
-The Exit Row is its own coach and ranks ahead of **all** of Standard — including Standard rows 8–15, which physically sit in front of it. Rank 52 is 17E in the Exit Row; rank 53 is 8A.
+The Exit Row is its own coach and ranks ahead of **all** of Standard — including Standard rows 8–15, which physically sit in front of it. Rank 34 is 17C in the Exit Row; rank 35 is 8A.
 {% endhint %}
 
 See [Coaches and seats](coaches-and-seats.md) for each coach's layout.
@@ -62,8 +62,8 @@ When your seat changes, the camera walks you to it and the PA announces it: _"Pa
 
 Everyone below the cutoff rides in the freight car. It is not a punishment: by far the biggest car on the train, it is where most holders live. Walk back to it with **Freight car** under the view; its placard counts how many holders are riding below the cutoff.
 
-If you are in the freight car, the Boarding ladder tells you what the last seat aboard is holding. While fewer than 178 wallets hold the token, some seats stay unsold, and any balance at all takes one.
+If you are in the freight car, the Boarding ladder tells you what the last seat aboard is holding. While fewer than 118 wallets hold the token, some seats stay unsold, and any balance at all takes one.
 
 ## Looking is free
 
-You can walk the camera anywhere on the train with **Walk the train** — any coach, and a window, middle or aisle seat in it — and see exactly what it sees. Only your holding decides where you are ticketed.
+You can walk the camera anywhere on the train with **Walk the train** — any coach, and a window or aisle seat in it — and see exactly what it sees. Only your holding decides where you are ticketed.

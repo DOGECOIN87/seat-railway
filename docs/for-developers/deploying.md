@@ -36,7 +36,7 @@ Do **not** reuse `seat-airlines.space`: it belongs to Seat Airlines' own Pages s
 ## The Worker — Cloudflare
 
 {% hint style="info" %}
-**Seat Railway has its own Worker**, `seat-railway-banners`, with its own KV namespace, R2 bucket and D1 database (already created, and the D1 migrations already applied). It shares nothing with Seat Airlines' `seat-airlines-banners`. To deploy it, add these repository **secrets** (Settings → Secrets and variables → Actions): `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and `RPC_URL`; then run **Deploy the banners Worker**, and **Set the Worker's RPC secret**.
+**Seat Railway has its own Worker**, `seat-railway-banners`, with its own KV namespace, R2 bucket and D1 database (already created, and the D1 migrations already applied). It shares nothing with Seat Airlines' `seat-airlines-banners`. To deploy it, add these repository **secrets** (Settings → Secrets and variables → Actions): `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and either `HELIUS_API_KEY` or `RPC_URL` (the railway's own Helius key; see [Configuration → Helius](configuration.md#helius)). Then run **Deploy the banners Worker**, and **Set the Worker's RPC secret**.
 {% endhint %}
 
 `.github/workflows/worker.yml` runs on pushes to `main` that touch `worker/`. It type-checks and tests the Worker, and deploys it **only if** the repository has a `CLOUDFLARE_API_TOKEN` secret (with Workers Scripts, Workers KV Storage and Workers R2 Storage edit rights). Without one it stops after the tests and says so in the job summary — a green run does not by itself mean the Worker was deployed, so check the **Deploy** step.
@@ -53,8 +53,8 @@ curl -fsS https://<your-worker>/health
 Worth knowing before you ship:
 
 * **Migrations are applied by hand.** `wrangler deploy` ships code, not schema. Apply a new migration before the code that needs it:\
-  `npx wrangler d1 migrations apply seat-airlines-directory --remote`
-* **Set `RPC_URL`.** It is a secret: `npx wrangler secret put RPC_URL`, or run the **Set the Worker's RPC secret** workflow, which reads the repository's `RPC_URL` and `CLOUDFLARE_API_TOKEN` secrets.
+  `npx wrangler d1 migrations apply seat-railway-directory --remote`
+* **Set `RPC_URL`.** It is a secret: `npx wrangler secret put RPC_URL`, or run the **Set the Worker's RPC secret** workflow. That reads the repository's `HELIUS_API_KEY` (or a whole `RPC_URL`) and `CLOUDFLARE_API_TOKEN` secrets, and checks the endpoint answers before writing it.
 * **`ALLOWED_ORIGINS` must name the site**, or every write fails in the browser with a CORS error.
 * **Check `/health` after every deploy** — especially `sections` and `seated`.
 

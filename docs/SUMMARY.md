@@ -11,7 +11,7 @@
 ## How it runs
 
 * [One number runs the train](how-it-runs/one-number-runs-the-train.md)
-* [The five worlds](how-it-runs/the-five-worlds.md)
+* [The line's tiers](how-it-runs/the-line.md)
 * [The lamps and the PA](how-it-runs/lamps-and-the-pa.md)
 * [The sky outside](how-it-runs/the-sky.md)
 
@@ -21,6 +21,10 @@
 * [Coaches and seats](the-train/coaches-and-seats.md)
 * [Views and controls](the-train/views-and-controls.md)
 * [Your ticket](the-train/your-ticket.md)
+
+## The game
+
+* [Runaway](the-game/runaway.md)
 
 ## The railway
 
@@ -45,6 +49,7 @@
 ## Help
 
 * [FAQ](help/faq.md)
+* [What's new](help/whats-new.md)
 
 ## For developers
 

@@ -27,9 +27,9 @@ On a computer, use the wallet's browser extension. **On a phone, open the site i
 
 Your balance is merged into the seating the moment it is read, so you do not wait for the next refresh to see where you sit.
 
-## The flying game
+## Runaway
 
-The side game on the way in — fly Seat Airlines' plane — needs a connected wallet too: **Connect & fly** connects it and takes off. It is the same connection as checking in, so connect once and both are done. See [Views and controls](../the-train/views-and-controls.md#the-flying-game).
+You can play **Runaway**, the game on the way in, without a wallet. You only need one to put your score on the board: **Sign & post** on the end screen connects it if it isn't connected yet, and asks it to sign a message naming your score. It's the same connection as checking in, so connect once and both are done. See [Runaway](../the-game/runaway.md).
 
 ## What connecting shares
 

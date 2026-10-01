@@ -17,7 +17,10 @@ Base URL in production: `https://seat-railway-banners.trashmarket.workers.dev`. 
 | `POST /banner` | Publish an advert — see below |
 | `DELETE /banner` | Take your own advert down — see below |
 | `GET /images/<key>` | Advert artwork, when it is stored in KV rather than R2 |
-| `GET /flight` | The crew's current manual controls |
+| `GET /flight` | The operator's current manual controls for the train (the route keeps the airline's name) |
+| `GET /rail-scores` | The **Runaway** board: the top drivers, best score per wallet |
+| `POST /rail-runs` | Start a Runaway run: returns its id, and the server's clock starts |
+| `POST /rail-scores` | Post a run's score, signed — see [Runaway](../the-game/runaway.md#the-leaderboard) |
 
 `GET /holding` answers **503** when the chain cannot be asked, never a zero balance: a holder told they hold nothing would be moved to the hold and shut out of the directory.
 
@@ -29,7 +32,18 @@ Base URL in production: `https://seat-railway-banners.trashmarket.workers.dev`. 
 | `directory` | Whether the D1 database is bound |
 | `sections` | Whether the coaches (the API calls them cabins) can be told apart **right now**. False means no card shows contact details and no introduction sends. |
 | `configured` | Whether a `TOKEN_MINT` or `HOLDERS_URL` was ever set — separates "nobody configured it" from "the endpoint refused" |
-| `seated` / `cabin` | How many of the seats actually filled. A cabin stuck at 20 of 178 means the RPC refused the full holder scan. |
+| `seated` / `cabin` | How many of the seats actually filled. A cabin stuck at 20 of 118 means the RPC refused the full holder scan. |
+
+### Posting a Runaway score
+
+`POST /rail-scores` takes `{ address, run, score, survived, climb, issued, signature }`. Here `survived` is the run's seconds, `climb` is the tokens picked up, and `signature` is the wallet's signature over the message in [Wallet safety](../safety/wallet-safety.md). The server refuses the post if:
+
+* the run is not one it started, or has already been posted;
+* the seconds are longer than its own clock allows;
+* the tokens are more than the line could have held in that time;
+* the metres (the score less 25 a token) fall outside what the train could have covered between its starting speed and its full acceleration.
+
+The checks are in `worker/src/railLeaderboard.ts`, and use the same constants as the game, imported from `src/lib/railGame.ts`. Runaway's board is kept in its own `rail_runaway_*` tables.
 
 ## Publishing an advert
 

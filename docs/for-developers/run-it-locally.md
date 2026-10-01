@@ -46,7 +46,7 @@ npm install
 npm test                 # signature and image checks, with a real ed25519 keypair
 
 # Apply the directory schema to the local database once, with the Worker stopped:
-npx wrangler d1 migrations apply seat-airlines-directory --local --config wrangler.local.toml
+npx wrangler d1 migrations apply seat-railway-directory --local --config wrangler.local.toml
 
 npm run dev:local        # http://127.0.0.1:8787
 npm run test:e2e         # in another shell: the full route suite

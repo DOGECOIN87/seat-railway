@@ -27,7 +27,11 @@ so the train on your screen *is* the chart — and its 118 seats go to the bigge
 
 - [The premise](#the-premise)
 - [How the train shows the market cap](#how-the-train-shows-the-market-cap)
+- [The line's tiers](#the-lines-tiers)
+- [Runaway](#runaway)
+- [Weather](#weather)
 - [On board](#on-board)
+- [The token](#the-token)
 - [Explore the documentation](#explore-the-documentation)
 - [For developers](#for-developers) — [architecture](#architecture) · [quick start](#quick-start) · [project structure](#project-structure) · [configuration](#configuration) · [deploying](#deploying)
 - [Licence](#licence)
@@ -37,7 +41,7 @@ so the train on your screen *is* the chart — and its 118 seats go to the bigge
 | | |
 | :-- | :-- |
 | **Market cap is the length of the train** | A carriage is coupled on at every 1-2-5 step from $10K — $10K, $20K, $50K, $100K … — up to fourteen at $200M. Fall back under a milestone and a carriage is left behind on the line. |
-| **Market cap is where the line goes** | Country under $1M, a viaduct above the clouds at $1M, space at $10M, the moon at $50M, Mars at $100M. |
+| **Market cap is where the line goes** | Open country, then a market town at $100K and the city at $400K; a viaduct above the clouds at $1M, space at $10M, the moon at $50M, Mars at $100M. |
 | **The five-minute move is the grade** | A rising market lays the line ahead uphill, a falling one downhill, so the track behind the train is the chart. |
 | **Your bag is your seat** | The 118 biggest holders are seated by rank, driver's cab first. Everyone else rides in the freight car. |
 | **Seats are finite** | Out-hold the holder in front of you and you take their seat — and the PA tells the whole train. |
@@ -52,22 +56,36 @@ so the train on your screen *is* the chart — and its 118 seats go to the bigge
 | The market's… | …becomes |
 | :-- | :-- |
 | Market cap | **Length**: a carriage per milestone, coupling on from behind and uncoupled when lost |
-| Market cap | **The cab's display**, and **the world** the line runs through |
+| Market cap | **The cab's display**, and **the tier** the line runs through |
 | Five-minute change | **The grade** of the line ahead, the **speed**, and the **signals** (green, amber, red) |
 | Holder count | **Lit carriages**, front first, and **passengers** on board |
 | Milestones | The **horn** when a carriage couples on, the **crossing bell** when one is left behind |
 
 → [One number runs the train](docs/how-it-runs/one-number-runs-the-train.md) · [How the train shows the market cap](docs/the-railway/market-cap-on-the-train.md)
 
-### The five worlds
+## The line's tiers
+
+Seven tiers, one number. Under $1M the ground itself changes with the market; from $1M the line leaves the ground. A tier is entered at its line and left 8% under it, so a market sitting on a line never flicks the world back and forth.
+
+| Market cap | Tier | The line runs through |
+| :-- | :-- | :-- |
+| under $100K | **Countryside** | Farmland, forest, mountains, desert and coast, never repeating; buoys rocking off the coast |
+| $100K | **Market Town** | A street grid with lane markings, lawns and houses, and shop buildings on the line with rooftop signs that light at night |
+| $400K | **The City** | Glass towers on a wider grid, windows cut to scale and lit after dark, and a river crossed on a suspension bridge between stations |
+| $1M | **Above the clouds** | A viaduct over the cloud deck |
+| $10M | **Space** | A glowing guideway, a planet below |
+| $50M | **The moon** | Craters and boulders under a black sky |
+| $100M | **Mars** | Red plains and two small moons |
+
+→ [The line's tiers](docs/how-it-runs/the-line.md)
 
 <table>
 <tr>
 <td width="50%" valign="top">
 <img src="docs/.gitbook/assets/levels/1-country.jpg" alt="The train running through farmland">
 
-**In the country** · under $1M<br>
-<sub>Farmland, forest, snowy mountains, desert and coast, blending one into the next and never repeating. A station every couple of kilometres, billboards in between, and your own sky and weather.</sub>
+**Countryside** · under $100K<br>
+<sub>Farmland, forest, snowy mountains, desert and coast, blending one into the next and never repeating. A station every couple of kilometres, billboards in between, and your own sky and weather. Then the town at $100K, and the city at $400K.</sub>
 </td>
 <td width="50%" valign="top">
 <img src="docs/.gitbook/assets/levels/2-clouds.jpg" alt="The train on a viaduct above the clouds">
@@ -99,6 +117,34 @@ so the train on your screen *is* the chart — and its 118 seats go to the bigge
 </td>
 </tr>
 </table>
+
+## Runaway
+
+The game on the way in. **The brakes are gone.** You drive a train on three parallel tracks and switch tracks to dodge what's coming:
+
+* **Controls:** **←** / **→** (or A / D, or a tap or swipe).
+* **Hazards:** oncoming trains, standing wagons, rockfalls and buffer stops, a wave at a time. Every wave leaves a way through.
+* **Tokens:** gold tokens on the rails, 25 points each.
+* **The twist:** about twenty seconds in, an alarm goes off and the train starts gathering speed until something stops it.
+
+You score a metre a point and 25 a token. When you crash it ends on **WASTED**, and you can post your score to the **Top drivers** board with a signed message, never a transaction.
+
+→ [Runaway](docs/the-game/runaway.md)
+
+## Weather
+
+The sky is the visitor's own (time of day, and live weather from Open-Meteo), drawn the way it looks from a train:
+
+| | |
+| :-- | :-- |
+| **Rain** | Streaks stretched along each drop's motion past the camera, falling straight at a standstill and raking across the view at speed. The ground darkens, and the streets and rails turn glossy, then dry. |
+| **Snow** | Flakes that flutter down, then settle on everything facing up, and melt away after. |
+| **Storms** | Forked lightning off the line, a double-flicker flash lighting the sky and clouds. |
+| **Fog** | Drifting ground mist. |
+| **The sea** | Four swells per pixel, white-capped in a storm, with channel buoys rocking and flashing. |
+| **On the glass** | Drops run back along the coach windows, and the cab's windscreen has working wipers. |
+
+→ [The sky outside](docs/how-it-runs/the-sky.md)
 
 ## On board
 
@@ -155,7 +201,27 @@ A holder directory with the train's own manners: publish a card, read your own c
 </div>
 
 > [!NOTE]
-> Seat Railway began as a copy of [Seat Airlines](https://github.com/DOGECOIN87/Seat-Airlines). The inside views (seat, driver's cab, freight car) still use the airline's 3D interiors, and the **Connect & fly** side game on the landing still flies the airline's plane.
+> Seat Railway began as a copy of [Seat Airlines](https://github.com/DOGECOIN87/Seat-Airlines). It now has its own interiors, its own game, and its own Worker and Helius key.<!-- interim-token --> It will have its own token too.<!-- /interim-token --> What changed: [What's new](docs/help/whats-new.md).
+
+## The token
+
+The train runs on one Solana token:
+
+```
+AWJCyg9PrMtYju9yaQmdQLcwrGobHMTv9JU3mo4upump
+```
+
+<!-- interim-token -->
+**Seat Railway will have its own token.** Until it launches, the address above is the Seat Airlines token, so the train has a live market to run on.
+<!-- /interim-token -->
+
+Switching tokens is one command:
+
+```bash
+npm run token:update -- <new CA>
+```
+
+It checks on-chain that the address is a token mint, writes it to the page, the Worker, `index.html` and the docs, runs the tests and a build, and pushes. → [The token](docs/getting-started/the-token.md)
 
 ## Explore the documentation
 
@@ -177,7 +243,7 @@ The full guide is the [`docs/`](docs/README.md) folder of this repository, laid 
 **How it runs**
 
 - [One number runs the train](docs/how-it-runs/one-number-runs-the-train.md)
-- [The five worlds](docs/how-it-runs/the-five-worlds.md)
+- [The line's tiers](docs/how-it-runs/the-line.md)
 - [The lamps and the PA](docs/how-it-runs/lamps-and-the-pa.md)
 - [The sky outside](docs/how-it-runs/the-sky.md)
 
@@ -200,6 +266,7 @@ The full guide is the [`docs/`](docs/README.md) folder of this repository, laid 
 - [Buy trackside ad space (proposal)](docs/the-railway/billboards-for-the-token.md)
 - [Every seat is a billboard](docs/the-wall/every-seat-is-a-billboard.md)
 - [Put an advert on your seat](docs/the-wall/put-an-advert-on-your-seat.md)
+- [Runaway](docs/the-game/runaway.md)
 
 </td>
 </tr>
@@ -219,6 +286,7 @@ The full guide is the [`docs/`](docs/README.md) folder of this repository, laid 
 
 - [Wallet safety](docs/safety/wallet-safety.md)
 - [FAQ](docs/help/faq.md)
+- [What's new](docs/help/whats-new.md)
 
 </td>
 <td colspan="2" valign="top">
@@ -256,7 +324,7 @@ The page is a static single-page app on GitHub Pages. Anything that has to be sh
 flowchart LR
     subgraph Browser["seat-railway.space · GitHub Pages"]
         UI["React 19 + Tailwind 4<br/>the page, the seat map, the directory"]
-        GL["three.js<br/>the train, the line, the five worlds"]
+        GL["three.js<br/>the train, the line, its tiers, the weather"]
         UI --- GL
     end
     JUP[("Jupiter<br/>market data")] -->|"market cap · 5m move · holders"| UI
@@ -265,13 +333,13 @@ flowchart LR
     W --- KV[("KV<br/>records")]
     W --- R2[("R2<br/>artwork")]
     W --- D1[("D1<br/>cards · messages")]
-    W -->|"holder scan, cached a minute"| RPC[("Solana RPC")]
+    W -->|"holder list, cached a minute"| RPC[("Helius RPC<br/>the railway's own key")]
 ```
 
 The train is built in [`src/three/RailWorld.ts`](src/three/RailWorld.ts) and sized by the pure functions in [`src/lib/consist.ts`](src/lib/consist.ts). The seat ladder lives in [`src/lib/seating.ts`](src/lib/seating.ts) — no browser and no Cloudflare in it — and the page and the Worker import the same file, so they cannot disagree about who sits where. → [How it is built](docs/for-developers/how-it-is-built.md) · [Engineering notes](docs/for-developers/engineering-notes.md)
 
 > [!NOTE]
-> The railway has its **own Worker**, `seat-railway-banners`, with its own storage — it shares nothing with Seat Airlines. Deploying it needs the `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and `RPC_URL` repository secrets. → [Deploying](docs/for-developers/deploying.md)
+> The railway has its **own Worker**, `seat-railway-banners`, with its own storage — it shares nothing with Seat Airlines. Deploying it needs the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets, and the railway's own Helius key as `HELIUS_API_KEY` (or a whole `RPC_URL`). → [Deploying](docs/for-developers/deploying.md)
 
 ### Quick start
 
@@ -292,11 +360,12 @@ To run the Worker locally too — Miniflare, with simulated KV, R2 and D1 — se
 ├── src/
 │   ├── App.tsx              the landing, then the page: the view, its section panels
 │   ├── components/          views, the seat map, the directory, the departure board
-│   ├── three/               the 3D worlds: RailWorld.ts (the train and the line), and the interiors
-│   ├── lib/                 consist (carriages, grade), market feed, seating, wallet, directory client
+│   ├── three/               RailWorld.ts (the train, the line, the tiers), railInterior, railWeather, railHazards
+│   ├── lib/                 consist, tiers, railGame (Runaway), market feed, seating, wallet, directory client
 │   └── content/cabin.ts     the coaches' layout and copy
 ├── public/
-│   ├── models/              the train, track, station and billboard (GLB)
+│   ├── models/              the train, track, station, billboard, town shops and city bridge (GLB)
+│   ├── textures/            the town's and the city's paving
 │   └── rail/                the track loop, horns and crossing bell
 ├── worker/                  the Cloudflare Worker: adverts, directory, holders
 ├── docs/                    the documentation (GitBook-ready)
@@ -327,6 +396,7 @@ The full list, and the Worker's bindings and secrets: [Configuration](docs/for-d
 | :-- | :-- |
 | **The page** | Every push to `main` runs the tests, builds and publishes to GitHub Pages at [seat-railway.space](https://seat-railway.space/) — once Pages is turned on (**Settings → Pages → Source: GitHub Actions**). |
 | **The Worker** | Pushes that touch `worker/` type-check, test and deploy `seat-railway-banners` — when the repository has the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets. |
+| **Helius** | Add the railway's own Helius key as the `HELIUS_API_KEY` secret and run **Set the Worker's RPC secret**: it checks the key answers, then writes it to the Worker. → [Configuration → Helius](docs/for-developers/configuration.md#helius) |
 | **A new token** | `npm run token:update -- <new CA>`: checks on-chain that it is a token mint, writes it everywhere it is printed (page, Worker, `index.html`, docs), runs the tests and a build, and pushes. `--no-push` stops before committing. |
 
 Step by step, including a custom domain: [Deploying](docs/for-developers/deploying.md).
