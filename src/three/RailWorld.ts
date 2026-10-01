@@ -12,6 +12,7 @@ import { noise2 } from './noise';
 import type { ViewPose, WorldHandles } from './WorldScene';
 import { createRailInterior, type RailInteriorMode } from './railInterior';
 import { createRailHazards } from './railHazards';
+import { createWeather } from './railWeather';
 import { LANE_GAP, type RailGame } from '../lib/railGame';
 import { groundTierFor, type GroundTier } from '../lib/tiers';
 import { coachForRow, COACH_PITCH } from '../lib/railLayout';
@@ -436,51 +437,38 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     for (let i = 0; i < PUFFS; i++) puffOffsets.push(new THREE.Vector3((r() - 0.5) * 2.4, (r() - 0.3) * 0.6, (r() - 0.5) * 1.2));
   }
 
-  const precip = (() => {
-    const n = lowPower ? 2500 : 6000;
-    const geo = keep(new THREE.BufferGeometry());
-    const pos = new Float32Array(n * 3);
-    const r = rng(12);
-    for (let i = 0; i < n * 3; i++) pos[i] = r() * 120;
-    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    const mat = keep(new THREE.ShaderMaterial({
-      transparent: true,
-      depthWrite: false,
-      uniforms: { uTime: { value: 0 }, uCam: { value: new THREE.Vector3() }, uSpeed: { value: 18 }, uSize: { value: 2 }, uColor: { value: new THREE.Color(0xaabbcc) }, uOpacity: { value: 0.6 } },
-      vertexShader: /* glsl */ `
-        uniform float uTime, uSpeed, uSize;
-        uniform vec3 uCam;
-        #include <common>
-        #include <logdepthbuf_pars_vertex>
-        void main() {
-          vec3 p = position;
-          p.y = mod(p.y - uTime * uSpeed, 120.0);
-          p.x += sin(uTime * 0.7 + position.z) * (uSpeed < 5.0 ? 1.5 : 0.0);
-          vec3 base = floor(uCam / 120.0) * 120.0;
-          vec3 w = base + p;
-          w = w + 120.0 * step(w, uCam - 60.0) - 120.0 * step(uCam + 60.0, w);
-          vec4 mv = modelViewMatrix * vec4(w, 1.0);
-          gl_Position = projectionMatrix * mv;
-          gl_PointSize = uSize * 60.0 / -mv.z;
-          #include <logdepthbuf_vertex>
-        }`,
-      fragmentShader: /* glsl */ `
-        uniform vec3 uColor;
-        uniform float uOpacity;
-        #include <common>
-        #include <logdepthbuf_pars_fragment>
-        void main() {
-          #include <logdepthbuf_fragment>
-          vec2 c = gl_PointCoord - 0.5;
-          if (dot(c, c) > 0.25) discard;
-          gl_FragColor = vec4(uColor, uOpacity);
-        }`,
-    }));
-    const pts = new THREE.Points(geo, mat);
-    pts.frustumCulled = false;
-    scene.add(pts);
-    return { pts, mat };
-  })();
+  /* Rain, snow, lightning and mist (see railWeather), and what they leave on
+     the ground: a wet sheen that dries, and snow that settles and melts. */
+  const weather = createWeather(scene);
+  const groundSnow = { value: 0 };
+  const groundWet = { value: 0 };
+  /** Snow on whatever faces up, and the dark of wet ground, for the country's Lambert materials. */
+  const weathered = (m: THREE.Material, settle = 0.6) => {
+    m.onBeforeCompile = (sh) => {
+      sh.uniforms.uSnow = groundSnow;
+      sh.uniforms.uWet = groundWet;
+      sh.vertexShader = sh.vertexShader
+        .replace('#include <common>', '#include <common>\nvarying float vUpward;\nvarying vec2 vSnowAt;')
+        .replace('#include <begin_vertex>', `#include <begin_vertex>
+          vUpward = normalize(objectNormal).y;
+          #ifdef USE_INSTANCING
+            vSnowAt = (instanceMatrix * vec4(position, 1.0)).xz;
+          #else
+            vSnowAt = position.xz;
+          #endif`);
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', `#include <common>
+          uniform float uSnow, uWet;
+          varying float vUpward;
+          varying vec2 vSnowAt;`)
+        .replace('#include <color_fragment>', `#include <color_fragment>
+          diffuseColor.rgb *= 1.0 - uWet * 0.2;
+          float drift = 0.75 + 0.25 * sin(vSnowAt.x * 0.21) * sin(vSnowAt.y * 0.17);
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.93, 0.95, 0.99), clamp(uSnow * smoothstep(${settle.toFixed(2)}, ${(settle + 0.25).toFixed(2)}, vUpward) * drift * 1.15, 0.0, 1.0));`);
+    };
+    m.customProgramCacheKey = () => `weathered-${settle}`;
+    return m;
+  };
 
   /* ── The line's centreline ──────────────────────────────────────────
      Sampled every few metres and extended as the country ahead is built.
@@ -596,23 +584,58 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
   const geoBase = <T extends THREE.BufferGeometry>(g: T, y0 = 0): T => { g.translate(0, y0, 0); return keep(g); };
   const STOCK = {
     trunk: { geo: geoBase(new THREE.CylinderGeometry(0.18, 0.28, 1, 5), 0.5), mat: flat(0x5b4330), cap: 520 },
-    leafy: { geo: keep(new THREE.IcosahedronGeometry(1, 0)), mat: keep(new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true })), cap: 300 },
-    conifer: { geo: geoBase(new THREE.ConeGeometry(1, 1, 7), 0.5), mat: keep(new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true })), cap: 520 },
+    leafy: { geo: keep(new THREE.IcosahedronGeometry(1, 0)), mat: keep(weathered(new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true }), 0.35)), cap: 300 },
+    conifer: { geo: geoBase(new THREE.ConeGeometry(1, 1, 7), 0.5), mat: keep(weathered(new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true }), 0.2)), cap: 520 },
     cactus: { geo: geoBase(new THREE.CylinderGeometry(0.32, 0.38, 1, 7), 0.5), mat: flat(0x4f7b3a), cap: 90 },
-    rock: { geo: keep(new THREE.DodecahedronGeometry(1, 0)), mat: keep(new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true })), cap: 140 },
+    rock: { geo: keep(new THREE.DodecahedronGeometry(1, 0)), mat: keep(weathered(new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true }), 0.5)), cap: 140 },
     house: { geo: geoBase(new THREE.BoxGeometry(1, 1, 1), 0.5), mat: keep(new THREE.MeshLambertMaterial({ color: 0xffffff })), cap: 140 },
     roof: {
       geo: (() => { const g = new THREE.CylinderGeometry(0.62, 0.62, 1, 3); g.rotateZ(Math.PI / 2); g.rotateX(Math.PI / 6); g.scale(1, 0.75, 1.15); return keep(g); })(),
-      mat: flat(0x8c3b2e), cap: 140,
+      mat: weathered(flat(0x8c3b2e), 0.3), cap: 140,
     },
     tower: { geo: geoBase(new THREE.BoxGeometry(1, 1, 1), 0.5), mat: towerMat, cap: 90 },
   } as const;
   type Kind = keyof typeof STOCK;
   const KINDS = Object.keys(STOCK) as Kind[];
 
-  const terrainMat = keep(new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true }));
+  const terrainMat = keep(weathered(new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true }), 0.55));
   const waterMat = keep(new THREE.MeshStandardMaterial({ color: 0x2d6f8f, roughness: 0.15, metalness: 0.3, transparent: true, opacity: 0.88 }));
-  const ballastMat = keep(new THREE.MeshLambertMaterial({ color: 0x7a7268, flatShading: true }));
+  /* The sea and the rivers move: four swells, their normals worked out per
+     pixel, steeper and white-capped in a storm. The swells' lengths divide
+     1200 m, the stretch the world's grid is wrapped to, so they never jump. */
+  const waterShift = { value: new THREE.Vector2() };
+  const waterTime = { value: 0 };
+  const waterStorm = { value: 0 };
+  waterMat.onBeforeCompile = (sh) => {
+    sh.uniforms.uWaterShift = waterShift;
+    sh.uniforms.uWaterTime = waterTime;
+    sh.uniforms.uStorm = waterStorm;
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWaterW;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvWaterW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', `#include <common>
+        uniform vec2 uWaterShift;
+        uniform float uWaterTime, uStorm;
+        varying vec3 vWaterW;`)
+      .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
+        {
+          vec2 wp = vWaterW.xz + uWaterShift;
+          float amp = mix(0.05, 0.3, uStorm);
+          vec2 slope = vec2(0.0);
+          float crest = 0.0;
+          #define SWELL(DX, DZ, L, SPD, A) { vec2 d = normalize(vec2(DX, DZ)); float k = 6.2831853 / L; float ph = dot(d, wp) * k - uWaterTime * SPD * k; slope += d * cos(ph) * k * A; crest += sin(ph) * A; }
+          SWELL(1.0, 0.3, 40.0, 6.0, 1.0)
+          SWELL(-0.4, 1.0, 24.0, 4.6, 0.7)
+          SWELL(0.7, -0.8, 15.0, 3.6, 0.5)
+          SWELL(-1.0, -0.2, 9.6, 2.7, 0.35)
+          vec3 waveN = normalize(vec3(-slope.x * amp * 7.0, 1.0, -slope.y * amp * 7.0));
+          normal = normalize((viewMatrix * vec4(waveN, 0.0)).xyz);
+          float foam = smoothstep(1.2, 2.0, crest + 0.6 * sin(wp.x * 0.31 + uWaterTime * 0.7) * sin(wp.y * 0.27)) * uStorm;
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.88, 0.92, 0.94), foam * 0.85);
+        }`);
+  };
+  const ballastMat = keep(weathered(new THREE.MeshLambertMaterial({ color: 0x7a7268, flatShading: true }), 0.5));
   const railMat = keep(new THREE.MeshStandardMaterial({ color: 0x55585e, roughness: 0.35, metalness: 0.8, emissive: 0x000000 }));
   const sleeperMat = keep(new THREE.MeshLambertMaterial({ color: 0x6d655b }));
   const pierMat = keep(new THREE.MeshLambertMaterial({ color: 0xb8bcc2, flatShading: true }));
@@ -642,12 +665,12 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
      street grid drawn per pixel so the kerbs stay sharp at any distance. */
   const PAVE_COLS = XS.map((_, i) => i).filter((i) => XS[i] >= FORM + 3.6 && XS[i] <= 1200);
   const urbanCity = { value: 0 };
-  const urbanWet = { value: 0 };
   const pavementMat = (() => {
     const m = keep(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.88, metalness: 0, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
     m.onBeforeCompile = (sh) => {
       sh.uniforms.uCity = urbanCity;
-      sh.uniforms.uWet = urbanWet;
+      sh.uniforms.uWet = groundWet;
+      sh.uniforms.uSnow = groundSnow;
       sh.vertexShader = sh.vertexShader
         .replace('#include <common>', '#include <common>\nattribute vec3 aLine;\nvarying vec3 vLine;')
         .replace('#include <begin_vertex>', '#include <begin_vertex>\nvLine = aLine;');
@@ -655,6 +678,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
         .replace('#include <common>', `#include <common>
           uniform float uCity;
           uniform float uWet;
+          uniform float uSnow;
           varying vec3 vLine;
           float cellHash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }`)
         .replace('#include <map_fragment>', `#include <map_fragment>
@@ -679,8 +703,9 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
           float dashAlong = alongSt * (1.0 - crossSt) * step(abs(sx - sw * 0.5), 0.12) * step(0.5, fract(vLine.x / 6.0));
           vec3 surface = mix(ground, asphalt, street);
           surface = mix(surface, vec3(0.92), max(dashCross, dashAlong));
-          // Wet: darker, and (below) glossy.
+          // Wet: darker, and (below) glossy. Snow lies thinner on the streets.
           surface *= 1.0 - uWet * 0.35 * (1.0 - green * 0.5);
+          surface = mix(surface, vec3(0.5), uSnow * (1.0 - street * 0.45));
           diffuseColor.rgb *= surface * 1.9;
           float pavedSurface = 1.0 - green * (1.0 - min(1.0, kerb));`)
         .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
@@ -913,6 +938,11 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
 
   let world: World = 'country';
   let groundTier: GroundTier = 'country';
+  let rainAmt = 0, snowAmt = 0, fogAmt = 0;
+  const camWorld = new THREE.Vector3();
+  const trainVel = new THREE.Vector3();
+  const FLASH = new THREE.Color(0xdde4ff);
+  const STORM_SEA = new THREE.Color(0x34474f);
 
   const buildChunk = (c: Chunk, k: number) => {
     c.k = k;
@@ -1306,6 +1336,48 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     if (st) { stationModel = st; buildStations(); }
     if (bb) { billboardModel = bb; buildBillboards(); }
   };
+
+  /* ── Buoys off the coast ─────────────────────────────────────────────
+     After the storm scene supplied with the weather: red channel buoys out
+     on the sea, rocking on the swell (harder in a storm), each with a lamp
+     that flashes every few seconds. */
+  const BUOYS = 4;
+  const buoyRed = keep(new THREE.MeshStandardMaterial({ color: 0xc8322a, roughness: 0.55 }));
+  const buoyDark = keep(new THREE.MeshStandardMaterial({ color: 0x1d2024, roughness: 0.6, metalness: 0.4 }));
+  const buoyLamp = keep(new THREE.MeshBasicMaterial({ color: 0xff5040, toneMapped: false }));
+  const buoyGlowMap = (() => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 64;
+    const g = c.getContext('2d')!;
+    const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(0.3, 'rgba(255,120,90,0.5)');
+    grad.addColorStop(1, 'rgba(255,80,60,0)');
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 64, 64);
+    return keep(new THREE.CanvasTexture(c));
+  })();
+  const buoyGlowMat = keep(new THREE.SpriteMaterial({ map: buoyGlowMap, color: 0xff6a50, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+  const buoys = Array.from({ length: BUOYS }, () => {
+    const root = new THREE.Group();
+    const body = new THREE.Mesh(keep(new THREE.CylinderGeometry(1.1, 1.3, 1.8, 16)), buoyRed);
+    body.position.y = 0.4;
+    const top = new THREE.Mesh(keep(new THREE.ConeGeometry(0.75, 2.4, 12)), buoyRed);
+    top.position.y = 2.5;
+    const band = new THREE.Mesh(keep(new THREE.CylinderGeometry(1.32, 1.32, 0.25, 16)), buoyDark);
+    band.position.y = 1.2;
+    const mast = new THREE.Mesh(keep(new THREE.CylinderGeometry(0.06, 0.06, 1.4, 6)), buoyDark);
+    mast.position.y = 4.2;
+    const lamp = new THREE.Mesh(keep(new THREE.SphereGeometry(0.2, 10, 8)), buoyLamp);
+    lamp.position.y = 4.95;
+    const glow = new THREE.Sprite(buoyGlowMat);
+    glow.position.y = 4.95;
+    glow.scale.set(5, 5, 1);
+    root.add(body, top, band, mast, lamp, glow);
+    root.visible = false;
+    scene.add(root);
+    return { root, lamp, glow };
+  });
 
   /* ── The town's shopfronts and the city's bridge ─────────────────────
      Loaded the first time the market reaches the town. The shopfronts are
@@ -2004,6 +2076,28 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
       }
     }
 
+    /* Buoys on the sea, where the line runs by the coast */
+    {
+      let n = 0;
+      const blink = (time % 4) < 0.45;
+      if (world === 'country') {
+        for (let k = Math.floor((s - 200) / 230); k <= Math.floor((s + 1600) / 230) && n < BUOYS; k++) {
+          const u = k * 230 + noise2(k, 2, 151) * 120;
+          const sea = coastAt(u);
+          if (sea < 0.85 || noise2(k, 4, 151) < 0.3) continue;
+          const f = frameAt(u, fa);
+          const x = 110 + noise2(k, 6, 151) * 260;
+          const b = buoys[n++];
+          const swell = 0.25 + waterStorm.value;
+          local(f, x, f.y - 5.5 - (1 - sea) * 60 - 0.6 + Math.sin(time * 1.1 + k) * 0.45 * swell, origin, b.root.position);
+          b.root.rotation.set(Math.sin(time * 0.9 + k * 2) * 0.12 * swell, k, Math.cos(time * 0.8 + k) * 0.14 * swell);
+          b.root.visible = true;
+          b.lamp.visible = b.glow.visible = blink;
+        }
+      }
+      for (let i = n; i < BUOYS; i++) buoys[i].root.visible = false;
+    }
+
     /* The city's rivers: the bridge over each, and the water under it */
     if (bridges.length) {
       const rc0 = riverCentre(s);
@@ -2063,7 +2157,6 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     hemi.color.copy(cMid).lerp(new THREE.Color(0xffffff), 0.45);
     hemi.groundColor.set(world === 'mars' ? 0x6a3a22 : world === 'clouds' ? 0xdde6f0 : 0x4a4232);
     hemi.intensity = lerp(0.25, 1.15, day) + (world === 'space' ? 0.25 : 0);
-    if (sky.weather === 'storm' && grounded(world) && Math.random() < dt * 0.25) hemi.intensity += 6;
 
     const night = 1 - day;
     scene.environmentIntensity = lerp(0.22, 0.55, day);
@@ -2088,15 +2181,21 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     railMat.emissive.set(world === 'space' ? CYAN : 0x000000);
     railMat.emissiveIntensity = world === 'space' ? 1.2 : 0;
 
-    /* Weather */
+    /* Weather: the amounts ease in and out, the ground wets and dries, snow settles and melts */
     const raining = grounded(world) && (sky.weather === 'rain' || sky.weather === 'storm');
     const snowing = grounded(world) && sky.weather === 'snow';
-    precip.pts.visible = raining || snowing;
-    precip.mat.uniforms.uTime.value = time;
-    precip.mat.uniforms.uSpeed.value = snowing ? 2.2 : 26;
-    precip.mat.uniforms.uSize.value = snowing ? 3.2 : 1.6;
-    precip.mat.uniforms.uColor.value.set(snowing ? 0xffffff : 0x9fb3c8);
-    precip.mat.uniforms.uOpacity.value = snowing ? 0.9 : 0.45;
+    const storming = grounded(world) && sky.weather === 'storm';
+    const ease = (v: number, to: number, up: number, down: number) => v + (to - v) * Math.min(1, dt / (to > v ? up : down));
+    rainAmt = ease(rainAmt, raining ? (storming ? 1 : 0.7) : 0, 4, 6);
+    snowAmt = ease(snowAmt, snowing ? 1 : 0, 4, 6);
+    fogAmt = ease(fogAmt, grounded(world) && sky.weather === 'fog' ? 1 : 0, 5, 8);
+    groundWet.value = grounded(world) ? ease(groundWet.value, raining ? 1 : 0, 12, 90) : 0;
+    groundSnow.value = grounded(world) ? ease(groundSnow.value, snowing ? 1 : 0, 25, 70) : 0;
+    railMat.roughness = lerp(0.35, 0.12, groundWet.value);
+    waterTime.value = time;
+    waterShift.value.set(((origin.x % 1200) + 1200) % 1200, ((origin.z % 1200) + 1200) % 1200);
+    waterStorm.value = ease(waterStorm.value, storming ? 1 : raining ? 0.45 : sky.weather === 'overcast' ? 0.25 : 0.08, 6, 10);
+    waterMat.color.set(0x2d6f8f).lerp(STORM_SEA, waterStorm.value);
 
     clouds.visible = grounded(world) && sky.cloudCover > 0.08;
     if (clouds.visible) {
@@ -2104,6 +2203,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
       const move = speed * dt;
       let n = 0;
       cloudMat.color.copy(cHor).lerp(new THREE.Color(0xffffff), sky.weather === 'overcast' || raining ? 0.25 : 0.7);
+      if (storming) cloudMat.color.multiplyScalar(0.55);
       for (let i = 0; i < CLOUDS; i++) {
         const cl = cloudAt[i];
         // Clouds hold still over the ground: the camera rides the train forward under them.
@@ -2192,7 +2292,24 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     }
     planet.rotation.y += dt * 0.004;
     moonlets.position.copy(camera.position);
-    precip.mat.uniforms.uCam.value.copy(camera.position);
+
+    /* The weather itself, round the camera; lightning lights the sky and the ground */
+    camWorld.set(camera.position.x + origin.x, camera.position.y + origin.y, camera.position.z + origin.z);
+    trainVel.set(Math.sin(origin.h) * speed, 0, -Math.cos(origin.h) * speed);
+    const flash = weather.update({
+      time, dt, camera, camScene: camera.position, camWorld, trainVel,
+      rain: rainAmt, snow: snowAmt, storm: storming, fog: fogAmt, night,
+      horizon: cHor, groundAt: () => camera.position.y - (inside ? 3 : 8), lowPower,
+    });
+    if (flash > 0) {
+      hemi.intensity += flash * 5;
+      skyUniforms.uTop.value.lerp(FLASH, flash * 0.35);
+      skyUniforms.uMid.value.lerp(FLASH, flash * 0.5);
+      skyUniforms.uHorizon.value.lerp(FLASH, flash * 0.45);
+      if (scene.fog instanceof THREE.Fog) scene.fog.color.lerp(FLASH, flash * 0.4);
+      cloudMat.color.lerp(FLASH, flash * 0.6);
+    }
+    inside?.weather(rainAmt, snowAmt, speed, time);
 
     sun.position.copy(target).addScaledVector(sunDir, 150);
     sun.target.position.copy(target);
@@ -2242,6 +2359,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     disposed = true;
     inside?.dispose();
     hazards?.dispose();
+    weather.dispose();
     for (const c of chunks) {
       c.terrain.geometry.dispose();
       c.water.geometry.dispose();

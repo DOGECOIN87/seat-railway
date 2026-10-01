@@ -264,6 +264,131 @@ export function createRailInterior(mode: RailInteriorMode) {
     }
   }
 
+  /* ── Rain on the glass ─────────────────────────────────────────────
+     The windows get a pane each, clear until it rains. Drops bead on it,
+     and run back along the coach's windows as the train picks up speed; on
+     the cab's windscreen they are pushed up, and two wipers clear them. */
+  const glassUniforms = (w: number, h: number, screen: boolean) => ({
+    uTime: { value: 0 }, uRain: { value: 0 }, uSnow: { value: 0 }, uFlow: { value: 0 },
+    uSize: { value: new THREE.Vector2(w, h) }, uScreen: { value: screen ? 1 : 0 },
+    uWiper: { value: 0 }, uFlip: { value: 1 },
+    // The wipers' pivots, in metres from the pane's bottom left corner.
+    uWipeAt: { value: new THREE.Vector4(w / 2 - 0.85, 0.06, w / 2 + 0.85, 0.06) },
+  });
+  const glassShader = (uniforms: ReturnType<typeof glassUniforms>) => keep(new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    uniforms,
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      #include <common>
+      #include <logdepthbuf_pars_vertex>
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        #include <logdepthbuf_vertex>
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform float uTime, uRain, uSnow, uFlow, uScreen, uWiper, uFlip;
+      uniform vec2 uSize;
+      uniform vec4 uWipeAt;
+      varying vec2 vUv;
+      #include <common>
+      #include <logdepthbuf_pars_fragment>
+      float h21(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+      // Beads: one to a cell at most, each with a life of a few seconds.
+      float beads(vec2 m, float cell, float density, float t) {
+        vec2 id = floor(m / cell);
+        vec2 f = fract(m / cell) - 0.5;
+        float n = h21(id);
+        if (n > density) return 0.0;
+        vec2 c = (vec2(h21(id + 3.1), h21(id + 7.7)) - 0.5) * 0.55;
+        float r = mix(0.12, 0.34, h21(id + 11.3));
+        float life = fract(t * (0.08 + n * 0.15) + n * 9.0);
+        float alive = smoothstep(0.0, 0.08, life) * (1.0 - smoothstep(0.7, 1.0, life));
+        return smoothstep(r, r * 0.55, length(f - c)) * alive;
+      }
+      // Runners: drops dragged across the glass, drawn long the way they go.
+      float runners(vec2 m, vec2 dir, float t, float density) {
+        vec2 across = vec2(-dir.y, dir.x);
+        vec2 q = vec2(dot(m, dir), dot(m, across));
+        float lane = floor(q.y / 0.05);
+        float n = h21(vec2(lane, 1.7));
+        if (n > density) return 0.0;
+        float speed = 0.25 + n * 0.5;
+        float along = q.x - t * speed * (0.4 + uFlow);
+        float cell = 0.5 + n * 0.6;
+        float f = fract(along / cell);
+        float y = fract(q.y / 0.05) - 0.5 - (h21(vec2(lane, 9.1)) - 0.5) * 0.4;
+        float head = smoothstep(0.035, 0.01, length(vec2((f - 0.85) * cell * 0.9, y * 0.05)));
+        float trail = smoothstep(0.85, 0.2, f) * smoothstep(0.0, 0.25, f) * smoothstep(0.12, 0.0, abs(y)) * 0.35;
+        return max(head, trail);
+      }
+      // Seconds since a wiper last went over this point (large when they are parked).
+      float wiped(vec2 m, vec2 pivot) {
+        vec2 d = m - pivot;
+        if (length(d) > 1.15 || d.y < 0.0) return 99.0;
+        float a = atan(d.y, d.x);
+        float lo = 0.26, hi = 2.88, period = 1.7;
+        float u = clamp((a - lo) / (hi - lo), 0.0, 1.0);
+        if (uWiper < 0.5) return 99.0;
+        float w = 6.2831853 / period;
+        float t1 = acos(1.0 - 2.0 * u) / w;
+        float t2 = period - t1;
+        float tp = mod(uTime, period);
+        return tp >= t2 ? tp - t2 : tp >= t1 ? tp - t1 : tp + (period - t2);
+      }
+      void main() {
+        #include <logdepthbuf_fragment>
+        vec2 m = vUv * uSize;
+        float wet = max(uRain, uSnow);
+        if (wet < 0.01) discard;
+        // At speed the coach's drops run back along the windows; the windscreen's run up.
+        vec2 dir = uScreen > 0.5 ? normalize(vec2(0.05, 1.0)) : normalize(vec2(uFlip, -0.25 + 0.2 * uFlow));
+        float drop = beads(m, 0.045, 0.55 * wet, uTime) + beads(m + 0.37, 0.09, 0.35 * wet, uTime * 0.7);
+        drop = max(drop, runners(m, dir, uTime, uRain * (0.25 + 0.5 * uFlow)));
+        if (uScreen > 0.5) {
+          float since = min(wiped(m, uWipeAt.xy), wiped(m, uWipeAt.zw));
+          drop *= smoothstep(0.05, 1.4, since);
+        }
+        drop = clamp(drop, 0.0, 1.0);
+        // A wet film over the whole pane, and each drop a dark lens with a bright rim.
+        vec3 tint = mix(vec3(0.62, 0.7, 0.78), vec3(0.97), uSnow);
+        float alpha = drop * mix(0.55, 0.9, uSnow) + wet * 0.05;
+        gl_FragColor = vec4(tint * (0.75 + drop * 0.4), alpha);
+      }`,
+  }));
+  const panes: { mesh: THREE.Mesh; u: ReturnType<typeof glassUniforms> }[] = [];
+  const addPane = (w: number, h: number, at: number[], yaw: number, screen: boolean, flip = 1) => {
+    const u = glassUniforms(w, h, screen);
+    u.uFlip.value = flip;
+    const mesh = new THREE.Mesh(plane, glassShader(u));
+    mesh.scale.set(w, h, 1);
+    mesh.position.set(at[0], at[1], at[2]);
+    mesh.rotation.y = yaw;
+    mesh.renderOrder = 6;
+    mesh.visible = false;
+    group.add(mesh);
+    panes.push({ mesh, u });
+  };
+  const wipers: THREE.Group[] = [];
+  if (mode === 'cab') {
+    addPane(3.4, 1.9, [0, 2.48, -8.86], 0, true);
+    for (const x of [-0.85, 0.85]) {
+      const pivot = new THREE.Group();
+      pivot.position.set(x, 1.59, -8.84);
+      const arm = box(pivot, charcoal, [1.05, 0.03, 0.02], [0.52, 0, 0]);
+      arm.castShadow = false;
+      group.add(pivot);
+      wipers.push(pivot);
+    }
+  } else {
+    // In the wall's thickness, so the pillars stand in front of it. The left pane faces the other way, so its drops are turned round to run aft.
+    for (const side of [-1, 1]) addPane(17.6, 1.2, [side * 1.8, 2.51, 0], side < 0 ? Math.PI / 2 : -Math.PI / 2, false, side < 0 ? -1 : 1);
+  }
+  let wiperClock = 0;
+  let lastTime = 0;
+
   const eye = new THREE.Vector3();
   return {
     group,
@@ -288,6 +413,27 @@ export function createRailInterior(mode: RailInteriorMode) {
     setAdverts(bySeat: Readonly<Record<string, string>>) { adverts = bySeat; loadAdverts(); },
     setReadout(value: DeckReadout) { readout = value; },
     setSuiteDoor(open: boolean) { suiteDoorOpen = open; },
+    /** Rain and snow on the glass: how much of each, how fast the train is going, and the clock. */
+    weather(rain: number, snow: number, speed: number, time: number) {
+      const dt = lastTime ? Math.min(0.1, time - lastTime) : 0;
+      lastTime = time;
+      const running = rain > 0.05 || snow > 0.05;
+      // The wipers keep their own clock, so they finish a sweep and park when it stops.
+      if (running || (wiperClock % 1.7) > 0.02) wiperClock += dt;
+      const flow = Math.min(1, speed / 40);
+      for (const p of panes) {
+        p.mesh.visible = rain > 0.01 || snow > 0.01;
+        p.u.uTime.value = p.u.uScreen.value ? wiperClock : time;
+        p.u.uRain.value = rain;
+        p.u.uSnow.value = snow;
+        p.u.uFlow.value = flow;
+        p.u.uWiper.value = running ? 1 : 0;
+      }
+      // The blades follow the same sweep the shader clears.
+      const w = (2 * Math.PI) / 1.7;
+      const sweep = 0.26 + (2.88 - 0.26) * (0.5 - 0.5 * Math.cos(w * wiperClock));
+      wipers.forEach((pivot) => { pivot.rotation.z = running || (wiperClock % 1.7) > 0.02 ? sweep : 0.26; });
+    },
     dispose() {
       disposed = true;
       passengers?.dispose();
