@@ -3,6 +3,7 @@ import { FULL_CABIN, SEAT_ORDER, seatHolders } from '../dist-test/seating.js';
 import { coachForRow, coachRows, railRowZ, railSeatX } from '../dist-test/railLayout.js';
 import { newRailGame, startRailGame, stepRailGame, steer, laneX, NOSE, LANES, COIN_POINTS, MAX_SPEED } from '../dist-test/railGame.js';
 import { implausibleRail } from '../dist-test/railLeaderboard.js';
+import { groundTierFor, nextTier, TIERS } from '../dist-test/tiers.js';
 
 assert.equal(FULL_CABIN, 118);
 assert.equal(new Set(SEAT_ORDER.map((s) => s.id)).size, FULL_CABIN);
@@ -79,4 +80,17 @@ const a = newRailGame(99), b = newRailGame(99);
 startRailGame(a); startRailGame(b);
 for (let i = 0; i < 600; i++) { stepRailGame(a, 1 / 60); stepRailGame(b, 1 / 60); }
 assert.deepEqual(a.hazards, b.hazards);
-console.log('Railway layout, holder ranking, the Runaway game and server score validation passed.');
+// The line's levels: country, town, city, each entered at its line and left only well under it.
+assert.equal(groundTierFor(50_000), 'country');
+assert.equal(groundTierFor(100_000), 'town');
+assert.equal(groundTierFor(399_999), 'town');
+assert.equal(groundTierFor(400_000), 'city');
+assert.equal(groundTierFor(380_000, 'city'), 'city', 'a dip just under the line kept the city');
+assert.equal(groundTierFor(360_000, 'city'), 'town');
+assert.equal(groundTierFor(95_000, 'town'), 'town');
+assert.equal(groundTierFor(90_000, 'town'), 'country');
+assert.equal(groundTierFor(150_000, 'country'), 'town', 'rising is never held back');
+assert.deepEqual(TIERS.map((t) => t.from), [...TIERS.map((t) => t.from)].sort((a, b) => a - b));
+assert.equal(nextTier('city').key, 'clouds');
+assert.equal(nextTier('mars'), null);
+console.log('Railway layout, holder ranking, the Runaway game, the line\'s tiers and server score validation passed.');

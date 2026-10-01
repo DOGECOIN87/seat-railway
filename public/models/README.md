@@ -9,6 +9,10 @@ Loaded by `src/three/RailWorld.ts`. All are converted from the models supplied f
 | `track.glb` | the station's rails and sleepers | One 14.7748 m tile (24 sleepers); the scene tiles it along the line near the camera. |
 | `station.glb` | the platform side of the station | Third-party signage textures removed; the scene draws its own signs. Scaled ×1.75 at runtime. |
 | `billboard.glb` | `BILLBOARD.blend` | Transforms baked; textures downscaled to 512 px. The ad face is drawn on a plane of its own over the panel. |
+| `town-block.glb` | `MyBuild.obj`, two shop buildings | The Market Town's shopfronts. Y up, ground at y = 0, metres. Materials merged to `Glass`, `Light`, `Sign`, `Fascia` and the walls; small parts dropped and the rest decimated (130k → 76k faces). The shop's brand panels are plain cyan fascia. Built by `scripts/models/town-block.py`. |
+| `bridge.glb` | `lowpoly-manhattan-bridge.glb` | The City's river bridge. Merged to one mesh, repainted one steel material. Deck top at y = 18.6, waterline about y = 2; the scene scales it ×2.2. |
+
+`../textures/ground-color.jpg` and `ground-normal.jpg` are the supplied ground textures, downscaled to 1024 px: the town's and the city's paving, with the street grid drawn over them per pixel.
 
 The reference photo that was mapped onto the car body in the source (a real operator's train, with its logo) is deliberately not included.
 

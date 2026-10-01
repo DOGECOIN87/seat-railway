@@ -13,6 +13,7 @@ import type { ViewPose, WorldHandles } from './WorldScene';
 import { createRailInterior, type RailInteriorMode } from './railInterior';
 import { createRailHazards } from './railHazards';
 import { LANE_GAP, type RailGame } from '../lib/railGame';
+import { groundTierFor, type GroundTier } from '../lib/tiers';
 import { coachForRow, COACH_PITCH } from '../lib/railLayout';
 import { FULL_CABIN } from '../lib/seating';
 
@@ -191,10 +192,25 @@ const MARS_HI = new THREE.Color('#D88E57');
 const CLOUD_LO = new THREE.Color('#C9D6E6');
 const CLOUD_HI = new THREE.Color('#FFFFFF');
 
-/** The world the line runs through, from the market's band. */
-type World = 'country' | 'clouds' | 'space' | 'moon' | 'mars';
-const worldFor = (band: FlightBand): World =>
-  band === 'atmosphere' ? 'country' : band === 'above-clouds' ? 'clouds' : band;
+/** The world the line runs through: the market's band, and on the ground its tier (see lib/tiers). */
+type World = GroundTier | 'clouds' | 'space' | 'moon' | 'mars';
+const worldFor = (band: FlightBand, ground: GroundTier): World =>
+  band === 'atmosphere' ? ground : band === 'above-clouds' ? 'clouds' : band;
+/** On the ground, under a sky with weather in it: the country, the town or the city. */
+const grounded = (w: World) => w === 'country' || w === 'town' || w === 'city';
+const urban = (w: World) => w === 'town' || w === 'city';
+
+/* ── The city's river ──────────────────────────────────────────────────
+   Halfway between stations the line crosses a river. The line runs straight
+   and level over it everywhere, so the crossing is ready whichever world is
+   showing; only the city cuts the valley and hangs the bridge across it. */
+const BRIDGE_SCALE = 2.2;
+/** The model's deck top and waterline, in its own units. */
+const BRIDGE_DECK = 18.6;
+const BRIDGE_WATER = 2;
+/** Half the bridge's length, metres. */
+const BRIDGE_HALF = 72 * BRIDGE_SCALE;
+const RIVER_DROP = (BRIDGE_DECK - BRIDGE_WATER) * BRIDGE_SCALE;
 
 /* ── Handles ──────────────────────────────────────────────────────────── */
 
@@ -485,13 +501,21 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     const d = Math.abs(u - stationCentre(m));
     return 1 - smooth(110, 260, d);
   };
+  const riverCentre = (u: number) => {
+    const m = Math.round((u / CHUNK - STATION_EVERY) / STATION_EVERY);
+    return (m * STATION_EVERY + STATION_EVERY) * CHUNK;
+  };
+  /** 1 on the straight that carries the line over a river, 0 well away from it. */
+  const riverLevel = (u: number) => 1 - smooth(BRIDGE_HALF + 40, BRIDGE_HALF + 170, Math.abs(u - riverCentre(u)));
+  /** 1 in the river's valley, under the bridge, to 0 at the top of its banks. */
+  const riverValley = (u: number) => 1 - smooth(BRIDGE_HALF - 55, BRIDGE_HALF - 8, Math.abs(u - riverCentre(u)));
   const curvature = (u: number) =>
-    ((Math.sin(u / 1250) * 0.65 + Math.sin(u / 3300 + 2) * 0.45) / 1600) * (1 - stationMask(u));
+    ((Math.sin(u / 1250) * 0.65 + Math.sin(u / 3300 + 2) * 0.45) / 1600) * (1 - Math.max(stationMask(u), riverLevel(u)));
   const extendTo = (u: number) => {
     while ((pStart + px.length - 1) * STEP < u) {
       const i = px.length - 1;
       const uu = (pStart + i) * STEP;
-      const level = stationMask(uu);
+      const level = Math.max(stationMask(uu), riverLevel(uu));
       slope += ((slopeTarget * (1 - level)) - slope) * 0.045;
       const h = ph[i] + curvature(uu) * STEP;
       px.push(px[i] + Math.sin(h) * STEP);
@@ -521,6 +545,52 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
   const trackY = (u: number) => frameAt(u, tmpF).y;
   const tmpF: Frame = { x: 0, y: 0, z: 0, h: 0 };
 
+  /* ── The city's towers ──────────────────────────────────────────────
+     One box each, the windows drawn on by the shader: a grid of panes cut
+     to the tower's real size, so every floor is 3.7 m whatever its height,
+     a share of them lit after dark. */
+  const urbanNight = { value: 0 };
+  const towerMat = (() => {
+    const m = keep(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6, metalness: 0.3 }));
+    m.onBeforeCompile = (sh) => {
+      sh.uniforms.uNight = urbanNight;
+      sh.vertexShader = sh.vertexShader
+        .replace('#include <common>', '#include <common>\nvarying vec3 vFacade;\nvarying vec3 vFaceN;\nvarying float vSeed;')
+        .replace('#include <begin_vertex>', `#include <begin_vertex>
+          #ifdef USE_INSTANCING
+            vec3 sc = vec3(length(instanceMatrix[0].xyz), length(instanceMatrix[1].xyz), length(instanceMatrix[2].xyz));
+            vSeed = fract(sin(dot(instanceMatrix[3].xz, vec2(12.9898, 78.233))) * 43758.5453);
+          #else
+            vec3 sc = vec3(1.0);
+            vSeed = 0.0;
+          #endif
+          vFacade = position * sc;
+          vFaceN = normal;`);
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', `#include <common>
+          uniform float uNight;
+          varying vec3 vFacade;
+          varying vec3 vFaceN;
+          varying float vSeed;
+          float paneHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }`)
+        .replace('#include <color_fragment>', `#include <color_fragment>
+          float acrossX = step(0.5, abs(vFaceN.x));
+          vec2 cell = vec2(mix(vFacade.x, vFacade.z, acrossX) / 3.1, vFacade.y / 3.7);
+          vec2 pf = fract(cell);
+          float wall = 1.0 - step(0.5, abs(vFaceN.y));
+          float pane = wall * step(0.12, pf.x) * step(pf.x, 0.88) * step(0.2, pf.y) * step(pf.y, 0.9) * step(4.5, vFacade.y);
+          vec3 glassTone = mix(vec3(0.09, 0.14, 0.2), vec3(0.3, 0.42, 0.52), paneHash(floor(cell) + vSeed * 7.0) * 0.55);
+          diffuseColor.rgb = mix(diffuseColor.rgb, glassTone, pane * 0.88);
+          float paneLit = step(0.62 - 0.3 * uNight, paneHash(floor(cell) * 1.7 + vSeed * 13.0)) * pane;`)
+        .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
+          roughnessFactor = mix(roughnessFactor, 0.1, pane);`)
+        .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+          totalEmissiveRadiance += paneLit * uNight * mix(vec3(1.0, 0.8, 0.52), vec3(0.75, 0.88, 1.0), step(0.8, paneHash(floor(cell) + 3.1))) * 1.6;`);
+    };
+    return m;
+  })();
+  const TOWER = ['#8f9aa5', '#b9b2a6', '#5d6773', '#c9ccd0', '#7c858c', '#a39a8d', '#3f4a56'].map((c) => new THREE.Color(c));
+
   /* ── Shared stock for the country ── */
   const flat = (hex: number) => keep(new THREE.MeshLambertMaterial({ color: hex, flatShading: true }));
   const geoBase = <T extends THREE.BufferGeometry>(g: T, y0 = 0): T => { g.translate(0, y0, 0); return keep(g); };
@@ -530,11 +600,12 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     conifer: { geo: geoBase(new THREE.ConeGeometry(1, 1, 7), 0.5), mat: keep(new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true })), cap: 520 },
     cactus: { geo: geoBase(new THREE.CylinderGeometry(0.32, 0.38, 1, 7), 0.5), mat: flat(0x4f7b3a), cap: 90 },
     rock: { geo: keep(new THREE.DodecahedronGeometry(1, 0)), mat: keep(new THREE.MeshLambertMaterial({ color: 0xffffff, flatShading: true })), cap: 140 },
-    house: { geo: geoBase(new THREE.BoxGeometry(1, 1, 1), 0.5), mat: keep(new THREE.MeshLambertMaterial({ color: 0xffffff })), cap: 14 },
+    house: { geo: geoBase(new THREE.BoxGeometry(1, 1, 1), 0.5), mat: keep(new THREE.MeshLambertMaterial({ color: 0xffffff })), cap: 140 },
     roof: {
       geo: (() => { const g = new THREE.CylinderGeometry(0.62, 0.62, 1, 3); g.rotateZ(Math.PI / 2); g.rotateX(Math.PI / 6); g.scale(1, 0.75, 1.15); return keep(g); })(),
-      mat: flat(0x8c3b2e), cap: 14,
+      mat: flat(0x8c3b2e), cap: 140,
     },
+    tower: { geo: geoBase(new THREE.BoxGeometry(1, 1, 1), 0.5), mat: towerMat, cap: 90 },
   } as const;
   type Kind = keyof typeof STOCK;
   const KINDS = Object.keys(STOCK) as Kind[];
@@ -564,6 +635,77 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     const t = (i / SEG_X) * 2 - 1;
     XS.push(Math.sign(t) * Math.pow(Math.abs(t), 1.9) * HALF_WIDTH);
   }
+  /* ── Paving ─────────────────────────────────────────────────────────
+     The town's and the city's ground near the line: the terrain's own
+     columns from the edge of the formation out, so it lies exactly on the
+     ground, textured with the supplied concrete and its normal map, and the
+     street grid drawn per pixel so the kerbs stay sharp at any distance. */
+  const PAVE_COLS = XS.map((_, i) => i).filter((i) => XS[i] >= FORM + 3.6 && XS[i] <= 1200);
+  const urbanCity = { value: 0 };
+  const urbanWet = { value: 0 };
+  const pavementMat = (() => {
+    const m = keep(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.88, metalness: 0, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+    m.onBeforeCompile = (sh) => {
+      sh.uniforms.uCity = urbanCity;
+      sh.uniforms.uWet = urbanWet;
+      sh.vertexShader = sh.vertexShader
+        .replace('#include <common>', '#include <common>\nattribute vec3 aLine;\nvarying vec3 vLine;')
+        .replace('#include <begin_vertex>', '#include <begin_vertex>\nvLine = aLine;');
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', `#include <common>
+          uniform float uCity;
+          uniform float uWet;
+          varying vec3 vLine;
+          float cellHash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }`)
+        .replace('#include <map_fragment>', `#include <map_fragment>
+          if (vLine.z > 0.3) discard;
+          float bu = mix(70.0, 90.0, uCity), bx = mix(60.0, 80.0, uCity), sw = mix(9.0, 14.0, uCity);
+          float ax = abs(vLine.y);
+          float su = mod(vLine.x, bu), sx = mod(ax, bx);
+          float crossSt = step(su, sw) * step(10.0, ax);
+          float alongSt = step(sx, sw) * step(10.0, ax);
+          float street = max(crossSt, alongSt);
+          float h = cellHash(vec2(floor(vLine.x / bu), floor(vLine.y / bx)));
+          vec3 paving = vec3(0.66, 0.64, 0.6);
+          vec3 lawn = mix(vec3(0.33, 0.46, 0.2), vec3(0.45, 0.52, 0.28), step(0.55, h));
+          float green = uCity > 0.5 ? step(h, 0.12) : step(h, 0.8);
+          vec3 ground = mix(paving, lawn, green);
+          // A kerb of paving round every lawn, a metre and a half wide.
+          float kerb = step(su, sw + 1.5) + step(bu - 1.5, su) + step(sx, sw + 1.5) + step(bx - 1.5, sx);
+          ground = mix(ground, paving, min(1.0, kerb) * green);
+          vec3 asphalt = vec3(0.23, 0.24, 0.26);
+          // Dashed white down the middle of every street, none in the junctions.
+          float dashCross = crossSt * (1.0 - alongSt) * step(abs(su - sw * 0.5), 0.12) * step(0.5, fract(ax / 6.0));
+          float dashAlong = alongSt * (1.0 - crossSt) * step(abs(sx - sw * 0.5), 0.12) * step(0.5, fract(vLine.x / 6.0));
+          vec3 surface = mix(ground, asphalt, street);
+          surface = mix(surface, vec3(0.92), max(dashCross, dashAlong));
+          // Wet: darker, and (below) glossy.
+          surface *= 1.0 - uWet * 0.35 * (1.0 - green * 0.5);
+          diffuseColor.rgb *= surface * 1.9;
+          float pavedSurface = 1.0 - green * (1.0 - min(1.0, kerb));`)
+        .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
+          roughnessFactor = mix(roughnessFactor, mix(0.82, 0.18, uWet), pavedSurface);`);
+    };
+    return m;
+  })();
+  let groundMaps = false;
+  const loadGroundMaps = () => {
+    if (groundMaps) return;
+    groundMaps = true;
+    const loader = new THREE.TextureLoader();
+    const get = (file: string, colour: boolean) => loader.load(`${import.meta.env.BASE_URL}textures/${file}`, (t) => {
+      if (disposed) { t.dispose(); return; }
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+      if (colour) t.colorSpace = THREE.SRGBColorSpace;
+      if (colour) pavementMat.map = keep(t); else pavementMat.normalMap = keep(t);
+      pavementMat.normalScale.set(0.7, 0.7);
+      pavementMat.needsUpdate = true;
+    });
+    get('ground-color.jpg', true);
+    get('ground-normal.jpg', false);
+  };
+
   const SLEEPERS_PER_CHUNK = Math.round(CHUNK / 0.68);
   const RAIL_SAMPLES = Math.ceil(CHUNK / STEP) + 1;
 
@@ -576,6 +718,8 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     ballast: THREE.Mesh;
     rails: THREE.Mesh;
     sleepers: THREE.InstancedMesh;
+    /** The town's and the city's paving, either side of the line. */
+    pavement: THREE.Mesh[];
     /** Runaway's other tracks, one rails ribbon and one set of sleepers each. */
     sides: { rails: THREE.Mesh; sleepers: THREE.InstancedMesh; x: number }[];
     piers: THREE.InstancedMesh;
@@ -622,6 +766,17 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     const rails = new THREE.Mesh(railsGeo, railMat);
     const sleepers = new THREE.InstancedMesh(sleeperGeo, sleeperMat, SLEEPERS_PER_CHUNK);
     sleepers.receiveShadow = true;
+    const pavement = [-1, 1].map(() => {
+      const g = ribbon(PAVE_COLS.length, SEG_U + 1);
+      g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(PAVE_COLS.length * (SEG_U + 1) * 2), 2));
+      g.setAttribute('aLine', new THREE.BufferAttribute(new Float32Array(PAVE_COLS.length * (SEG_U + 1) * 3), 3));
+      const mesh = new THREE.Mesh(g, pavementMat);
+      mesh.receiveShadow = true;
+      mesh.frustumCulled = false;
+      mesh.visible = false;
+      group.add(mesh);
+      return mesh;
+    });
     const sides = SIDE_TRACKS.map((x) => {
       const r = new THREE.Mesh(ribbon(4 * 2 + 1, RAIL_SAMPLES), railMat);
       const sl = new THREE.InstancedMesh(sleeperGeo, sleeperMat, SLEEPERS_PER_CHUNK);
@@ -639,13 +794,13 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     for (const k of KINDS) {
       const m = new THREE.InstancedMesh(STOCK[k].geo, STOCK[k].mat, STOCK[k].cap);
       m.count = 0;
-      if (k === 'house' || k === 'roof') m.castShadow = true;
+      if (k === 'house' || k === 'roof' || k === 'tower') m.castShadow = true;
       scatter[k] = m;
       group.add(m);
     }
     group.add(terrain, water, ballast, rails, sleepers, piers, signal);
     for (const o of [terrain, water, ballast, rails, sleepers, piers, ...Object.values(scatter)]) o.frustumCulled = false;
-    return { k: -1, group, origin: { x: 0, y: 0, z: 0, h: 0 }, terrain, water, ballast, rails, sleepers, sides, piers, signal, signalLamp: lamp, scatter, world: null };
+    return { k: -1, group, origin: { x: 0, y: 0, z: 0, h: 0 }, terrain, water, ballast, rails, sleepers, pavement, sides, piers, signal, signalLamp: lamp, scatter, world: null };
   };
 
   /* Ground height at a point beside the line. */
@@ -669,9 +824,15 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
       }
       return lerp(ty - 0.95 + rise * h, ty - 0.95, station);
     }
-    const [a, b, t] = biomeMix(u);
     const hills = (fbm(u / 230, x / 230, 11, 4) - 0.42);
     const ridged = 1 - Math.abs(fbm(u / 650, x / 650, 13, 4) * 2 - 1);
+    if (urban(world)) {
+      // Level streets near the line; the far hills still on the skyline.
+      let h = hills * (world === 'city' ? 3 : 7) * rise + smooth(600, 1400, ax) * Math.pow(ridged, 2.2) * 260;
+      if (world === 'city') h = lerp(h, -RIVER_DROP - 4, riverValley(u));
+      return lerp(ty - 0.95 + h, ty - 0.95, station);
+    }
+    const [a, b, t] = biomeMix(u);
     const look = (bm: Biome) => {
       let h = hills * LOOK[bm].hills * rise + smooth(180, 1100, ax) * Math.pow(ridged, 2.2) * LOOK[bm].mountains;
       if (bm === 'desert') h = Math.round(h / 16) * 16 * 0.7 + h * 0.3;
@@ -693,6 +854,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     if (world === 'moon') return out.copy(MOON_LO).lerp(MOON_HI, n * 0.6 + smooth(-20, 20, rel) * 0.4);
     if (world === 'mars') return out.copy(MARS_LO).lerp(MARS_HI, n * 0.6 + smooth(-30, 120, rel) * 0.4);
     if (world === 'space') return out.set(0x000000);
+    if (urban(world)) return urbanColour(u, x, rel, n, out);
     const [a, b, t] = biomeMix(u);
     const look = (bm: Biome, o: THREE.Color) => {
       const L = LOOK[bm];
@@ -714,6 +876,29 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     return out;
   };
 
+  /* The town and the city from above: a street grid, lawns and yards in the
+     town, paving and plazas in the city, stone walls down to the river. */
+  const STREET = new THREE.Color('#45484d');
+  const PAVING = new THREE.Color('#9b978f');
+  const LAWN = new THREE.Color('#6d8f45');
+  const YARD = new THREE.Color('#8a9a5a');
+  const RIVERBANK = new THREE.Color('#5d5a54');
+  const urbanColour = (u: number, x: number, rel: number, n: number, out: THREE.Color) => {
+    const ax = Math.abs(x);
+    if (rel < -4) return out.copy(RIVERBANK).multiplyScalar(0.85 + n * 0.3);
+    const city = world === 'city';
+    const bu = city ? 90 : 70, bx = city ? 80 : 60;
+    const su = ((u % bu) + bu) % bu, sx = ax % bx;
+    const street = ax > 10 && (su < (city ? 14 : 9) || sx < (city ? 14 : 9));
+    if (street) return out.copy(STREET).multiplyScalar(0.9 + n * 0.2);
+    const cell = noise2(Math.floor(u / bu), Math.floor(x / bx), 73);
+    if (city) out.copy(PAVING).lerp(cell < 0.12 ? LAWN : STREET, cell < 0.12 ? 0.85 : cell * 0.35);
+    else out.copy(cell < 0.55 ? LAWN : cell < 0.8 ? YARD : PAVING);
+    // Fading to the far country beyond the edge of town.
+    if (ax > (city ? 1100 : 700)) out.lerp(LOOK.meadow.low, smooth(city ? 1100 : 700, 1400, ax));
+    return out.multiplyScalar(0.92 + n * 0.16);
+  };
+
   const m4 = new THREE.Matrix4();
   const q = new THREE.Quaternion();
   const v3 = new THREE.Vector3();
@@ -727,7 +912,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     out.set(f.x + Math.cos(f.h) * x - o.x, y - o.y, f.z + Math.sin(f.h) * x - o.z);
 
   let world: World = 'country';
-  let currentBand: FlightBand = 'atmosphere';
+  let groundTier: GroundTier = 'country';
 
   const buildChunk = (c: Chunk, k: number) => {
     c.k = k;
@@ -816,6 +1001,37 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     c.sleepers.instanceMatrix.needsUpdate = true;
     c.sleepers.visible = world !== 'space';
 
+    /* Paving, in the town and the city */
+    const paved = urban(world);
+    for (let k = 0; k < 2; k++) {
+      const mesh = c.pavement[k];
+      mesh.visible = paved;
+      if (!paved) continue;
+      const side = k ? 1 : -1;
+      const cols = side < 0 ? [...PAVE_COLS].reverse() : PAVE_COLS;
+      const pp = mesh.geometry.attributes.position as THREE.BufferAttribute;
+      const uvA = mesh.geometry.attributes.uv as THREE.BufferAttribute;
+      const la = mesh.geometry.attributes.aLine as THREE.BufferAttribute;
+      const uBase = ((u0 % 900) + 900) % 900, lBase = ((u0 % 6300) + 6300) % 6300;
+      for (let j = 0; j <= SEG_U; j++) {
+        const along = (j / SEG_U) * CHUNK;
+        const u = u0 + along;
+        const f = frameAt(u, fa);
+        const valley = world === 'city' ? riverValley(u) : 0;
+        cols.forEach((i, n) => {
+          const x = side * XS[i];
+          const h = heightAt(u, x, f.y, world);
+          local(f, x, h + 0.05, origin, v3);
+          const idx = j * cols.length + n;
+          pp.setXYZ(idx, v3.x, v3.y, v3.z);
+          uvA.setXY(idx, (uBase + along) / 9, x / 9);
+          la.setXYZ(idx, lBase + along, x, valley);
+        });
+      }
+      pp.needsUpdate = true; uvA.needsUpdate = true; la.needsUpdate = true;
+      mesh.geometry.computeVertexNormals();
+    }
+
     /* Runaway's other tracks, laid the same way beside the first */
     for (const side of c.sides) {
       const sp = side.rails.geometry.attributes.position as THREE.BufferAttribute;
@@ -892,6 +1108,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
   const scatter = (c: Chunk, u0: number, origin: Frame) => {
     const r = rng(c.k * 7919 + 17);
     const candidates = lowPower ? 520 : 900;
+    if (urban(world)) { scatterUrban(c, u0, origin, r); return; }
     for (let n = 0; n < candidates; n++) {
       const u = u0 + r() * CHUNK;
       const side = r() < 0.5 ? -1 : 1;
@@ -973,6 +1190,70 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     }
   };
 
+  /* The town and the city: buildings stand on the blocks between the
+     streets the pavement shader draws, one to a block in the city and a few
+     to a block in the town, with trees along the way. */
+  const scatterUrban = (c: Chunk, u0: number, origin: Frame, r: () => number) => {
+    const city = world === 'city';
+    const bu = city ? 90 : 70, bx = city ? 80 : 60, sw = city ? 14 : 9;
+    const reach = city ? 1100 : 320;
+    const firstBlock = Math.floor(u0 / bu), lastBlock = Math.floor((u0 + CHUNK) / bu);
+    for (let bi = firstBlock; bi <= lastBlock; bi++) {
+      for (const side of [-1, 1]) {
+        for (let bj = 0; bj * bx < reach; bj++) {
+          const roll = noise2(bi, bj * side, 97);
+          // Each block's own corner of the grid, past the street on its near side.
+          const blockU = bi * bu + sw, blockX = bj * bx + sw;
+          const lenU = bu - sw, lenX = bx - sw;
+          const midU = blockU + lenU / 2;
+          if (midU < u0 || midU >= u0 + CHUNK) continue;
+          if (stationMask(midU) > 0.05 && blockX < 60) continue;
+          if (city && riverValley(midU) > 0.01) continue;
+          if (blockX + lenX < FORM + 14) continue;
+          const f = frameAt(midU, fa);
+          if (city) {
+            if (roll < 0.1) continue; // a plaza
+            const near = Math.max(FORM + 12, blockX + 4);
+            const w = Math.min(lenX - 8, 18 + r() * 34), d = Math.min(lenU - 8, 18 + r() * 40);
+            const x = side * Math.max(near + w / 2, blockX + lenX / 2 + (r() - 0.5) * (lenX - w - 8));
+            const core = Math.pow(fbm(midU / 900, x / 900, 81, 3), 2) * 3.4;
+            const ht = 16 + (core * 150 + r() * 45) * (1 - smooth(250, 1050, Math.abs(x)) * 0.8);
+            const h = heightAt(midU, x, f.y, world);
+            local(f, x, h - 0.5, origin, v3);
+            put(c, 'tower', v3, -f.h, w, ht + 0.5, d, TOWER[Math.floor(r() * TOWER.length)]);
+          } else {
+            // The row nearest the line is the shops' (see the shopfronts below).
+            if (bj === 0) continue;
+            // Up to four houses round the block's edge, a tree or two in the middle.
+            for (let k = 0; k < 4; k++) {
+              if (r() < 0.25) continue;
+              const qu = blockU + (k % 2 ? 0.72 : 0.28) * lenU;
+              const qx = side * (blockX + (k < 2 ? 0.28 : 0.72) * lenX);
+              if (Math.abs(qx) < FORM + 14) continue;
+              const fq = frameAt(qu, fb);
+              const h = heightAt(qu, qx, fq.y, world);
+              const w = 8 + r() * 5, dd = 9 + r() * 6, hh = 4 + r() * 5;
+              const rot = -fq.h + (r() < 0.5 ? 0 : Math.PI / 2);
+              local(fq, qx, h - 0.3, origin, v3);
+              put(c, 'house', v3, rot, w, hh, dd, WALL[Math.floor(r() * WALL.length)]);
+              v3.y += hh;
+              put(c, 'roof', v3, rot, w * 1.05, hh * 0.5, dd * 1.05);
+            }
+            if (r() < 0.7) {
+              const tx = side * (blockX + lenX * 0.5), tu = blockU + lenU * 0.5;
+              const ft = frameAt(tu, fb);
+              const ht = 6 + r() * 3;
+              local(ft, tx, heightAt(tu, tx, ft.y, world), origin, v3);
+              put(c, 'trunk', v3, r() * 6, 1, ht * 0.45, 1);
+              v3.y += ht * 0.62;
+              put(c, 'leafy', v3, r() * 6, ht * 0.42, ht * 0.38, ht * 0.42, LEAF[Math.floor(r() * LEAF.length)]);
+            }
+          }
+        }
+      }
+    }
+  };
+
   const ensureChunks = (s: number) => {
     const first = Math.floor(s / CHUNK) - BEHIND;
     if (!chunks.length) {
@@ -1024,6 +1305,67 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     if (t) { trackTile = t; buildTrackTiles(); }
     if (st) { stationModel = st; buildStations(); }
     if (bb) { billboardModel = bb; buildBillboards(); }
+  };
+
+  /* ── The town's shopfronts and the city's bridge ─────────────────────
+     Loaded the first time the market reaches the town. The shopfronts are
+     the supplied building, one instanced mesh per material, standing on the
+     blocks nearest the line; the bridge carries the line over the city's
+     river, with the water under it. */
+  const SHOP_EVERY = 70;
+  const SHOPS = 10;
+  const shopParts: { mesh: THREE.InstancedMesh; mat: THREE.MeshStandardMaterial; name: string }[] = [];
+  const bridges: THREE.Object3D[] = [];
+  const riverWater: THREE.Mesh[] = [];
+  let urbanLoading = false;
+  const loadUrban = () => {
+    loadGroundMaps();
+    if (urbanLoading) return;
+    urbanLoading = true;
+    void (async () => {
+      const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
+      const loader = new GLTFLoader();
+      const get = (name: string) => loader.loadAsync(MODEL(name)).then((g: GLTF) => g.scene).catch(() => null);
+      const [shop, bridge] = await Promise.all([get('town-block.glb'), get('bridge.glb')]);
+      if (disposed) return;
+      if (shop) {
+        shop.updateMatrixWorld(true);
+        shop.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (!mesh.isMesh) return;
+          const src = mesh.material as THREE.MeshStandardMaterial;
+          const mat = keep(src.clone());
+          mat.side = THREE.FrontSide;
+          if (src.name === 'Light' || src.name === 'Sign' || src.name === 'Fascia') mat.emissive.copy(src.color);
+          const geo = keep(mesh.geometry.clone().applyMatrix4(mesh.matrixWorld));
+          const inst = new THREE.InstancedMesh(geo, mat, SHOPS);
+          inst.count = 0;
+          inst.castShadow = true;
+          inst.receiveShadow = true;
+          inst.frustumCulled = false;
+          scene.add(inst);
+          shopParts.push({ mesh: inst, mat, name: src.name });
+        });
+      }
+      if (bridge) {
+        bridge.traverse((o) => {
+          const mesh = o as THREE.Mesh;
+          if (mesh.isMesh) { mesh.castShadow = true; keep(mesh.geometry); keep(mesh.material as THREE.Material); }
+        });
+        for (let i = 0; i < 2; i++) {
+          const b = i ? bridge.clone() : bridge;
+          b.scale.setScalar(BRIDGE_SCALE);
+          b.visible = false;
+          scene.add(b);
+          bridges.push(b);
+          const w = new THREE.Mesh(decalGeo, waterMat);
+          w.rotation.order = 'YXZ';
+          w.visible = false;
+          scene.add(w);
+          riverWater.push(w);
+        }
+      }
+    })();
   };
 
   /* ── Livery ──────────────────────────────────────────────────────────
@@ -1331,7 +1673,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
       const slot = stationSlots[(m % 2 + 2) % 2] ?? stationSlots[i];
       if (slot.m === m && !force) return;
       slot.m = m;
-      slot.root.visible = world === 'country' || world === 'moon' || world === 'mars';
+      slot.root.visible = grounded(world) || world === 'moon' || world === 'mars';
     });
   };
 
@@ -1503,14 +1845,14 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
       if (o.__railBand) band = { ...band, band: o.__railBand };
       if (o.__railCap) setMarket(o.__railCap, change);
     }
-    /* The world, from the market's band. */
-    if (band.band !== currentBand) {
-      currentBand = band.band;
-      const next = worldFor(band.band);
-      if (next !== world) {
-        world = next;
-        if (chunks.length) rebuildAll();
-      }
+    /* The world, from the market's band, and on the ground from its tier. */
+    groundTier = groundTierFor(cap, groundTier);
+    const nextWorld = worldFor(band.band, groundTier);
+    if (nextWorld !== world) {
+      world = nextWorld;
+      urbanCity.value = world === 'city' ? 1 : 0;
+      if (urban(world)) loadUrban();
+      if (chunks.length) rebuildAll();
     }
 
     /* The grade the line ahead is laid at, and the speed along it. */
@@ -1636,6 +1978,53 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
       hazards.update(options.runaway(), placeOnLine, now);
     }
 
+    /* The town's shopfronts, on the blocks nearest the line */
+    if (shopParts.length) {
+      let n = 0;
+      if (world === 'town') {
+        for (let bi = Math.floor((s - 300) / SHOP_EVERY); bi <= Math.floor((s + 1500) / SHOP_EVERY) && n < SHOPS; bi++) {
+          for (const side of [-1, 1]) {
+            if (n >= SHOPS || noise2(bi, side, 131) < 0.35) continue;
+            const u = bi * SHOP_EVERY + 9 + (SHOP_EVERY - 9) / 2;
+            if (stationMask(u) > 0.02) continue;
+            const x = side * (FORM + 9 + 25.5);
+            const f = frameAt(u, fa);
+            local(f, x, heightAt(u, x, f.y, world), origin, v3);
+            q.setFromAxisAngle(yAxis, -f.h + (noise2(bi, side, 137) < 0.5 ? 0 : Math.PI));
+            m4.compose(v3, q, s3.set(1, 1, 1));
+            for (const part of shopParts) part.mesh.setMatrixAt(n, m4);
+            n++;
+          }
+        }
+      }
+      for (const part of shopParts) {
+        part.mesh.count = n;
+        part.mesh.instanceMatrix.needsUpdate = true;
+        part.mat.emissiveIntensity = part.name === 'Light' ? 0.12 + urbanNight.value * 1.5 : part.name === 'Sign' ? 0.25 + urbanNight.value * 1.1 : part.name === 'Fascia' ? 0.3 + urbanNight.value * 0.9 : 0;
+      }
+    }
+
+    /* The city's rivers: the bridge over each, and the water under it */
+    if (bridges.length) {
+      const rc0 = riverCentre(s);
+      let n = 0;
+      for (const rc of [rc0 - STATION_EVERY * CHUNK, rc0, rc0 + STATION_EVERY * CHUNK]) {
+        if (world !== 'city' || n >= bridges.length || rc < s - 700 || rc > s + 2400) continue;
+        const f = frameAt(rc, fa);
+        const deck = f.y - 0.95;
+        local(f, 0, deck - BRIDGE_DECK * BRIDGE_SCALE, origin, bridges[n].position);
+        bridges[n].rotation.set(0, -f.h, 0);
+        bridges[n].visible = true;
+        const w = riverWater[n];
+        local(f, 0, deck - RIVER_DROP, origin, w.position);
+        w.rotation.set(-Math.PI / 2, -f.h, 0);
+        w.scale.set(3000, BRIDGE_HALF * 2 - 20, 1);
+        w.visible = true;
+        n++;
+      }
+      for (let i = n; i < bridges.length; i++) { bridges[i].visible = false; riverWater[i].visible = false; }
+    }
+
     /* ── Sky and light ── */
     const pal = sky.palette;
     const elev = sky.elevation;
@@ -1646,7 +2035,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     if (world === 'clouds') { cTop.lerp(new THREE.Color('#06204F'), 0.5 * day); cHor.lerp(new THREE.Color('#BFD9F2'), 0.3 * day); fogNear = 600; fogFar = 3400; }
     if (world === 'space' || world === 'moon') { cTop.set('#000000'); cMid.set('#01030a'); cHor.set(world === 'space' ? '#0c2147' : '#05070c'); starAmt = 1; fogNear = 1e5; fogFar = 2e5; }
     if (world === 'mars') { cTop.set('#4A3A33').lerp(new THREE.Color('#090606'), 1 - day); cMid.set('#B07A55').lerp(new THREE.Color('#120c0a'), 1 - day); cHor.set('#E2B98C').lerp(new THREE.Color('#2a1a12'), 1 - day); starAmt = 1 - day; fogNear = 400; fogFar = 2600; }
-    if (world === 'country') {
+    if (grounded(world)) {
       if (sky.weather === 'fog') { fogNear = 30; fogFar = 420; }
       else if (sky.weather === 'rain' || sky.weather === 'storm' || sky.weather === 'snow') { fogNear = 120; fogFar = 1100; }
       else if (sky.weather === 'overcast') { fogNear = 160; fogFar = 1500; }
@@ -1657,7 +2046,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     skyUniforms.uGround.value.copy(world === 'space' ? cMid : cHor);
     skyUniforms.uSunCol.value.set(pal.disc);
     skyUniforms.uGlow.value.set(pal.glow);
-    skyUniforms.uDisc.value = sky.weather === 'overcast' || sky.weather === 'fog' || sky.weather === 'rain' || sky.weather === 'storm' ? (world === 'country' ? 0 : 1) : 1;
+    skyUniforms.uDisc.value = sky.weather === 'overcast' || sky.weather === 'fog' || sky.weather === 'rain' || sky.weather === 'storm' ? (grounded(world) ? 0 : 1) : 1;
     starMat.opacity = starAmt;
     stars.visible = starAmt > 0.02;
     scene.fog = fogFar < 1e5 ? (scene.fog instanceof THREE.Fog ? scene.fog : new THREE.Fog(0, 1, 2)) : null;
@@ -1674,12 +2063,13 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     hemi.color.copy(cMid).lerp(new THREE.Color(0xffffff), 0.45);
     hemi.groundColor.set(world === 'mars' ? 0x6a3a22 : world === 'clouds' ? 0xdde6f0 : 0x4a4232);
     hemi.intensity = lerp(0.25, 1.15, day) + (world === 'space' ? 0.25 : 0);
-    if (sky.weather === 'storm' && world === 'country' && Math.random() < dt * 0.25) hemi.intensity += 6;
+    if (sky.weather === 'storm' && grounded(world) && Math.random() < dt * 0.25) hemi.intensity += 6;
 
     const night = 1 - day;
     scene.environmentIntensity = lerp(0.22, 0.55, day);
     headlamp.intensity = night * 260;
-    const groundNight = world === 'country' ? smooth(0.18, 0.85, night) : 0;
+    const groundNight = grounded(world) ? smooth(0.18, 0.85, night) : 0;
+    urbanNight.value = smooth(0.25, 0.8, night);
     platformFill.intensity = groundNight * 0.5;
     trainRim.intensity = groundNight * 0.68;
     trackGlow.intensity = groundNight * 42;
@@ -1699,8 +2089,8 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     railMat.emissiveIntensity = world === 'space' ? 1.2 : 0;
 
     /* Weather */
-    const raining = world === 'country' && (sky.weather === 'rain' || sky.weather === 'storm');
-    const snowing = world === 'country' && sky.weather === 'snow';
+    const raining = grounded(world) && (sky.weather === 'rain' || sky.weather === 'storm');
+    const snowing = grounded(world) && sky.weather === 'snow';
     precip.pts.visible = raining || snowing;
     precip.mat.uniforms.uTime.value = time;
     precip.mat.uniforms.uSpeed.value = snowing ? 2.2 : 26;
@@ -1708,7 +2098,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     precip.mat.uniforms.uColor.value.set(snowing ? 0xffffff : 0x9fb3c8);
     precip.mat.uniforms.uOpacity.value = snowing ? 0.9 : 0.45;
 
-    clouds.visible = world === 'country' && sky.cloudCover > 0.08;
+    clouds.visible = grounded(world) && sky.cloudCover > 0.08;
     if (clouds.visible) {
       const shown = Math.round(CLOUDS * Math.min(1, sky.cloudCover * 1.1));
       const move = speed * dt;
@@ -1859,6 +2249,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
       c.rails.geometry.dispose();
       c.sleepers.dispose();
       for (const side of c.sides) { side.rails.geometry.dispose(); side.sleepers.dispose(); }
+      for (const p of c.pavement) p.geometry.dispose();
       c.piers.dispose();
       for (const k of KINDS) c.scatter[k].dispose();
     }

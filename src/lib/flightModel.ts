@@ -6,6 +6,7 @@
  * or the clock. Keeping it separate is what lets the HUD animate at 60fps off
  * a feed that ticks five times a second.
  */
+import { groundTierFor, nextTier, tierInfo } from './tiers';
 import type { FlightTick } from './flightFeed';
 
 /** Nose-up/nose-down limit, degrees. Beyond this the airframe is past saving. */
@@ -120,7 +121,7 @@ export interface BandState {
 }
 
 const BAND_LABEL: Record<FlightBand, string> = {
-  atmosphere: 'In the country',
+  atmosphere: 'Countryside',
   'above-clouds': 'Above the clouds',
   space: 'Space',
   moon: 'The moon',
@@ -147,8 +148,15 @@ export function bandFor(marketCap: number): BandState {
     const p = logProgress(marketCap, BAND_CLOUDS, BAND_SPACE);
     return { band: 'above-clouds', progress: p, label: BAND_LABEL['above-clouds'], next: 'Space at $10M', toNext: p };
   }
+  /* On the ground the line runs through the country, a town, then the city
+     (see lib/tiers): the label names the one it is in, and the next stop is
+     the next of them. */
   const p = logProgress(marketCap, 4_000, BAND_CLOUDS);
-  return { band: 'atmosphere', progress: p, label: BAND_LABEL.atmosphere, next: 'Above the clouds at $1M', toNext: p };
+  const here = groundTierFor(marketCap);
+  const after = nextTier(here);
+  const label = here === 'country' ? BAND_LABEL.atmosphere : tierInfo(here).name;
+  const next = after ? `${after.name} at ${formatCap(after.from)}` : 'Above the clouds at $1M';
+  return { band: 'atmosphere', progress: p, label, next, toNext: p };
 }
 
 /** Market cap as money, at the scale it happens to be. */
