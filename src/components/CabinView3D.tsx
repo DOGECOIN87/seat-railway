@@ -149,7 +149,7 @@ const CabinView3D = ({ feed, sky, band, seat, zone, facing, taken, adverts, cont
     >
       <canvas ref={canvasRef} className="block h-full w-full" />
       {noGl && <RailInteriorFallback mode="coach" seat={seat} zone={zone} doorOpen={doorOpen} />}
-      {zone.key === 'first' && <button className="absolute top-3 right-3 rounded-md bg-black/75 px-3 py-2 text-xs text-white"
+      {zone.key === 'first' && <button className="absolute bottom-12 right-3 z-10 rounded-md bg-black/75 px-3 py-2 text-xs text-white"
         aria-pressed={doorOpen} onPointerDown={(e) => e.stopPropagation()} onClick={() => setDoorOpen((open) => !open)}>
         {doorOpen ? 'Close suite door' : 'Open suite door'}
       </button>}

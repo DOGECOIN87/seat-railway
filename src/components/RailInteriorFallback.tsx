@@ -38,7 +38,7 @@ export default function RailInteriorFallback({ mode, seat, zone, doorOpen = fals
         <rect x="455" y="310" width="20" height="76" rx="8" fill="#244846" stroke="#c2a66e"/>
         <rect x="568" y="310" width="20" height="76" rx="8" fill="#244846" stroke="#c2a66e"/>
         <rect x="483" y="252" width="75" height="30" rx="9" fill="#426b68"/>
-        <rect x="440" y="475" width="85" height="9" rx="3" fill="#00c9f1"/>
+        <rect x="440" y="113" width="85" height="9" rx="3" fill="#00c9f1"/>
         <path d="M620 298V400" stroke="#071015" strokeWidth="10"/>
         <path d={doorOpen ? 'M620 200V296' : 'M620 300V398'} stroke="#acb9b8" strokeWidth="7"/>
         <path d="M620 303h-12m0 0v21" stroke="#d9c498" strokeWidth="3" fill="none" transform={doorOpen ? 'translate(0 -100)' : undefined}/>
@@ -48,7 +48,7 @@ export default function RailInteriorFallback({ mode, seat, zone, doorOpen = fals
           <text x="230" y="350" textAnchor="end">Panoramic window</text><path d="M245 347H319" stroke="#526b72"/>
           <text x="756" y="348">Sliding door</text><path d="M625 344H741" stroke="#526b72"/>
           <text x="756" y="421">Reclining armchair</text><path d="M580 403L610 418H741" stroke="#526b72" fill="none"/>
-          <text x="756" y="480">Personal screen</text><path d="M530 480H741" stroke="#526b72"/>
+          <text x="756" y="123">Personal screen</text><path d="M530 118H741" stroke="#526b72"/>
         </g>
       </> : mode === 'cab' ? <>
         <path d="M180 100H820L950 305H50Z" fill={`url(#${id}-glass)`}/>
