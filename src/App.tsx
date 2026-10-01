@@ -34,6 +34,7 @@ import {
 import { carriagesFor } from './lib/consist';
 import { useFlightState } from './lib/useFlightState';
 import { useAircraftAudio } from './lib/useAircraftAudio';
+import { groundTierFor, type GroundTier } from './lib/tiers';
 import { useSky } from './lib/useSky';
 import { coverFor } from './lib/manualControls';
 import { useFlight } from './lib/useFlight';
@@ -417,6 +418,24 @@ export default function App() {
       wasBand.current = band.band;
     }
   }, [band.band, say]);
+
+  /* So is reaching a new stretch of ground: the town, the city (see lib/tiers).
+     Read with the same hysteresis as the scene, so a market sitting on a line
+     does not have the PA saying so every minute. */
+  const wasTier = useRef<GroundTier>(groundTierFor(tick.marketCap));
+  useEffect(() => {
+    if (band.band !== 'atmosphere') return;
+    const tier = groundTierFor(tick.marketCap, wasTier.current);
+    if (tier === wasTier.current) return;
+    const up = tier === 'city' || (tier === 'town' && wasTier.current === 'country');
+    const lines: Record<GroundTier, string> = {
+      country: 'Out into open country. Fields both sides.',
+      town: up ? 'Now entering Market Town. Shops on both sides of the line.' : 'Back out to Market Town. Mind the high street.',
+      city: 'Ladies and gentlemen, welcome to the City. River bridge ahead.',
+    };
+    say(lines[tier], up ? 'pa' : 'alert');
+    wasTier.current = tier;
+  }, [tick.marketCap, band.band, say]);
 
   useEffect(() => {
     if (!wallet.address) {
