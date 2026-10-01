@@ -69,6 +69,10 @@ const GROUND = 120000;
 export interface ViewPose {
   /** Absolute distance on the railway, for a driving challenge. */
   railDistance?: number;
+  /** Metres right of the centre track the train is running: Runaway's other tracks. */
+  lateral?: number;
+  /** 0–1: how hard the cab is being shaken, after a collision. */
+  shake?: number;
   /** Seat index across the cabin, 0–5, or null for the flight deck. */
   seatIndex: number | null;
   row: number;

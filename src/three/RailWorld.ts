@@ -11,6 +11,8 @@ import { MARK_PATH } from '../components/Mark';
 import { noise2 } from './noise';
 import type { ViewPose, WorldHandles } from './WorldScene';
 import { createRailInterior, type RailInteriorMode } from './railInterior';
+import { createRailHazards } from './railHazards';
+import { LANE_GAP, type RailGame } from '../lib/railGame';
 import { coachForRow, COACH_PITCH } from '../lib/railLayout';
 import { FULL_CABIN } from '../lib/seating';
 
@@ -200,7 +202,11 @@ export interface RailOptions {
   /** Skip the detailed track and the station, for a low-power view. */
   light?: boolean;
   interior?: RailInteriorMode;
-  stopAt?: number;
+  /**
+   * Runaway: three tracks side by side instead of one, and whatever the game
+   * has put on them. Read every frame; the game is the page's, not the world's.
+   */
+  runaway?: () => RailGame;
 }
 
 export interface RailHandles extends WorldHandles {
@@ -227,6 +233,9 @@ interface Car {
 
 export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions = {}): RailHandles {
   const lowPower = options.light || (typeof navigator !== 'undefined' && /Mobi|Android/i.test(navigator.userAgent));
+  /** Metres either side of the centre track that more track is laid at: Runaway's. */
+  const SIDE_TRACKS = options.runaway ? [-LANE_GAP, LANE_GAP] : [];
+  const FORM = options.runaway ? LANE_GAP : 0;
   const renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: !lowPower,
@@ -567,6 +576,8 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     ballast: THREE.Mesh;
     rails: THREE.Mesh;
     sleepers: THREE.InstancedMesh;
+    /** Runaway's other tracks, one rails ribbon and one set of sleepers each. */
+    sides: { rails: THREE.Mesh; sleepers: THREE.InstancedMesh; x: number }[];
     piers: THREE.InstancedMesh;
     signal: THREE.Mesh;
     signalLamp: THREE.Mesh;
@@ -588,7 +599,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     return g;
   };
   /* The ballast's cross-section, and a deck's for the viaduct. */
-  const BALLAST = [[-2.7, -0.95], [-1.75, -0.22], [1.75, -0.22], [2.7, -0.95]];
+  const BALLAST = [[-2.7 - FORM, -0.95], [-1.75 - FORM, -0.22], [1.75 + FORM, -0.22], [2.7 + FORM, -0.95]];
   const DECK = [[-2.6, -2.4], [-2.6, -0.22], [2.6, -0.22], [2.6, -2.4]];
   /* Two rails, each a little box tube: pairs of (x, y) round its section. */
   const RAIL_SECTION = [[-0.035, -0.17], [-0.035, 0], [0.035, 0], [0.035, -0.17]];
@@ -611,6 +622,14 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     const rails = new THREE.Mesh(railsGeo, railMat);
     const sleepers = new THREE.InstancedMesh(sleeperGeo, sleeperMat, SLEEPERS_PER_CHUNK);
     sleepers.receiveShadow = true;
+    const sides = SIDE_TRACKS.map((x) => {
+      const r = new THREE.Mesh(ribbon(4 * 2 + 1, RAIL_SAMPLES), railMat);
+      const sl = new THREE.InstancedMesh(sleeperGeo, sleeperMat, SLEEPERS_PER_CHUNK);
+      sl.receiveShadow = true;
+      r.frustumCulled = false; sl.frustumCulled = false;
+      group.add(r, sl);
+      return { rails: r, sleepers: sl, x };
+    });
     const piers = new THREE.InstancedMesh(pierGeo, pierMat, 6);
     const signal = new THREE.Mesh(signalGeo, signalMat);
     const lamp = new THREE.Mesh(lampGeo, signalLamp);
@@ -626,13 +645,13 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     }
     group.add(terrain, water, ballast, rails, sleepers, piers, signal);
     for (const o of [terrain, water, ballast, rails, sleepers, piers, ...Object.values(scatter)]) o.frustumCulled = false;
-    return { k: -1, group, origin: { x: 0, y: 0, z: 0, h: 0 }, terrain, water, ballast, rails, sleepers, piers, signal, signalLamp: lamp, scatter, world: null };
+    return { k: -1, group, origin: { x: 0, y: 0, z: 0, h: 0 }, terrain, water, ballast, rails, sleepers, sides, piers, signal, signalLamp: lamp, scatter, world: null };
   };
 
   /* Ground height at a point beside the line. */
   const heightAt = (u: number, x: number, ty: number, world: World): number => {
     const ax = Math.abs(x);
-    const rise = smooth(6.5, 140, ax);
+    const rise = smooth(6.5 + FORM, 140 + FORM, ax);
     const station = stationMask(u) * (1 - smooth(8, 40, ax));
     if (world === 'clouds') return ty - 115 + fbm(u / 140, x / 140, 31, 4) * 34 + smooth(150, 1400, ax) * 30;
     if (world === 'space') return ty - 4000;
@@ -797,6 +816,33 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     c.sleepers.instanceMatrix.needsUpdate = true;
     c.sleepers.visible = world !== 'space';
 
+    /* Runaway's other tracks, laid the same way beside the first */
+    for (const side of c.sides) {
+      const sp = side.rails.geometry.attributes.position as THREE.BufferAttribute;
+      for (let j = 0; j < RAIL_SAMPLES; j++) {
+        const f = frameAt(u0 + Math.min(CHUNK, j * STEP), fa);
+        let col = 0;
+        for (const rail of [-1, 1]) {
+          for (const [dx, dy] of RAIL_SECTION) {
+            local(f, side.x + rail * GAUGE_HALF + dx, f.y + dy, origin, v3);
+            sp.setXYZ(j * 9 + col++, v3.x, v3.y, v3.z);
+          }
+          if (rail < 0) sp.setXYZ(j * 9 + col++, v3.x, v3.y - 0.6, v3.z);
+        }
+      }
+      sp.needsUpdate = true;
+      side.rails.geometry.computeVertexNormals();
+      for (let i = 0; i < SLEEPERS_PER_CHUNK; i++) {
+        const f = frameAt(u0 + (i + 0.5) * (CHUNK / SLEEPERS_PER_CHUNK), fa);
+        local(f, side.x, f.y - 0.17, origin, v3);
+        q.setFromAxisAngle(yAxis, -f.h);
+        m4.compose(v3, q, s3.set(1, 1, 1));
+        side.sleepers.setMatrixAt(i, m4);
+      }
+      side.sleepers.instanceMatrix.needsUpdate = true;
+      side.sleepers.visible = side.rails.visible = world !== 'space';
+    }
+
     /* Piers, under the viaduct over the clouds */
     c.piers.visible = world === 'clouds';
     if (world === 'clouds') {
@@ -815,7 +861,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     c.signal.visible = k % 3 === 0 && world !== 'space';
     if (c.signal.visible) {
       const f = frameAt(u0 + 20, fa);
-      local(f, -2.9, f.y - 0.2, origin, v3);
+      local(f, -2.9 - FORM, f.y - 0.2, origin, v3);
       c.signal.position.copy(v3);
       c.signal.rotation.set(0, -f.h, 0);
     }
@@ -973,7 +1019,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
       lead = l; carriage = c;
       buildConsist();
     }
-    const [t, st, bb] = await Promise.all([get('track.glb'), options.light ? null : get('station.glb'), get('billboard.glb')]);
+    const [t, st, bb] = await Promise.all([get('track.glb'), options.light || options.runaway ? null : get('station.glb'), get('billboard.glb')]);
     if (disposed) return;
     if (t) { trackTile = t; buildTrackTiles(); }
     if (st) { stationModel = st; buildStations(); }
@@ -1094,17 +1140,14 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
   const ledFace = keep(new THREE.MeshBasicMaterial({ map: ledArt.tex, toneMapped: false }));
 
   const decalGeo = keep(new THREE.PlaneGeometry(1, 1));
-  const stopMarker = options.stopAt === undefined ? null : new THREE.Group();
-  if (stopMarker) {
-    const art = canvasTex(256, 256, (g) => {
-      g.fillStyle = '#eef4f5'; g.fillRect(0, 0, 256, 256);
-      g.fillStyle = '#0b0b0d'; g.font = '800 68px Arial'; g.textAlign = 'center';
-      g.fillText('STOP', 128, 108); g.fillText('SR350', 128, 200);
-    });
-    const mat = keep(new THREE.MeshBasicMaterial({ map: art.tex, side: THREE.DoubleSide, toneMapped: false }));
-    const sign = new THREE.Mesh(decalGeo, mat); sign.scale.set(0.85, 0.85, 1); sign.position.set(1.65, 2.2, 0);
-    stopMarker.add(sign); scene.add(stopMarker);
-  }
+  /* Runaway's trains, wagons, rocks and tokens. */
+  const hazards = options.runaway ? createRailHazards() : null;
+  if (hazards) scene.add(hazards.group);
+  const lineOrigin: Frame = { x: 0, y: 0, z: 0, h: 0 };
+  const placeOnLine = (u: number, x: number, out: THREE.Vector3) => {
+    const f = frameAt(u, fb);
+    return out.set(f.x + Math.cos(f.h) * x - lineOrigin.x, f.y - lineOrigin.y, f.z + Math.sin(f.h) * x - lineOrigin.z);
+  };
   /** Body half-width at a height, from the model, so decals sit on the skin. */
   const skinAt = (root: THREE.Object3D, y0: number, y1: number) => {
     let max = 0;
@@ -1195,6 +1238,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
   /* ── Detailed track near the camera ── */
   const tileParts: THREE.InstancedMesh[] = [];
   const TILES_NEAR = (NEAR_TRACK * 2 + 1) * 11;
+  const TILE_TRACKS = [0, ...SIDE_TRACKS];
   const buildTrackTiles = () => {
     if (!trackTile) return;
     trackTile.updateMatrixWorld(true);
@@ -1207,7 +1251,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
       const mat = name === 'None'
         ? keep(new THREE.MeshStandardMaterial({ color: 0x8d8780, roughness: 0.9 }))
         : railMat;
-      const inst = new THREE.InstancedMesh(geo, mat, TILES_NEAR);
+      const inst = new THREE.InstancedMesh(geo, mat, TILES_NEAR * TILE_TRACKS.length);
       inst.count = 0;
       inst.receiveShadow = true;
       inst.frustumCulled = false;
@@ -1428,12 +1472,12 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     }
   };
 
-  const placeAlong = (root: THREE.Object3D, u: number, origin: Frame, flip = false) => {
+  const placeAlong = (root: THREE.Object3D, u: number, origin: Frame, flip = false, x = 0) => {
     const f1 = frameAt(u + BOGIE, fa);
-    local(f1, 0, f1.y, origin, v3);
+    local(f1, x, f1.y, origin, v3);
     const ax = v3.x, ay = v3.y, az = v3.z;
     const f2 = frameAt(u - BOGIE, fb);
-    local(f2, 0, f2.y, origin, v3);
+    local(f2, x, f2.y, origin, v3);
     root.position.set((ax + v3.x) / 2, (ay + v3.y) / 2, (az + v3.z) / 2);
     // Face from the rear bogie to the front one: the models run nose to -Z.
     const dx = ax - v3.x, dy = ay - v3.y, dz = az - v3.z;
@@ -1544,18 +1588,22 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
         const mx = (f0.x + f1.x) / 2 - origin.x, my = (f0.y + f1.y) / 2 - origin.y, mz = (f0.z + f1.z) / 2 - origin.z;
         const dx = f0.x - f1.x, dy = f0.y - f1.y, dz = f0.z - f1.z;
         const obj = tmpObj;
-        obj.position.set(mx, my, mz);
+        const hh = (f0.h + f1.h) / 2;
         obj.rotation.set(Math.atan2(-dy, Math.hypot(dx, dz)), Math.atan2(dx, dz), 0, 'YXZ');
-        obj.updateMatrix();
-        for (const p of tileParts) p.setMatrixAt(n, obj.matrix);
+        TILE_TRACKS.forEach((x, k) => {
+          obj.position.set(mx + Math.cos(hh) * x, my, mz + Math.sin(hh) * x);
+          obj.updateMatrix();
+          for (const p of tileParts) p.setMatrixAt(n + k * TILES_NEAR, obj.matrix);
+        });
       }
-      for (const p of tileParts) { p.count = n; p.instanceMatrix.needsUpdate = true; p.visible = world !== 'space'; }
+      for (const p of tileParts) { p.count = n + (TILE_TRACKS.length - 1) * TILES_NEAR; p.instanceMatrix.needsUpdate = true; p.visible = world !== 'space'; }
       // Under the detailed track the simple rails and sleepers stand aside.
       const near = Math.floor(s / CHUNK);
       for (const c of chunks) {
         const hide = Math.abs(c.k - near) <= NEAR_TRACK && world !== 'space';
         c.rails.visible = !hide;
         c.sleepers.visible = !hide && world !== 'space';
+        for (const side of c.sides) side.rails.visible = side.sleepers.visible = !hide && world !== 'space';
       }
     }
 
@@ -1583,10 +1631,9 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
 
     /* Signals: green on a rising market, red on a falling one */
     signalLamp.color.set(change > 2 ? 0x30ff6a : change < -2 ? 0xff3030 : 0xffb020);
-    if (stopMarker && options.stopAt !== undefined) {
-      const stop = frameAt(options.stopAt, fa);
-      stopMarker.position.set(stop.x - origin.x, stop.y - origin.y, stop.z - origin.z);
-      stopMarker.rotation.y = -stop.h;
+    if (hazards && options.runaway) {
+      Object.assign(lineOrigin, origin);
+      hazards.update(options.runaway(), placeOnLine, now);
     }
 
     /* ── Sky and light ── */
@@ -1717,7 +1764,7 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     if (inside) {
       const eye = inside.eye(pose);
       const slot = options.interior === 'cab' ? 0 : options.interior === 'freight' ? Math.max(1, wantCars) : Math.min(Math.max(1, wantCars), coachForRow(pose.row) + 1);
-      placeAlong(inside.group, s - slot * COACH_PITCH, origin);
+      placeAlong(inside.group, s - slot * COACH_PITCH, origin, false, pose.lateral ?? 0);
       inside.group.updateMatrixWorld(true);
       camera.position.copy(eye).applyMatrix4(inside.group.matrixWorld);
       const yaw = THREE.MathUtils.degToRad(pose.yaw);
@@ -1726,6 +1773,14 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
       tmpV.transformDirection(inside.group.matrixWorld).add(camera.position);
       camera.up.set(0, 1, 0).transformDirection(inside.group.matrixWorld);
       camera.lookAt(tmpV);
+      if (pose.shake) {
+        // A collision: the cab jolts, hard at first and dying away.
+        const k = pose.shake;
+        camera.position.x += (Math.random() - 0.5) * 0.5 * k;
+        camera.position.y += (Math.random() - 0.5) * 0.35 * k;
+        camera.rotateZ((Math.random() - 0.5) * 0.09 * k);
+        camera.rotateX((Math.random() - 0.5) * 0.05 * k);
+      }
       camera.fov = options.interior === 'cab' ? 68 : 72;
       camera.updateProjectionMatrix();
       consist.visible = false; placeholder.visible = false;
@@ -1752,9 +1807,9 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
     sun.position.copy(target).addScaledVector(sunDir, 150);
     sun.target.position.copy(target);
     const nose = frameAt(s + CAR_LEN / 2, fb);
-    headlamp.position.set(nose.x - origin.x, nose.y - origin.y + 1.2, nose.z - origin.z);
+    local(nose, pose.lateral ?? 0, nose.y + 1.2, origin, headlamp.position);
     const ahead = frameAt(s + 80, fb);
-    headlamp.target.position.set(ahead.x - origin.x, ahead.y - origin.y, ahead.z - origin.z);
+    local(ahead, pose.lateral ?? 0, ahead.y, origin, headlamp.target.position);
 
     renderer.render(scene, camera);
     tmpV.copy(target).project(camera);
@@ -1796,12 +1851,14 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
   const dispose = () => {
     disposed = true;
     inside?.dispose();
+    hazards?.dispose();
     for (const c of chunks) {
       c.terrain.geometry.dispose();
       c.water.geometry.dispose();
       c.ballast.geometry.dispose();
       c.rails.geometry.dispose();
       c.sleepers.dispose();
+      for (const side of c.sides) { side.rails.geometry.dispose(); side.sleepers.dispose(); }
       c.piers.dispose();
       for (const k of KINDS) c.scatter[k].dispose();
     }

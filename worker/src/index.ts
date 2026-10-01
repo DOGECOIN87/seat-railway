@@ -543,7 +543,7 @@ function ensureLogbook(db: D1Database): Promise<unknown> {
 const leaderboardTables = new Map<string, Promise<unknown>>();
 
 function ensureLeaderboard(db: D1Database, rail = false): Promise<unknown> {
-  const prefix = rail ? 'rail_game' : 'game';
+  const prefix = rail ? 'rail_runaway' : 'game';
   const cached = leaderboardTables.get(prefix);
   if (cached) return cached;
   const ready = db.batch([
@@ -1116,7 +1116,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
       const rail = url.pathname.startsWith('/rail-');
       const scorePath = rail ? '/rail-scores' : '/scores';
       const runPath = rail ? '/rail-runs' : '/runs';
-      const prefix = rail ? 'rail_game' : 'game';
+      const prefix = rail ? 'rail_runaway' : 'game';
       const db = env.DIRECTORY;
       if (!db) return json({ error: 'This deployment has no leaderboard configured.' }, 503, cors);
       const priv = { ...cors, 'cache-control': 'no-store' };

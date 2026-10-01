@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from 'react';
 import { fetchBoard, hasBoard, readBest, recentBoard, shortWallet, type BoardEntry } from '../lib/scoresApi';
 import ModalWindow from './ModalWindow';
+import { COIN_POINTS } from '../lib/railGame';
 
 interface ScoresDialogProps {
   /** The visitor's wallet, to find them on the board. */
@@ -42,7 +43,7 @@ export default function ScoresDialog({ address, onClose }: ScoresDialogProps) {
       </header>
       <div className="sa-modal__body">
         <p className="sa-scores__lead">
-          Station stops. Precision and time earn points.
+          Runaway: a metre a point, {COIN_POINTS} a token. Switch tracks, stay alive.
         </p>
 
         {board === undefined ? (
@@ -66,7 +67,7 @@ export default function ScoresDialog({ address, onClose }: ScoresDialogProps) {
                       {you && <span className="sa-scores__you">You</span>}
                     </span>
                     <span className="sa-scores__meta">
-                      {`${row.climb.toFixed(1)} m from the marker · ${Math.round(row.survived)} s`}
+                      {`${Math.round(row.climb)} token${Math.round(row.climb) === 1 ? '' : 's'} · ${Math.round(row.survived)} s`}
                     </span>
                   </span>
                   <span className="sa-scores__score">{row.score.toLocaleString('en-US')}</span>
