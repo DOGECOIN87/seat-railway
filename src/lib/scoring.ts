@@ -99,7 +99,7 @@ export function scoreCeiling(elapsedMs: number): number {
 /** What the wallet signs to post a score. Readable on purpose: it is what the wallet shows. */
 export function scoreChallenge(address: string, run: string, score: number, issued: string): string {
   return [
-    'SEAT AIRLINES',
+    'SEAT RAILWAY',
     'Post my score to the landing leaderboard.',
     '',
     `Score: ${score}`,

@@ -1,21 +1,24 @@
-name = "seat-airlines-banners"
+name = "seat-railway-banners"
 main = "src/index.ts"
 compatibility_date = "2025-09-01"
+
+# Seat Railway's own Worker. Its KV namespace, R2 bucket and D1 database are
+# the railway's, created for it, so it shares nothing with Seat Airlines'
+# seat-airlines-banners and can never overwrite it.
 
 # The published wall: one small JSON record per wallet.
 [[kv_namespaces]]
 binding = "BANNERS"
-id = "0767939f209a41ab9692f2b1b1550c05"
+id = "ff6bd5a53a32473d952ec9b7251acf35"
 
 # The artwork.
 [[r2_buckets]]
 binding = "IMAGES"
-bucket_name = "seat-airlines-banners"
+bucket_name = "seat-railway-banners"
 
 # The cabin directory: holder cards and the introductions between them.
 #
-# The database exists and `migrations/0001_networking.sql` has been applied to
-# it, so this binding is live: deploying with it wired up turns the directory
+# The database exists and migrations 0001–0006 have been applied to it, so this binding is live: deploying with it wired up turns the directory
 # on. Until this deploy lands, the routes answer 503 saying there is none.
 #
 # A binding naming a database that does not exist fails the deploy outright,
@@ -23,8 +26,8 @@ bucket_name = "seat-airlines-banners"
 # a fresh database, create that database first.
 [[d1_databases]]
 binding = "DIRECTORY"
-database_name = "seat-airlines-directory"
-database_id = "a8e4747a-ef46-4689-ac75-c50f7f428b83"
+database_name = "seat-railway-directory"
+database_id = "af2972dd-42cb-4a43-b75a-806d7c12cd0f"
 
 # How often one address may make GET /holding ask the chain for a wallet that
 # is not on the holder list: each is a metered RPC call. Seated wallets are
@@ -32,7 +35,7 @@ database_id = "a8e4747a-ef46-4689-ac75-c50f7f428b83"
 # the namespace is any number unique to this account.)
 [[ratelimits]]
 name = "HOLDING_LIMIT"
-namespace_id = "1001"
+namespace_id = "1002"
 simple = { limit = 20, period = 60 }
 
 [vars]
@@ -44,17 +47,17 @@ simple = { limit = 20, period = 60 }
 # read benefit.
 #
 # To enable:
-#   Cloudflare dashboard → R2 → seat-airlines-banners → Settings →
+#   Cloudflare dashboard → R2 → seat-railway-banners → Settings →
 #   Public access → Allow Access → copy the pub-*.r2.dev URL, then:
 #
-PUBLIC_IMAGE_BASE = "https://pub-7bcf6d5d613c464da99814dd49b0f3ff.r2.dev"
+# PUBLIC_IMAGE_BASE = "https://pub-<id>.r2.dev"   (unset: artwork is served from KV)
 #
 # Until this is set, images are served through the Worker from KV — correct,
 # but it keeps the Worker on the read path for every image request.
 
 # The origins allowed to call this. Left empty the Worker echoes whatever
 # origin asks, which is fine locally and careless in production.
-ALLOWED_ORIGINS = "https://seat-airlines.space,https://www.seat-airlines.space"
+ALLOWED_ORIGINS = "https://seat-railway.space,https://www.seat-railway.space"
 
 # The holder list, for the directory's section rules: who may read whose card,
 # and whose conversations carry forward. **Point this at the same feed as the

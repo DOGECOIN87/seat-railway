@@ -27,10 +27,8 @@ The PA confirms it: _"Advert up on seat 8A."_
 
 ## What your wallet signs
 
-The message still begins `SEAT AIRLINES`: the server that checks it is shared with Seat Airlines, and it verifies the wording exactly.
-
 ```
-SEAT AIRLINES
+SEAT RAILWAY
 Publish this advert on my seat.
 
 wallet: <your address>
@@ -62,7 +60,7 @@ Your image is cropped to a square and re-encoded as a **384 × 384** picture of 
 The takedown message names the advert it removes, so it can never be used to take down an advert you put up afterwards:
 
 ```
-SEAT AIRLINES
+SEAT RAILWAY
 Take the advert off my seat.
 
 wallet: <your address>

@@ -40,7 +40,7 @@
  * `worker/wrangler.toml`. A fork points itself somewhere else by setting
  * `VITE_BANNERS_API` rather than by editing this line.
  */
-export const DEFAULT_WORKER_API = 'https://seat-airlines-banners.trashmarket.workers.dev';
+export const DEFAULT_WORKER_API = 'https://seat-railway-banners.trashmarket.workers.dev';
 
 /**
  * The first of these that was actually configured, else the default above.

@@ -270,8 +270,8 @@ flowchart LR
 
 The train is built in [`src/three/RailWorld.ts`](src/three/RailWorld.ts) and sized by the pure functions in [`src/lib/consist.ts`](src/lib/consist.ts). The seat ladder lives in [`src/lib/seating.ts`](src/lib/seating.ts) — no browser and no Cloudflare in it — and the page and the Worker import the same file, so they cannot disagree about who sits where. → [How it is built](docs/for-developers/how-it-is-built.md) · [Engineering notes](docs/for-developers/engineering-notes.md)
 
-> [!WARNING]
-> **The Worker is shared with Seat Airlines for now**, and so is the token: the committed build reads `seat-airlines-banners.trashmarket.workers.dev`. That Worker only answers origins in its `ALLOWED_ORIGINS`, so until `https://seat-railway.space` is added there, the published railway shows the train and the market but no seats, adverts or directory. For a token of its own, deploy `worker/` under a new name and set `VITE_BANNERS_API`. → [Deploying](docs/for-developers/deploying.md)
+> [!NOTE]
+> The railway has its **own Worker**, `seat-railway-banners`, with its own storage — it shares nothing with Seat Airlines. Deploying it needs the `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and `RPC_URL` repository secrets. → [Deploying](docs/for-developers/deploying.md)
 
 ### Quick start
 
@@ -326,7 +326,7 @@ The full list, and the Worker's bindings and secrets: [Configuration](docs/for-d
 | What | How |
 | :-- | :-- |
 | **The page** | Every push to `main` runs the tests, builds and publishes to GitHub Pages at [seat-railway.space](https://seat-railway.space/) — once Pages is turned on (**Settings → Pages → Source: GitHub Actions**). |
-| **The Worker** | Pushes that touch `worker/` type-check, test and deploy it — when the repository has a `CLOUDFLARE_API_TOKEN` secret. Give the railway's Worker a name of its own first, so it cannot replace Seat Airlines'. |
+| **The Worker** | Pushes that touch `worker/` type-check, test and deploy `seat-railway-banners` — when the repository has the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets. |
 | **A new token** | `npm run token:update -- <new CA>`: checks on-chain that it is a token mint, writes it everywhere it is printed (page, Worker, `index.html`, docs), runs the tests and a build, and pushes. `--no-push` stops before committing. |
 
 Step by step, including a custom domain: [Deploying](docs/for-developers/deploying.md).

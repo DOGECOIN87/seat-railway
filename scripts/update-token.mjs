@@ -26,7 +26,7 @@ import { createInterface } from 'node:readline/promises';
 const REPO = 'DOGECOIN87/Seat-Airlines';
 // Overridable only so the whole flow can be rehearsed against a local copy.
 const SITE = process.env.SA_SITE || 'https://seat-railway.space';
-const WORKER = process.env.SA_WORKER || 'https://seat-airlines-banners.trashmarket.workers.dev';
+const WORKER = process.env.SA_WORKER || 'https://seat-railway-banners.trashmarket.workers.dev';
 const RPC = 'https://api.mainnet-beta.solana.com';
 // As Solana names them in a parsed account: the classic token program, and Token-2022 (pump.fun's mints).
 const TOKEN_PROGRAMS = new Set(['spl-token', 'spl-token-2022']);

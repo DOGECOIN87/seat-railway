@@ -14,7 +14,7 @@
 # URL that does not resolve, which is the point — the image test asserts the
 # URL is well formed and on that base rather than fetching it, because in
 # this mode the bytes are on a CDN and not on this Worker.
-name = "seat-airlines-banners"
+name = "seat-railway-banners"
 main = "src/index.ts"
 compatibility_date = "2025-09-01"
 
@@ -24,11 +24,11 @@ id = "local-test"
 
 [[r2_buckets]]
 binding = "IMAGES"
-bucket_name = "seat-airlines-banners"
+bucket_name = "seat-railway-banners"
 
 [[d1_databases]]
 binding = "DIRECTORY"
-database_name = "seat-airlines-directory"
+database_name = "seat-railway-directory"
 database_id = "local-test"
 
 # How often one address may make GET /holding ask the chain for a wallet that

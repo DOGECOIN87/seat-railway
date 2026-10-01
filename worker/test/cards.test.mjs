@@ -58,11 +58,11 @@ await check('a run has one card id, and it is not the run', async () => {
 });
 
 await check('the page names the card for X, and sends a person on to the site', () => {
-  const html = cardPage({ image: 'https://w.test/c/abc.jpg', page: 'https://w.test/c/abc', site: 'https://seat-airlines.space/' });
+  const html = cardPage({ image: 'https://w.test/c/abc.jpg', page: 'https://w.test/c/abc', site: 'https://seat-railway.space/' });
   assert.match(html, /<meta name="twitter:card" content="summary_large_image">/);
   assert.match(html, /<meta name="twitter:image" content="https:\/\/w\.test\/c\/abc\.jpg">/);
   assert.match(html, /<meta property="og:image:width" content="1200">/);
-  assert.match(html, /http-equiv="refresh" content="0; url=https:\/\/seat-airlines\.space\/"/);
+  assert.match(html, /http-equiv="refresh" content="0; url=https:\/\/seat-railway\.space\/"/);
 });
 
 await check('nothing is written into the page unescaped', () => {

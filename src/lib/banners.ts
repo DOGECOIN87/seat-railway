@@ -313,7 +313,7 @@ async function sha256Hex(bytes: Uint8Array): Promise<string> {
  */
 export function challenge(owner: string, imageHash: string, issued: string, text: string, link?: string): string {
   return [
-    'SEAT AIRLINES',
+    'SEAT RAILWAY',
     'Publish this advert on my seat.',
     '',
     `wallet: ${owner}`,
@@ -332,7 +332,7 @@ export function challenge(owner: string, imageHash: string, issued: string, text
  */
 export function legacyChallenge(owner: string, imageHash: string, issued: string): string {
   return [
-    'SEAT AIRLINES',
+    'SEAT RAILWAY',
     'Publish this advert on my seat.',
     '',
     `wallet: ${owner}`,
@@ -454,7 +454,7 @@ export async function publishBanner(opts: {
  */
 export function takedownChallenge(owner: string, key: string, issued: string): string {
   return [
-    'SEAT AIRLINES',
+    'SEAT RAILWAY',
     'Take the advert off my seat.',
     '',
     `wallet: ${owner}`,

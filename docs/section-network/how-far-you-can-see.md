@@ -25,7 +25,7 @@ The **Section network** is a directory for holders: each can publish a card, int
 If you can read somebody's card, you can introduce yourself to them — so you can write to anybody in your own section, and to nobody outside it. The **freight car** is not a coach: a wallet without a seat is on no roster, its card is not shown, and it has no room to talk in.
 
 {% hint style="info" %}
-These rules are enforced by the server, not just by the page. A card from another coach arrives without its contact details, and a message to another coach is refused (the server's own wording): _"That holder is in another cabin. Introductions stay within your own."_
+These rules are enforced by the server, not just by the page. A card from another coach arrives without its contact details, and a message to another coach is refused: _"That holder is in another coach. Introductions stay within your own."_
 {% endhint %}
 
 Next: [Cards and sign-in](cards-and-sign-in.md) · [Introductions, rooms and the PA](introductions-rooms-and-the-pa.md)

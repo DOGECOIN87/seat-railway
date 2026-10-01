@@ -776,7 +776,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
       const ladder = await readLadder(env);
       return json({
         ok: true,
-        service: 'seat-airlines-banners',
+        service: 'seat-railway-banners',
         storage: usingR2(env) ? 'r2' : 'kv',
         directory: Boolean(env.DIRECTORY),
         // Whether the cabins can be told apart *right now* — the thing that
@@ -934,7 +934,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
       if (request.method === 'PUT') {
         const priv = { ...cors, 'cache-control': 'no-store' };
         const db = env.DIRECTORY;
-        if (!db) return json({ error: 'This deployment has no cabin directory configured.' }, 503, priv);
+        if (!db) return json({ error: 'This deployment has no coach directory configured.' }, 503, priv);
 
         const token = bearerToken(request.headers.get('authorization'));
         const who = token ? await sessionAddress(db, token) : null;
@@ -1222,7 +1222,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     if ((request.method === 'GET' || request.method === 'HEAD') && shared && isCardId(shared[1])) {
       const [, id, jpg] = shared;
       const card = await env.BANNERS.get(`card:${id}`, 'arrayBuffer');
-      const site = (env.ALLOWED_ORIGINS ?? '').split(',')[0]?.trim() || 'https://seat-airlines.space';
+      const site = (env.ALLOWED_ORIGINS ?? '').split(',')[0]?.trim() || 'https://seat-railway.space';
       if (!card) {
         // Gone, or never was: the site, rather than an error nobody asked for.
         return new Response(null, { status: 302, headers: { location: site } });
@@ -1257,7 +1257,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
     if (directoryRoute) {
       const db = env.DIRECTORY;
       if (!db) {
-        return json({ error: 'This deployment has no cabin directory configured.' }, 503, cors);
+        return json({ error: 'This deployment has no coach directory configured.' }, 503, cors);
       }
       const priv = { ...cors, 'cache-control': 'no-store' };
 
@@ -1336,7 +1336,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
 
       const token = bearerToken(request.headers.get('authorization'));
       const me = token ? await sessionAddress(db, token) : null;
-      if (!token || !me) return json({ error: 'Sign in to read the cabin directory.' }, 401, priv);
+      if (!token || !me) return json({ error: 'Sign in to read the coach directory.' }, 401, priv);
 
       /* Still aboard?
 
@@ -1509,7 +1509,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
         const room = zoneOfChannel(to);
         const announcing = to === ANNOUNCEMENT;
         if (!room && !announcing) {
-          if (!isAddress(to)) return json({ error: 'That is not a wallet address or a cabin.' }, 400, priv);
+          if (!isAddress(to)) return json({ error: 'That is not a wallet address or a coach.' }, 400, priv);
           if (to === me) return json({ error: 'That message is addressed to you.' }, 400, priv);
         }
 
@@ -1536,7 +1536,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
              one. It fails closed, as the rest of the directory does when it
              cannot tell the cabins apart: `HOLDERS_URL`, or `RPC_URL` with
              `TOKEN_MINT`, is what turns any of this on. */
-          return json({ error: 'The cabin cannot tell which section you are in right now.' }, 503, priv);
+          return json({ error: 'The train cannot tell which coach you are in right now.' }, 503, priv);
         }
         const mine = ladder.zoneOf(me);
 
@@ -1544,10 +1544,10 @@ async function handle(request: Request, env: Env): Promise<Response> {
           return json({ error: 'The PA belongs to the flight deck.' }, 403, priv);
         }
         if (room && !canPostToChannel(mine, room)) {
-          return json({ error: 'That is another cabin. You can only talk in your own.' }, 403, priv);
+          return json({ error: 'That is another coach. You can only talk in your own.' }, 403, priv);
         }
         if (!room && !announcing && !canMessage(mine, ladder.zoneOf(to), me, to)) {
-          return json({ error: 'That holder is in another cabin. Introductions stay within your own.' }, 403, priv);
+          return json({ error: 'That holder is in another coach. Introductions stay within your own.' }, 403, priv);
         }
 
         /* The PA is rationed by the day rather than by the hour, because a

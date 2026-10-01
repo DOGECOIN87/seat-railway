@@ -14,12 +14,12 @@ If a page claiming to be Seat Railway asks you to **approve a transaction**, to 
 
 ## The only three messages you will be asked to sign
 
-Each still begins `SEAT AIRLINES`, and the sign-in still names the _cabin directory_: Seat Railway shares its server with Seat Airlines, and the server checks every message word for word. The wording below is exactly what your wallet will show.
+Each begins `SEAT RAILWAY`, and the server checks every message word for word. The wording below is exactly what your wallet will show.
 
 **1. Putting an advert on your seat** — every time you publish one:
 
 ```
-SEAT AIRLINES
+SEAT RAILWAY
 Publish this advert on my seat.
 
 wallet: <your address>
@@ -30,7 +30,7 @@ issued: <the time you pressed the button>
 **2. Taking your advert down** — when you press **Remove**:
 
 ```
-SEAT AIRLINES
+SEAT RAILWAY
 Take the advert off my seat.
 
 wallet: <your address>
@@ -41,8 +41,8 @@ issued: <the time you pressed the button>
 **3. Signing in to the directory** — once a day at most:
 
 ```
-SEAT AIRLINES
-Sign in to the cabin directory.
+SEAT RAILWAY
+Sign in to the coach directory.
 
 This lets you publish your card, read your section, and send and
 receive introductions for one day. It authorises no transaction.
@@ -66,7 +66,7 @@ All three are checked by the server, and all three expire: a signature more than
 
 ## What is stored, and where
 
-**On the server** (a Cloudflare Worker, shared with Seat Airlines): your published adverts, your card, the messages you send, and your directory sessions. A session is stored only as a one-way fingerprint (SHA-256), so a copy of the session table cannot be used to get into anybody's account.
+**On the server** (Seat Railway's Cloudflare Worker): your published adverts, your card, the messages you send, and your directory sessions. A session is stored only as a one-way fingerprint (SHA-256), so a copy of the session table cannot be used to get into anybody's account.
 
 **In your browser:**
 

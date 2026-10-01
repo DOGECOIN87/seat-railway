@@ -4,7 +4,7 @@ description: Every public route on the Worker, what it takes and what it answers
 
 # Worker API
 
-Base URL in production: `https://seat-airlines-banners.trashmarket.workers.dev` — Seat Airlines' Worker, which Seat Railway shares for now (see [Deploying](deploying.md#the-worker-cloudflare)). Every route answers JSON, and errors come back as `{ "error": "<a sentence you can show a person>" }`.
+Base URL in production: `https://seat-railway-banners.trashmarket.workers.dev`. Every route answers JSON, and errors come back as `{ "error": "<a sentence you can show a person>" }`.
 
 ## Public routes
 
@@ -49,7 +49,7 @@ Base URL in production: `https://seat-airlines-banners.trashmarket.workers.dev` 
 The signature is over this exact text, where the fingerprint is the SHA-256 of the image bytes, in hex:
 
 ```
-SEAT AIRLINES
+SEAT RAILWAY
 Publish this advert on my seat.
 
 wallet: <owner>
@@ -73,7 +73,7 @@ It answers `{ "image": "<url of the stored artwork>" }`, or:
 `DELETE /banner` with `{ owner, key, issued, signature }`, where `key` is the stored name of the advert's artwork — the `banners/…` path its image URL ends in. The signature is over:
 
 ```
-SEAT AIRLINES
+SEAT RAILWAY
 Take the advert off my seat.
 
 wallet: <owner>

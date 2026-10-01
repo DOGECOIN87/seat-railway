@@ -35,8 +35,8 @@ Do **not** reuse `seat-airlines.space`: it belongs to Seat Airlines' own Pages s
 
 ## The Worker — Cloudflare
 
-{% hint style="warning" %}
-**Seat Railway currently uses Seat Airlines' Worker** (`seat-airlines-banners.trashmarket.workers.dev`), and so the same token's holders, adverts and directory. That Worker only answers the origins in its `ALLOWED_ORIGINS`, so until `https://seat-railway.space` and `https://www.seat-railway.space` are added there, the published railway shows the train and the market but **no seats, adverts or directory**. For a token of its own, the railway needs a Worker of its own — deploy `worker/` under a new name, then set `VITE_BANNERS_API` to it.
+{% hint style="info" %}
+**Seat Railway has its own Worker**, `seat-railway-banners`, with its own KV namespace, R2 bucket and D1 database (already created, and the D1 migrations already applied). It shares nothing with Seat Airlines' `seat-airlines-banners`. To deploy it, add these repository **secrets** (Settings → Secrets and variables → Actions): `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` and `RPC_URL`; then run **Deploy the banners Worker**, and **Set the Worker's RPC secret**.
 {% endhint %}
 
 `.github/workflows/worker.yml` runs on pushes to `main` that touch `worker/`. It type-checks and tests the Worker, and deploys it **only if** the repository has a `CLOUDFLARE_API_TOKEN` secret (with Workers Scripts, Workers KV Storage and Workers R2 Storage edit rights). Without one it stops after the tests and says so in the job summary — a green run does not by itself mean the Worker was deployed, so check the **Deploy** step.

@@ -188,8 +188,8 @@ export function isAddress(value: unknown): value is string {
  */
 export function signInChallenge(address: string, issued: string): string {
   return [
-    'SEAT AIRLINES',
-    'Sign in to the cabin directory.',
+    'SEAT RAILWAY',
+    'Sign in to the coach directory.',
     '',
     'This lets you publish your card, read your section, and send and',
     'receive introductions for one day. It authorises no transaction.',

@@ -1,4 +1,4 @@
-name = "seat-airlines-banners"
+name = "seat-railway-banners"
 main = "src/index.ts"
 compatibility_date = "2025-09-01"
 
@@ -8,10 +8,10 @@ id = "local-test"
 
 # Miniflare's own SQLite. The id never reaches Cloudflare; apply the schema to
 # it with:
-#   npx wrangler d1 migrations apply seat-airlines-directory --local --config wrangler.local.toml
+#   npx wrangler d1 migrations apply seat-railway-directory --local --config wrangler.local.toml
 [[d1_databases]]
 binding = "DIRECTORY"
-database_name = "seat-airlines-directory"
+database_name = "seat-railway-directory"
 database_id = "local-test"
 
 # How often one address may make GET /holding ask the chain for a wallet that

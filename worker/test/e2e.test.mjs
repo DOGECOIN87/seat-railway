@@ -36,10 +36,10 @@ const toBase58 = (bytes) => {
 };
 
 const challenge = (owner, hash, issued, text, link) =>
-  ['SEAT AIRLINES', 'Publish this advert on my seat.', '', `wallet: ${owner}`, `image:  sha256:${hash}`,
+  ['SEAT RAILWAY', 'Publish this advert on my seat.', '', `wallet: ${owner}`, `image:  sha256:${hash}`,
     `text:   ${text}`, `link:   ${link || '(none)'}`, `issued: ${issued}`].join('\n');
 const legacyChallenge = (owner, hash, issued) =>
-  ['SEAT AIRLINES', 'Publish this advert on my seat.', '', `wallet: ${owner}`, `image:  sha256:${hash}`, `issued: ${issued}`].join('\n');
+  ['SEAT RAILWAY', 'Publish this advert on my seat.', '', `wallet: ${owner}`, `image:  sha256:${hash}`, `issued: ${issued}`].join('\n');
 
 const sha256Hex = async (bytes) =>
   [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))]
@@ -262,7 +262,7 @@ await check('an unknown route 404s', async () => {
    really does take the advert off the wall. */
 
 const takedownChallenge = (who, key, issued) =>
-  ['SEAT AIRLINES', 'Take the advert off my seat.', '', `wallet: ${who}`, `advert: ${key}`, `issued: ${issued}`].join('\n');
+  ['SEAT RAILWAY', 'Take the advert off my seat.', '', `wallet: ${who}`, `advert: ${key}`, `issued: ${issued}`].join('\n');
 const takeDown = (body) =>
   fetch(`${BASE}/banner`, {
     method: 'DELETE',
@@ -323,8 +323,8 @@ console.log('\ncabin directory');
 
 const signInText = (address, issued) =>
   [
-    'SEAT AIRLINES',
-    'Sign in to the cabin directory.',
+    'SEAT RAILWAY',
+    'Sign in to the coach directory.',
     '',
     'This lets you publish your card, read your section, and send and',
     'receive introductions for one day. It authorises no transaction.',

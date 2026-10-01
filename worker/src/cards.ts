@@ -74,7 +74,7 @@ export function cardPage({ image, page, site }: { image: string; page: string; s
   const img = escapeHtml(image);
   const here = escapeHtml(page);
   const to = escapeHtml(site);
-  const title = 'Seat Airlines — can you beat my score?';
+  const title = 'Seat Railway — can you beat my score?';
   const description = 'One engine gone at altitude. How long can you keep her in the air?';
   return `<!doctype html>
 <html lang="en">
@@ -84,7 +84,7 @@ export function cardPage({ image, page, site }: { image: string; page: string; s
 <title>${title}</title>
 <meta name="description" content="${description}">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Seat Airlines">
+<meta property="og:site_name" content="Seat Railway">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${description}">
 <meta property="og:url" content="${here}">
@@ -99,7 +99,7 @@ export function cardPage({ image, page, site }: { image: string; page: string; s
 <meta http-equiv="refresh" content="0; url=${to}">
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#030610;color:#fff;font:600 16px/1.4 system-ui,sans-serif}a{color:#7FE3F7}img{max-width:min(92vw,600px);border-radius:12px;display:block;margin:0 auto 16px}</style>
 </head>
-<body><main><img src="${img}" alt="A flight on Seat Airlines" width="${CARD_WIDTH}" height="${CARD_HEIGHT}"><a href="${to}">Fly Seat Airlines →</a></main></body>
+<body><main><img src="${img}" alt="A run on Seat Railway" width="${CARD_WIDTH}" height="${CARD_HEIGHT}"><a href="${to}">Ride Seat Railway →</a></main></body>
 </html>
 `;
 }

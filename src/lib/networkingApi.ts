@@ -182,8 +182,8 @@ export class DirectoryRefused extends Error {
  */
 export function signInChallenge(address: string, issued: string): string {
   return [
-    'SEAT AIRLINES',
-    'Sign in to the cabin directory.',
+    'SEAT RAILWAY',
+    'Sign in to the coach directory.',
     '',
     'This lets you publish your card, read your section, and send and',
     'receive introductions for one day. It authorises no transaction.',
@@ -239,7 +239,7 @@ function keepSession(session: Session | null): void {
 /* ── Requests ───────────────────────────────────────────────────────────── */
 
 async function call<T>(path: string, init: RequestInit & { token?: string } = {}): Promise<T> {
-  if (!API) throw new Error('This deployment has no cabin directory configured.');
+  if (!API) throw new Error('This deployment has no coach directory configured.');
   const { token, ...rest } = init;
   let res: Response;
   try {

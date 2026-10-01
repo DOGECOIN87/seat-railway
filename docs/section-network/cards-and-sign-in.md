@@ -10,11 +10,11 @@ Everything in the directory is behind one sign-in, so you are not asked to sign 
 
 1. Check in with your wallet — see [Connecting a wallet](../getting-started/connecting-a-wallet.md).
 2. In the **Network** tab, press **Sign in**.
-3. Your wallet shows this message — word for word as the shared server expects it, so it still names Seat Airlines and the cabin directory. Approve it:
+3. Your wallet shows this message. Approve it:
 
 ```
-SEAT AIRLINES
-Sign in to the cabin directory.
+SEAT RAILWAY
+Sign in to the coach directory.
 
 This lets you publish your card, read your section, and send and
 receive introductions for one day. It authorises no transaction.

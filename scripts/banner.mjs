@@ -315,7 +315,7 @@ ${fontFaces}
     letter-spacing: 0.02em; color: ${NAVY}; white-space: nowrap;
   }
 </style></head>
-<body><div class="banner">${svg}<div class="plate"><img src="${logoUri}" alt=""><span>SEAT AIRLINES</span></div></div></body></html>`;
+<body><div class="banner">${svg}<div class="plate"><img src="${logoUri}" alt=""><span>SEAT RAILWAY</span></div></div></body></html>`;
 
 mkdirSync(OUT, { recursive: true });
 writeFileSync(join(OUT, 'banner.svg'), svg.replace('<defs>', `<defs><style>${fontFaces}</style>`));
@@ -335,7 +335,7 @@ for (const [scale, name] of [[1, 'banner.png'], [2, 'banner@2x.png']]) {
   await page.setContent(html, { waitUntil: 'load' });
   const loaded = await page.evaluate(async () => {
     await Promise.all([
-      document.fonts.load("800 62px Montserrat", 'SEAT AIRLINES'),
+      document.fonts.load("800 62px Montserrat", 'SEAT RAILWAY'),
       document.fonts.load("500 9px 'IBM Plex Mono'", '0123456789ABCDEF'),
       document.fonts.load("600 9px 'IBM Plex Mono'", 'ECONOMY'),
     ]);
