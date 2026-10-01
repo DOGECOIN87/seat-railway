@@ -100,7 +100,7 @@ export function scoreCeiling(elapsedMs: number): number {
 export function scoreChallenge(address: string, run: string, score: number, issued: string): string {
   return [
     'SEAT RAILWAY',
-    'Post my score to the landing leaderboard.',
+    'Post my score to the Runaway leaderboard.',
     '',
     `Score: ${score}`,
     `Run: ${run}`,

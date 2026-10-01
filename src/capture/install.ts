@@ -37,15 +37,15 @@ const HOLDERS = Array.from({ length: 182 }, (_, i) => ({
    the window on the left. */
 const MY_BALANCE = Math.round((HOLDERS[39].balance + HOLDERS[40].balance) / 2);
 
-/** The leaderboard, with plainly fictional pilots. */
+/** The leaderboard, with plainly fictional drivers. */
 const BOARD = [
-  { name: 'PILOT_07', score: 12_480 },
-  { name: 'WINGS_22', score: 11_905 },
-  { name: 'CAPT_ACE', score: 10_730 },
-  { name: 'NAV_0042', score: 9_860 },
-  { name: 'JETS_031', score: 8_215 },
+  { name: 'DRVR_07', score: 12_480 },
+  { name: 'RAIL_22', score: 11_905 },
+  { name: 'LOCO_ACE', score: 10_730 },
+  { name: 'SGNL_042', score: 9_860 },
+  { name: 'TRAK_031', score: 8_215 },
 ].map((row, i) => ({
-  // shortWallet() shows the first four and last four: PILO…T_07 and so on.
+  // shortWallet() shows the first four and last four: DRVR…R_07 and so on.
   address: `${row.name.slice(0, 4)}xxxxxxxxxxxxxxxxxxxxxxxxxxxxx${row.name.slice(-4)}`,
   score: row.score,
   survived: 40 + i * 3,

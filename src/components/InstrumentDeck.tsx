@@ -108,7 +108,7 @@ function CarriageStack({ cars }: { cars: number }) {
 function railPhase(change: number): string {
   if (change > 40) return 'FULL POWER';
   if (change > 8) return 'UPHILL';
-  if (change > -6) return 'CRUISING';
+  if (change > -6) return 'LINE SPEED';
   if (change > -22) return 'DOWNHILL';
   return 'BRAKING';
 }

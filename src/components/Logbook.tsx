@@ -167,7 +167,7 @@ const Controls = ({ controls, onControls }: {
             round rather than to the nearest equivalent — so this rolls. */}
         <Switch on={false} onClick={() => set({ halfRolls: controls.halfRolls + 2 })}>Barrel roll</Switch>
         {controls.halfRolls !== 0 && (
-          <Switch on={false} onClick={() => set({ halfRolls: 0 })}>Wings level</Switch>
+          <Switch on={false} onClick={() => set({ halfRolls: 0 })}>Upright</Switch>
         )}
       </Row>
 

@@ -944,7 +944,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
         const token = bearerToken(request.headers.get('authorization'));
         const who = token ? await sessionAddress(db, token) : null;
         if (!isAdmin(env.ADMIN_WALLET, who)) {
-          return json({ error: 'The flight controls belong to the flight deck.' }, 403, priv);
+          return json({ error: 'The train controls belong to the driver.' }, 403, priv);
         }
 
         let body: unknown;
@@ -1144,7 +1144,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
           .bind(ip, now - 60 * 60 * 1000)
           .first<{ n: number }>();
         if ((recent?.n ?? 0) >= RUNS_PER_HOUR) {
-          return json({ error: 'That is a lot of flights from here. Try again in a while.' }, 429, priv);
+          return json({ error: 'That is a lot of runs from here. Try again in a while.' }, 429, priv);
         }
         const run = newRunId();
         await db.batch([
@@ -1176,15 +1176,15 @@ async function handle(request: Request, env: Env): Promise<Response> {
           .prepare(`SELECT started_at, used FROM ${prefix}_runs WHERE id = ?`)
           .bind(post.run)
           .first<{ started_at: number; used: number }>();
-        if (!run) return json({ error: 'That flight is not one this server started.' }, 400, priv);
-        if (run.used) return json({ error: 'That flight has already been posted.' }, 409, priv);
+        if (!run) return json({ error: 'That run is not one this server started.' }, 400, priv);
+        if (run.used) return json({ error: 'That run has already been posted.' }, 409, priv);
         const now = Date.now();
-        if (now - run.started_at > RUN_TTL_MS) return json({ error: 'That flight is too long ago to post.' }, 400, priv);
+        if (now - run.started_at > RUN_TTL_MS) return json({ error: 'That run is too long ago to post.' }, 400, priv);
         const wrong = rail ? implausibleRail(post, run.started_at, now) : implausible(post, run.started_at, now);
         if (wrong) return json({ error: wrong }, 422, priv);
         // Spend the run first: the same flight posted twice, however fast, finds it used.
         const spent = await db.prepare(`UPDATE ${prefix}_runs SET used = 1 WHERE id = ? AND used = 0`).bind(post.run).run();
-        if (!spent.meta.changes) return json({ error: 'That flight has already been posted.' }, 409, priv);
+        if (!spent.meta.changes) return json({ error: 'That run has already been posted.' }, 409, priv);
         await db
           .prepare(`INSERT INTO ${prefix}_scores (address, score, survived, climb, posted_at) VALUES (?, ?, ?, ?, ?)
             ON CONFLICT(address) DO UPDATE SET
@@ -1216,7 +1216,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
       } catch {
         // No table yet: no flight has started, so this is not one.
       }
-      if (!started) return json({ error: 'That flight is not one this server started.' }, 404, priv);
+      if (!started) return json({ error: 'That run is not one this server started.' }, 404, priv);
       const id = await cardId(run);
       const key = `card:${id}`;
       const link = `${url.origin}/c/${id}`;
@@ -1550,7 +1550,7 @@ async function handle(request: Request, env: Env): Promise<Response> {
         const mine = ladder.zoneOf(me);
 
         if (announcing && !canAnnounce(mine)) {
-          return json({ error: 'The PA belongs to the flight deck.' }, 403, priv);
+          return json({ error: 'The PA belongs to the driver\'s cab.' }, 403, priv);
         }
         if (room && !canPostToChannel(mine, room)) {
           return json({ error: 'That is another coach. You can only talk in your own.' }, 403, priv);

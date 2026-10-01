@@ -82,7 +82,7 @@ export default function ScoresDialog({ address, onClose }: ScoresDialogProps) {
           <strong>{best > 0 ? best.toLocaleString('en-US') : '—'}</strong>
         </p>
         <p className="sa-scores__fine">
-          Drive from the landing to score. Posting signs a message, never a transaction.
+          Play Runaway on the front page to score. Posting signs a message, never a transaction.
         </p>
       </div>
     </ModalWindow>

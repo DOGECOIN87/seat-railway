@@ -43,7 +43,7 @@ export default function SeatDialog({
   const [copied, setCopied] = useState(false);
   const cabin = CABIN_ZONES.find((z) => z.key === zone) ?? CABIN_ZONES[0];
   const seat = findSeat(id);
-  const where = zone === 'deck' ? (id === 'CPT' ? 'Captain' : 'First officer') : WHERE[seat?.position ?? ''] ?? 'Seat';
+  const where = zone === 'deck' ? (id === 'CPT' ? 'Driver' : 'Second driver') : WHERE[seat?.position ?? ''] ?? 'Seat';
   const lavatory = (LAVATORY_SEATS as readonly string[]).includes(id);
   const link = safeHref(banner?.href);
   const own = banner && !banner.house ? banner : null;
