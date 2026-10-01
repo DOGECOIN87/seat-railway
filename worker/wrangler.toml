@@ -77,23 +77,27 @@ ALLOWED_ORIGINS = "https://seat-railway.space,https://www.seat-railway.space"
 # nobody another wallet's conversations, and refuses introductions rather than
 # delivering one it cannot place. That is the safe direction to fail in, and
 # `GET /health` reports `sections` either way — and `seated` out of `cabin`
-# beside it, because a cabin that fills to twenty of a hundred and seventy-
-# eight is the other way this goes quietly wrong.
+# beside it, because a train that fills to twenty of a hundred and eighteen
+# is the other way this goes quietly wrong.
 #
 # MANIFEST_SIZE must match the page's VITE_MANIFEST_SIZE. Both default to the
-# whole aircraft — 178 — read from the same constant in the shared seating
+# whole train — 118 — read from the same constant in the shared seating
 # module, so leaving both unset is the one way they cannot disagree.
 # HOLDERS_URL = "https://…"
-# MANIFEST_SIZE = "178"
+# MANIFEST_SIZE = "118"
 
 # The token. Together with the RPC_URL secret below, lets the Worker refuse
 # adverts from wallets that do not hold it; without that secret the check is
 # skipped, and adverts from non-holders still never display on the page.
 TOKEN_MINT = "AWJCyg9PrMtYju9yaQmdQLcwrGobHMTv9JU3mo4upump"
-# RPC_URL is a secret (paid endpoints carry an API key in the URL):
+# RPC_URL is a secret (paid endpoints carry an API key in the URL). Use the
+# railway's own Helius key, not Seat Airlines':
 #
 #   npx wrangler secret put RPC_URL
-#   → https://mainnet.helius-rpc.com/?api-key=<YOUR_HELIUS_KEY>
+#   → https://mainnet.helius-rpc.com/?api-key=<SEAT_RAILWAY_HELIUS_KEY>
+#
+# or set HELIUS_API_KEY (or RPC_URL) as a repository secret and run the
+# "Set the Worker's RPC secret" workflow, which checks the key answers first.
 #
 # This is also the page's endpoint at one remove: the page reads balances and
 # the holder list from this Worker rather than opening an RPC of its own,
@@ -108,19 +112,20 @@ TOKEN_MINT = "AWJCyg9PrMtYju9yaQmdQLcwrGobHMTv9JU3mo4upump"
 # whole site rather than one per visitor, or one per copy.
 #
 # Unset, the Worker falls back to Solana's public endpoint — which rate-limits
-# the expensive holder scan and caps the cabin at twenty. `GET /health` reports
-# `seated` out of `cabin`; anything well below the full aircraft means the scan
+# the expensive holder scan and caps the train at twenty. `GET /health` reports
+# `seated` out of `cabin`; anything well below the full train means the scan
 # is being refused and the endpoint needs to be set.
 
 # The one wallet the operator's things belong to:
 #
 #   · the logbook — private notes, at GET/POST/PATCH/DELETE /logbook. Unset,
 #     that route does not exist: no logbook, and the same 404 for everybody.
-#   · the flight controls — PUT /flight, which rolls the aeroplane on every
-#     visitor's page. GET /flight is public either way.
+#   · the train controls — PUT /flight, which rolls the train on every
+#     visitor's page. GET /flight is public either way. (The route keeps the
+#     airline's name.)
 #
 # A public key rather than a secret, and deliberately kept in the open here.
-# It is on the chain, and drawn on this aircraft's own seat map if the
+# It is on the chain, and drawn on this train's own seat map if the
 # operator holds the token, so hiding it would buy nothing — what guards those
 # notes is the signature that opens a session, which needs the private key.
 # Move it to `wrangler secret put ADMIN_WALLET` if you would rather it were

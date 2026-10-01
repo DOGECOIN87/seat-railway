@@ -123,6 +123,8 @@ async function markdownUnder(dir) {
   return found;
 }
 const changed = [tokenPath, workerPath];
+/** Text between these markers is true only of the stand-in token, and is taken out on a switch. */
+const INTERIM = /<!-- interim-token -->[\s\S]*?<!-- \/interim-token -->\n?/g;
 await writeFile(tokenPath, tokenText.replace(tokenPattern, `$1${nextMint}$3`));
 await writeFile(workerPath, workerText.replace(workerPattern, `$1${nextMint}$3`));
 /* Anywhere else the old address is printed for a person to read or copy:
@@ -135,8 +137,10 @@ if (previousMint) {
     } catch {
       continue;
     }
-    if (!text.includes(previousMint)) continue;
-    await writeFile(path, text.split(previousMint).join(nextMint));
+    // Lines that only hold until the railway's own token launches go with the old address.
+    const settled = text.replace(INTERIM, '');
+    if (!settled.includes(previousMint) && settled === text) continue;
+    await writeFile(path, settled.split(previousMint).join(nextMint));
     changed.push(path);
   }
 }
@@ -166,7 +170,7 @@ if (!push) {
 /* ── 5. Commit and push ───────────────────────────────────────────────── */
 step(5, 'Committing and pushing to main…');
 git('add', ...changed);
-git('commit', '-q', '-m', `Fly the new token: ${nextMint}`, '-m', `Replaces ${previousMint || 'no token'} on the site, the Worker and the docs.`);
+git('commit', '-q', '-m', `Run the train on the new token: ${nextMint}`, '-m', `Replaces ${previousMint || 'no token'} on the site, the Worker and the docs.`);
 const pushed = spawnSync('git', ['push', '-q', 'origin', 'main'], { stdio: 'inherit' });
 if (pushed.status !== 0) fail('The push failed. The change is committed locally; run: git push origin main');
 const sha = git('rev-parse', 'HEAD');
