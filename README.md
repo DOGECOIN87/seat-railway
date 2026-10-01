@@ -208,11 +208,11 @@ A holder directory with the train's own manners: publish a card, read your own c
 The train runs on one Solana token:
 
 ```
-AWJCyg9PrMtYju9yaQmdQLcwrGobHMTv9JU3mo4upump
+XXXXXXXXXXXXXXXXXXXXX
 ```
 
 <!-- interim-token -->
-**Seat Railway will have its own token.** Until it launches, the address above is the Seat Airlines token, so the train has a live market to run on.
+**Seat Railway's own token hasn't launched yet.** Until it does, the site is connected to no token: the CA bar shows a placeholder, the train holds a steady opening reading of $163K (the Market Town tier), and nobody is seated.
 <!-- /interim-token -->
 
 Switching tokens is one command:

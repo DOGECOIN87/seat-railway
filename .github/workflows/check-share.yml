@@ -18,8 +18,8 @@ jobs:
     steps:
       - name: Look
         run: |
-          echo "== nameservers";         dig +short NS seat-airlines.space
-          echo "== share address";       dig +short share.seat-airlines.space
-          echo "== share /health";       curl -sS -m 20 https://share.seat-airlines.space/health || echo "(no answer)"
-          echo; echo "== site";          curl -sS -o /dev/null -m 20 -w "%{http_code} %{remote_ip}\n" https://seat-airlines.space/ || echo "(no answer)"
-          echo "== link picture";        curl -sS -o /dev/null -m 20 -w "%{http_code} %{content_type} %{size_download} bytes\n" https://seat-airlines.space/og-card.jpg || echo "(no answer)"
+          echo "== nameservers";         dig +short NS seat-railway.space
+          echo "== share address";       dig +short share.seat-railway.space
+          echo "== share /health";       curl -sS -m 20 https://share.seat-railway.space/health || echo "(no answer)"
+          echo; echo "== site";          curl -sS -o /dev/null -m 20 -w "%{http_code} %{remote_ip}\n" https://seat-railway.space/ || echo "(no answer)"
+          echo "== link picture";        curl -sS -o /dev/null -m 20 -w "%{http_code} %{content_type} %{size_download} bytes\n" https://seat-railway.space/og-card.jpg || echo "(no answer)"

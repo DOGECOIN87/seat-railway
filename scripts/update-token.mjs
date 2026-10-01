@@ -129,7 +129,10 @@ await writeFile(tokenPath, tokenText.replace(tokenPattern, `$1${nextMint}$3`));
 await writeFile(workerPath, workerText.replace(workerPattern, `$1${nextMint}$3`));
 /* Anywhere else the old address is printed for a person to read or copy:
    a stale CA in the docs is how somebody ends up buying the wrong token. */
-if (previousMint) {
+/* Before the first token, the docs print the CA bar's placeholder instead. */
+const PLACEHOLDER = 'XXXXXXXXXXXXXXXXXXXXX';
+const shownBefore = previousMint || PLACEHOLDER;
+{
   for (const path of ['index.html', 'README.md', ...(await markdownUnder('docs'))]) {
     let text;
     try {
@@ -139,8 +142,8 @@ if (previousMint) {
     }
     // Lines that only hold until the railway's own token launches go with the old address.
     const settled = text.replace(INTERIM, '');
-    if (!settled.includes(previousMint) && settled === text) continue;
-    await writeFile(path, settled.split(previousMint).join(nextMint));
+    if (!settled.includes(shownBefore) && settled === text) continue;
+    await writeFile(path, settled.split(shownBefore).join(nextMint));
     changed.push(path);
   }
 }

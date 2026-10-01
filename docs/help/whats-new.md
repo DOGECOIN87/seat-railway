@@ -31,7 +31,7 @@ The last airline words are gone from the site: the driver and second driver, the
 
 ### Its own token, and its own Helius key
 
-Seat Railway will have its own token. Until it launches, the site runs on the Seat Airlines token, and one command switches everything over. The Worker reads holders through a Helius key of the railway's own. → [The token](../getting-started/the-token.md) · [Configuration → Helius](../for-developers/configuration.md#helius)
+Seat Railway will have its own token. Until it launches, the site is connected to no token at all (it no longer runs on the Seat Airlines one), and one command switches it on. The Worker reads holders through a Helius key of the railway's own. → [The token](../getting-started/the-token.md) · [Configuration → Helius](../for-developers/configuration.md#helius)
 
 ## Version 1
 

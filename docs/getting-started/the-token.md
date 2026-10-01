@@ -9,14 +9,12 @@ description: The contract address, where to get it, and what the train reads fro
 The token is on **Solana**:
 
 ```
-AWJCyg9PrMtYju9yaQmdQLcwrGobHMTv9JU3mo4upump
+XXXXXXXXXXXXXXXXXXXXX
 ```
-
-It trades on pump.fun: [pump.fun/coin/AWJCyg9PrMtYju9yaQmdQLcwrGobHMTv9JU3mo4upump](https://pump.fun/coin/AWJCyg9PrMtYju9yaQmdQLcwrGobHMTv9JU3mo4upump).
 
 <!-- interim-token -->
 {% hint style="info" %}
-**Seat Railway will have its own token.** Until it launches, the address above is the **Seat Airlines** token, so the train has a live market to run on. The train, the seat ladder, the wall and the directory are all built to read whichever Solana token they are pointed at, and switching is one command (below).
+**Seat Railway's own token hasn't launched yet.** Until it does, the site is connected to no token: the CA bar shows a placeholder, the train holds a steady opening reading of $163K (the Market Town tier), and nobody is seated. The train, the seat ladder, the wall and the directory are all built to read whichever Solana token they are pointed at, and switching it on is one command (below).
 {% endhint %}
 <!-- /interim-token -->
 
