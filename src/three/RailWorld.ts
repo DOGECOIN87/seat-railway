@@ -276,6 +276,19 @@ export function createRailWorld(canvas: HTMLCanvasElement, options: RailOptions 
   scene.environment = environment.texture;
   scene.environmentIntensity = 0.4;
   room.dispose(); pmrem.dispose();
+  /* The supplied sky (Poly Haven's Bell Park Pier, CC0), cut to 1024 × 512,
+     replaces the studio room as soon as it arrives: the train's gloss, the
+     towers' glass and the water then reflect a real outdoor sky. It lights
+     only; the sky you see is still the visitor's own. */
+  void import('three/examples/jsm/loaders/RGBELoader.js').then(({ RGBELoader }) =>
+    new RGBELoader().loadAsync(`${import.meta.env.BASE_URL}textures/sky-hdri.hdr`)).then((hdr) => {
+    if (disposed) { hdr.dispose(); return; }
+    hdr.mapping = THREE.EquirectangularReflectionMapping;
+    const gen = new THREE.PMREMGenerator(renderer);
+    const sky = keep(gen.fromEquirectangular(hdr));
+    gen.dispose(); hdr.dispose();
+    scene.environment = sky.texture;
+  }).catch(() => { /* the studio room stays */ });
   const inside = options.interior ? createRailInterior(options.interior) : null;
   if (inside) scene.add(inside.group);
 

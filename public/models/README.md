@@ -17,3 +17,5 @@ Loaded by `src/three/RailWorld.ts`. All are converted from the models supplied f
 The reference photo that was mapped onto the car body in the source (a real operator's train, with its logo) is deliberately not included.
 
 To rebuild them, see `scripts/models/README.md`.
+
+`../textures/sky-hdri.hdr` is the supplied HDRI, Poly Haven's *Bell Park Pier* (CC0), averaged down from 4096 × 2048 to 1024 × 512 and written as run-length RGBE. The scene uses it for reflections and image-based light only; the sky drawn is the visitor's own.
