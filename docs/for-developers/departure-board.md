@@ -53,7 +53,7 @@ export const SPLASH_LAST: readonly string[] = ['NOW', 'BOARDING'];
 | **Between phrases** | 0.8 s once the first has landed, 0.55 s for each of the others. |
 | **After the last** | It holds for 0.9 s — longer if the train behind it is still loading — then the splash fades out over 0.8 s: about eight and a half seconds in all. A tap or any key clears it straight away, and does nothing else; the docs link opens the docs. |
 | **Off screen, or in a background tab** | It finishes the turn in progress and waits. Nothing new is queued until it can be seen. |
-| **Reduced motion** | The phrases change on the same schedule, but the flaps do not turn — each phrase simply appears. On Android this is the **Remove animations** setting. |
+| **Reduced motion** | The flaps turn as usual: the board is the site's opening moment, a few seconds of small movement, not a shake or a flash. |
 
 The board's timings are constants at the top of `src/components/SplitFlapBoard.tsx`: `FLIP_MS`, `FLIPS_MIN` and `FLIPS_MAX`, `STAGGER_MS`, `JITTER_MS`, `SETTLE_MS` and `INTRO_MS`, with `HOLD_MS` as the default hold. The order of the flaps on each drum is `DRUM`. The component takes the holds from whoever uses it — `hold`, `firstHold` — and `loop={false}` stops it on its last phrase instead of starting again. The splash's own timings are at the top of `src/components/Landing.tsx`: `SPLASH_FIRST_HOLD`, `SPLASH_PHRASE_HOLD`, `SPLASH_HOLD`, `SPLASH_WAIT`, `SPLASH_GIVE_UP` and `SPLASH_FADE`.
 

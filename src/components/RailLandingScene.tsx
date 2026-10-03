@@ -74,8 +74,8 @@ const RailLandingScene = ({ feed, sky, band, taken, controls = HANDS_OFF, onRead
     const p = pose.current;
     const wide = window.innerWidth > window.innerHeight * 1.15;
     p.frame = wide ? { x: 0.12, y: 0.14 } : { x: 0, y: 0.2 };
-    // A slow drift from the nose round toward the flank, and back.
-    p.orbit = still ? 0 : Math.sin(performance.now() / 26000) * 34 + 6;
+    // A slow drift from the nose round toward the flank, and back: under reduced motion half as far and slower.
+    p.orbit = still ? Math.sin(performance.now() / 40000) * 17 + 3 : Math.sin(performance.now() / 26000) * 34 + 6;
     world.current?.render(a, latest.current.sky, latest.current.band, p);
   }, controls);
 

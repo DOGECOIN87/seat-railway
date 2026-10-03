@@ -41,7 +41,7 @@ At night the train is lit the way a real one is: the sky no longer lights it, an
 * **The headlights** throw a beam down the line ahead.
 * **The tail lamps** on the last car show red.
 
-If your device is set to reduce motion, the camera stops drifting.
+If your device is set to reduce motion, the camera drifts half as far, more slowly.
 
 ## Live or modelled
 

@@ -118,7 +118,7 @@ Only in a near-total collapse: a five-minute fall of about 94% or more. Emergenc
 
 <summary>Why does the board at the top keep changing?</summary>
 
-It is a split-flap departure board, and it turns through the line's sayings: _Hold more, ride longer_, _Take a seat_, _Network_, _Build_, _Relax_ and more. If your device is set to reduce motion — on Android, **Remove animations** — the words still change, but the flaps do not turn. The views respect the same setting: the camera stops drifting, while the train keeps calmly running, because a train that is not moving is not much of a train.
+It is a split-flap departure board, and it turns through the line's sayings: _Hold more, ride longer_, _Take a seat_, _Network_, _Build_, _Relax_ and more. The flaps turn whatever your device's motion setting. With reduced motion on (on Android, **Remove animations**), the views soften instead: the camera drifts half as far, more slowly, and the train keeps running.
 
 </details>
 

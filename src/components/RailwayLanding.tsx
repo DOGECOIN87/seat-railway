@@ -82,7 +82,7 @@ export default function RailwayLanding({ feed, sky, band, marketCap, controls, t
   const onReady = useCallback(() => setReady(true), []);
   const onFail = useCallback(() => { setFailed(true); setPlaying(false); }, []);
   useEffect(() => {
-    const timer = window.setTimeout(() => setSplash(false), window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1200 : 2600);
+    const timer = window.setTimeout(() => setSplash(false), 2600);
     return () => window.clearTimeout(timer);
   }, []);
   const later = (fn: () => void, ms: number) => { timers.current.push(window.setTimeout(fn, ms)); };

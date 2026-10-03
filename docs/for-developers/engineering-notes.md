@@ -140,4 +140,4 @@ Avoid a blanket `localStorage.clear()` in production — it removes unrelated vi
 
 * The drawn and rendered views are `aria-hidden`; every value they show is also published as text in the annunciator strip and the readouts beneath them.
 * Seats are real buttons with pressed state, the radio log is a polite live region, and zoom and pan are fully keyboard-driven.
-* **Reduced motion calms the ride rather than parking it.** Readings snap instead of easing and the camera stops drifting, but the ground keeps going past, because a train that is not moving is not running.
+* **Reduced motion calms the ride rather than parking it.** Readings ease more slowly, the camera drifts half as far, and the departure board still turns its flaps; shakes and flashes are off. The ground keeps going past, because a train that is not moving is not running.

@@ -75,7 +75,7 @@ The carriages light up front first, in proportion to how many of the 118 seats a
 
 ## Smooth, but never invented
 
-The market is read every 20 seconds; the train eases towards each new reading at the screen's frame rate. If you have asked your device for **reduced motion**, the camera stops drifting and values snap to each reading instead of easing.
+The market is read every 20 seconds; the train eases towards each new reading at the screen's frame rate. If you have asked your device for **reduced motion**, the camera drifts half as far and the readings ease in more slowly and gently.
 
 {% hint style="info" %}
 The crew can occasionally take the controls for show — the camera, the time of day or the weather — and every visitor sees it at once. They cannot change the length of the train or the grade: those always come from the market.

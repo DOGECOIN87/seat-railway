@@ -80,6 +80,6 @@ docs/                        this documentation
 * Every view animates off refs through **one** `requestAnimationFrame` loop, so the instruments never re-render React at 60 fps.
 * Polling pauses in background tabs and aborts superseded requests.
 * The 3D scene adapts its pixel ratio to measured render time, and React and three.js ship as separate cached chunks.
-* `prefers-reduced-motion` drops the animation loop: values snap, and the view is repainted on a slow cadence.
+* `prefers-reduced-motion` keeps the animation loop but softens it: slower easing, half the pitch and the camera's drift, and no shakes or flashes. The departure board still turns its flaps.
 
 The repository's own [README](https://github.com/DOGECOIN87/seat-railway#readme) and [`worker/README.md`](https://github.com/DOGECOIN87/seat-railway/blob/main/worker/README.md) go deeper on every decision here.

@@ -71,8 +71,10 @@ function layout(phrase: readonly string[], rows: number, cols: number): number[]
 /** What a drum position prints. Blank prints nothing rather than a space. */
 const face = (at: number) => (at === BLANK ? '' : DRUM[at]);
 
-const prefersStill = () =>
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* The railway's board turns its flaps whatever the motion preference: it is
+   the brand's opening moment, a few seconds of small flaps, not a shake or a
+   flash. */
+const prefersStill = () => false;
 
 /** One character cell, and everything the loop needs to turn it. */
 interface Drum {
